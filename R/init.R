@@ -10,6 +10,7 @@ init_report <- function(path = ".", force = FALSE) {
 
     init_clean(file.path(path, "chapters"), force)
     init_clean(file.path(path, ".git"), force)
+    init_clean(file.path(path, "report.org"), force)
 
     repo <- git2r::init(path)
     do_init(report, path, repo)
@@ -42,9 +43,15 @@ do_init <- function(x, path, repo) UseMethod("do_init")
 
 do_init.report <- function(x, path, repo) {
     git2r::add(repo, file.path(path, "report.yml"))
+
+    filename <- file.path(path, "report.org")
+    writeLines(to_orgmode(x), con = filename)
+    git2r::add(repo, filename)
+
     path <- file.path(path, "chapters")
     dir.create(path)
     do_init(x$chapters, path, repo)
+
     invisible()
 }
 
@@ -58,7 +65,7 @@ do_init.chapter <- function(x, path, repo) {
     dir.create(path)
 
     filename <- file.path(path, "text.tex")
-    writeLines(lorem_ipsum(), con = filename)
+    writeLines(lorem_ipsum(x$title), con = filename)
     git2r::add(repo, filename)
 
     invisible()
@@ -70,11 +77,11 @@ lorem_ipsum <- function(title) {
       "",
       "\\section*{Heading 1}",
       "",
-      lorem_ipsum(),
+      lorem_ipsum_paragraph(),
       "",
       "\\subsection*{Heading 2}",
       "",
-      lorem_ipsum())
+      lorem_ipsum_paragraph())
 }
 
 ##' @keywords internal
@@ -86,4 +93,34 @@ lorem_ipsum_paragraph <- function() {
       "reprehenderit in voluptate velit esse cillum dolore eu fugiat",
       "nulla pariatur. Excepteur sint occaecat cupidatat non proident,",
       "sunt in culpa qui officia deserunt mollit anim id est laborum.")
+}
+
+##' @keywords internal
+to_orgmode <- function(x) UseMethod("to_orgmode")
+
+to_orgmode.report <- function(x) {
+    c("#+TODO: TODO(t!) UPDATE(u!) SUBMITTED(s!) CONVERTED(c!) AUTHOR-FEEDBACK(a!) TYPESET(y!) PROOF(p!) AUTHOR-OK(o!) REVIEW(r!) EDITOR(e!) | DONE(d@/!)",
+      "#+STARTUP: indent",
+      "#+STARTUP: hidestars",
+      paste0("#+TITLE: ", x$report),
+      "",
+      "* Time",
+      "#+BEGIN: clocktable :maxlevel 2 :scope file",
+      "#+CAPTION: Clock summary at [2015-12-20 Sun 21:28]",
+      "| Headline                 | Time   |      |",
+      "|--------------------------+--------+------|",
+      "| *Total time*             | *0:00* |      |",
+      "|--------------------------+--------+------|",
+      "| Chapters                 | 0:00   |      |",
+      "#+END:",
+      "",
+      to_orgmode(x$chapters))
+}
+
+to_orgmode.chapters <- function(x) {
+    c("* Chapters [%]", sapply(x, function(y) to_orgmode(y)))
+}
+
+to_orgmode.chapter <- function(x) {
+    paste0("** TODO ", x$title)
 }
