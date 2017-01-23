@@ -84,3 +84,31 @@ print.authors <- function(x, ..., indent = "") {
     lapply(x, print, indent = paste0(indent, "  "))
     invisible()
 }
+
+##' @export
+as.data.frame.report <- function(x, ...) {
+    as.data.frame(x$chapters)
+}
+
+as.data.frame.chapters <- function(x, ...) {
+    do.call("rbind", lapply(x, function(y) as.data.frame(y)))
+}
+
+as.data.frame.chapter <- function(x, ...) {
+    cbind(chapter = x$title,
+          rbind(as.data.frame(x$authors), as.data.frame(x$contacts)))
+}
+
+as.data.frame.authors <- function(x) {
+    cbind(role = "Author",
+          do.call("rbind", lapply(x, function(y) as.data.frame(y))))
+}
+
+as.data.frame.contacts <- function(x) {
+    cbind(role = "Contact",
+          do.call("rbind", lapply(x, function(y) as.data.frame(y))))
+}
+
+as.data.frame.contributor <- function(x) {
+    data.frame(name = x$name, email = x$email, organisation = x$organisation)
+}
