@@ -6,7 +6,7 @@
 load_report <- function(path = ".") {
     path <- normalizePath(path, mustWork = TRUE)
     r <- yaml.load_file(file.path(path, "report.yml"))
-
+    r$path <- path
     class(r) <- "report"
 
     class(r$contributors) <- "contributors"
@@ -15,6 +15,8 @@ load_report <- function(path = ".") {
 
     class(r$chapters) <- "chapters"
     for (i in seq_len(length(r$chapters))) {
+        path <- file.path(r$path, "chapters", r$chapters[[i]]$title)
+        r$chapters[[i]]$path <- path
         class(r$chapters[[i]]) <- "chapter"
 
         class(r$chapters[[i]]$contacts) <- "contacts"
