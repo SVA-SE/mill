@@ -57,25 +57,28 @@ do_init.chapter <- function(x, path, repo) {
     path <- file.path(path, x$title)
     dir.create(path)
 
-    lines <- c(paste0("\\chapter*{", x$title, "}"),
-               "",
-               "\\section*{Heading 1}",
-               "",
-               lorem_ipsum(),
-               "",
-               "\\subsection*{Heading 2}",
-               "",
-               lorem_ipsum())
-
     filename <- file.path(path, "text.tex")
-    writeLines(lines, con = filename)
+    writeLines(lorem_ipsum(), con = filename)
     git2r::add(repo, filename)
 
     invisible()
 }
 
 ##' @keywords internal
-lorem_ipsum <- function() {
+lorem_ipsum <- function(title) {
+    c(paste0("\\chapter*{", title, "}"),
+      "",
+      "\\section*{Heading 1}",
+      "",
+      lorem_ipsum(),
+      "",
+      "\\subsection*{Heading 2}",
+      "",
+      lorem_ipsum())
+}
+
+##' @keywords internal
+lorem_ipsum_paragraph <- function() {
     c("Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do",
       "eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut",
       "enim ad minim veniam, quis nostrud exercitation ullamco laboris",
