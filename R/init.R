@@ -5,15 +5,14 @@
 ##'     exists and force equals FALSE.
 ##' @export
 init_report <- function(path = ".", force = FALSE) {
-    path <- normalizePath(path, mustWork = TRUE)
     report <- load_report(path)
 
-    init_clean(file.path(path, "chapters"), force)
-    init_clean(file.path(path, ".git"), force)
-    init_clean(file.path(path, "report.org"), force)
+    init_clean(file.path(report$path, "chapters"), force)
+    init_clean(file.path(report$path, ".git"), force)
+    init_clean(file.path(report$path, "report.org"), force)
 
-    repo <- git2r::init(path)
-    do_init(report, path, repo)
+    repo <- git2r::init(report$path)
+    do_init(report, repo)
     git2r::commit(repo, "Initial repository")
 
     invisible(report)
@@ -39,35 +38,30 @@ init_clean <- function(path, force) {
 
 ##' @importFrom git2r init
 ##' @keywords internal
-do_init <- function(x, path, repo) UseMethod("do_init")
+do_init <- function(x, repo) UseMethod("do_init")
 
-do_init.report <- function(x, path, repo) {
-    git2r::add(repo, file.path(path, "report.yml"))
+do_init.report <- function(x, repo) {
+    git2r::add(repo, file.path(x$path, "report.yml"))
 
-    filename <- file.path(path, "report.org")
+    filename <- file.path(x$path, "report.org")
     writeLines(to_orgmode(x), con = filename)
     git2r::add(repo, filename)
 
-    path <- file.path(path, "chapters")
-    dir.create(path)
-    do_init(x$chapters, path, repo)
+    do_init(x$chapters, repo)
 
     invisible()
 }
 
-do_init.chapters <- function(x, path, repo) {
-    lapply(x, function(y) do_init(y, path, repo))
+do_init.chapters <- function(x, repo) {
+    lapply(x, function(y) do_init(y, repo))
     invisible()
 }
 
-do_init.chapter <- function(x, path, repo) {
-    path <- file.path(path, x$title)
-    dir.create(path)
-
-    filename <- file.path(path, "text.tex")
+do_init.chapter <- function(x, repo) {
+    dir.create(x$path, recursive = TRUE)
+    filename <- file.path(x$path, "text.tex")
     writeLines(lorem_ipsum(x$title), con = filename)
     git2r::add(repo, filename)
-
     invisible()
 }
 
