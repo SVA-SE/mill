@@ -4,7 +4,7 @@
 ##' @param force The method fails if the folder structure already
 ##'     exists and force equals FALSE.
 ##' @export
-init_report <- function(path = ".", force = FALSE) {
+init_report <- function(path = ".", import = NULL, force = FALSE) {
     report <- load_report(path)
 
     init_clean(file.path(report$path, "chapters"), force)
@@ -12,7 +12,7 @@ init_report <- function(path = ".", force = FALSE) {
     init_clean(file.path(report$path, "report.org"), force)
 
     repo <- git2r::init(report$path)
-    do_init(report, repo)
+    do_init(report, repo, import)
     git2r::commit(repo, "Initial repository")
 
     invisible(report)
@@ -38,29 +38,46 @@ init_clean <- function(path, force) {
 
 ##' @importFrom git2r init
 ##' @keywords internal
-do_init <- function(x, repo) UseMethod("do_init")
+do_init <- function(x, repo, import) UseMethod("do_init")
 
-do_init.report <- function(x, repo) {
+do_init.report <- function(x, repo, import) {
     git2r::add(repo, file.path(x$path, "report.yml"))
 
     filename <- file.path(x$path, "report.org")
     writeLines(to_orgmode(x), con = filename)
     git2r::add(repo, filename)
 
-    do_init(x$chapters, repo)
+    do_init(x$chapters, repo, import)
 
     invisible()
 }
 
-do_init.chapters <- function(x, repo) {
-    lapply(x, function(y) do_init(y, repo))
+do_init.chapters <- function(x, repo, import) {
+    lapply(x, function(y) do_init(y, repo, import))
     invisible()
 }
 
-do_init.chapter <- function(x, repo) {
+do_init.chapter <- function(x, repo, import) {
     dir.create(x$path, recursive = TRUE)
     filename <- file.path(x$path, "text.tex")
-    writeLines(lorem_ipsum(x$title), con = filename)
+
+    if (is.null(import)) {
+        writeLines(lorem_ipsum(x$title), con = filename)
+    } else {
+        from <- file.path(import, "chapters", from, "text.tex")
+        if (file.exists(from)) {
+            file.copy(from, filename)
+        } else {
+            from <- gsub("[[:space:]]", "_", x$title)
+            from <- file.path(import, "chapters", from, "text.tex")
+            if (file.exists(from)) {
+                file.copy(from, filename)
+            } else {
+                writeLines(lorem_ipsum(x$title), con = filename)
+            }
+        }
+    }    
+    
     git2r::add(repo, filename)
     invisible()
 }
