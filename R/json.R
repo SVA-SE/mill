@@ -1,47 +1,47 @@
 ##' @export
-json <- function(x) UseMethod("json")
+to_json <- function(x) UseMethod("to_json")
 
-json.default <- function(x) {
+to_json.default <- function(x) {
     key <- sub("^x[$]", "", deparse(substitute(x)))
     value <- x
     paste0("\"", key, "\":[\"", value, "\"]")
 }
 
 ##' @export
-json.report <- function(x) {
-    x <- c(json(x$report), json(x$contributors), json(x$chapters))
+to_json.report <- function(x) {
+    x <- c(to_json(x$report), to_json(x$contributors), to_json(x$chapters))
     x <- paste0(x, collapse = ",")
     paste0("{", x, "}")
 }
 
-json.contributors <- function(x) {
-    x <- paste0(sapply(x, function(y) json(y)), collapse = ",")
+to_json.contributors <- function(x) {
+    x <- paste0(sapply(x, function(y) to_json(y)), collapse = ",")
     paste0("\"contributors\":[", x, "]")
 }
 
-json.contributor <- function(x) {
-    x <- c(json(x$name), json(x$email), json(x$organisation))
+to_json.contributor <- function(x) {
+    x <- c(to_json(x$name), to_json(x$email), to_json(x$organisation))
     x <- paste0(x, collapse = ",")
     paste0("{", x, "}")
 }
 
-json.chapters <- function(x) {
-    x <- paste0(sapply(x, function(y) json(y)), collapse = ",")
+to_json.chapters <- function(x) {
+    x <- paste0(sapply(x, function(y) to_json(y)), collapse = ",")
     paste0("\"chapters\":[", x, "]")
 }
 
-json.chapter <- function(x) {
-    x <- c(json(x$title), json(x$contacts), json(x$authors))
+to_json.chapter <- function(x) {
+    x <- c(to_json(x$title), to_json(x$contacts), to_json(x$authors))
     x <- paste0(x, collapse = ",")
     paste0("{", x, "}")
 }
 
-json.contacts <- function(x) {
-    x <- paste0(sapply(x, function(y) json(y)), collapse = ",")
+to_json.contacts <- function(x) {
+    x <- paste0(sapply(x, function(y) to_json(y)), collapse = ",")
     paste0("\"contacts\":[", x, "]")
 }
 
-json.authors <- function(x) {
-    x <- paste0(sapply(x, function(y) json(y)), collapse = ",")
+to_json.authors <- function(x) {
+    x <- paste0(sapply(x, function(y) to_json(y)), collapse = ",")
     paste0("\"authors\":[", x, "]")
 }
