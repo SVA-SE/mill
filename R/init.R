@@ -1,6 +1,9 @@
 ##' Intialize the report folder structure
 ##'
 ##' @param path The path to the root folder of the project.
+##' @param import Import chapters from another report, where
+##'     \code{import} is the path to the root folder of the other
+##'     report.
 ##' @param force The method fails if the folder structure already
 ##'     exists and force equals FALSE.
 ##' @export

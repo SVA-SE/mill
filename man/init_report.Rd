@@ -4,10 +4,14 @@
 \alias{init_report}
 \title{Intialize the report folder structure}
 \usage{
-init_report(path = ".", force = FALSE)
+init_report(path = ".", import = NULL, force = FALSE)
 }
 \arguments{
 \item{path}{The path to the root folder of the project.}
+
+\item{import}{Import chapters from another report, where
+\code{import} is the path to the root folder of the other
+report.}
 
 \item{force}{The method fails if the folder structure already
 exists and force equals FALSE.}
