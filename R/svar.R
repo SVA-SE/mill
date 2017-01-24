@@ -34,7 +34,7 @@ load_report <- function(path = ".") {
 ##' @method summary report
 ##' @export
 summary.report <- function(object, ...) {
-    cat("Report: ", object$title, "\n\n", sep = "")
+    cat("Report: ", object$report, "\n\n", sep = "")
     print(object$contributors)
     cat("\n")
     print(object$chapters)
@@ -42,7 +42,7 @@ summary.report <- function(object, ...) {
 
 ##' @export
 print.report <- function(x, ...) {
-    cat("Report: ", x$title, "\n", sep = "")
+    cat("Report: ", x$report, "\n", sep = "")
     cat("Contributors: ", length(x$contributors), "\n", sep = "")
     cat("Chapters: ", length(x$chapters), "\n", sep = "")
 }

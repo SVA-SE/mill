@@ -9,7 +9,7 @@ json.default <- function(x) {
 
 ##' @export
 json.report <- function(x) {
-    x <- c(json(x$title), json(x$contributors), json(x$chapters))
+    x <- c(json(x$report), json(x$contributors), json(x$chapters))
     x <- paste0(x, collapse = ",")
     paste0("{", x, "}")
 }

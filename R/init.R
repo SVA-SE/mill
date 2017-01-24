@@ -116,7 +116,7 @@ to_orgmode.report <- function(x) {
     c("#+TODO: TODO(t!) UPDATE(u!) SUBMITTED(s!) CONVERTED(c!) AUTHOR-FEEDBACK(a!) TYPESET(y!) PROOF(p!) AUTHOR-OK(o!) REVIEW(r!) EDITOR(e!) | DONE(d@/!)",
       "#+STARTUP: indent",
       "#+STARTUP: hidestars",
-      paste0("#+TITLE: ", x$title),
+      paste0("#+TITLE: ", x$report),
       "",
       "* Time",
       "#+BEGIN: clocktable :maxlevel 2 :scope file",
