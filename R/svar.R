@@ -31,6 +31,7 @@ load_report <- function(path = ".") {
     r
 }
 
+##' @method summary report
 ##' @export
 summary.report <- function(object, ...) {
     cat("Report: ", object$report, "\n\n", sep = "")
