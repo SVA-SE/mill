@@ -76,8 +76,8 @@ do_init.chapter <- function(x, repo, import) {
                 writeLines(lorem_ipsum(x$title), con = filename)
             }
         }
-    }    
-    
+    }
+
     git2r::add(repo, filename)
     invisible()
 }
