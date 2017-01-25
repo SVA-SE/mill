@@ -101,6 +101,8 @@ Rproj_file <- function() {
       "LaTeX: pdfLaTeX")
 }
 
+##' Import a chapter from another report
+##'
 ##' @param from The path to the root folder of the other report to
 ##'     import the chapter from.
 ##' @param to The path of the chapter to import to.
