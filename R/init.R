@@ -45,6 +45,8 @@ init_clean <- function(path, force) {
 do_init <- function(x, repo, import) UseMethod("do_init")
 
 do_init.report <- function(x, repo, import) {
+    do_init(x$chapters, repo, import)
+
     git2r::add(repo, file.path(x$path, "report.yml"))
 
     filename <- file.path(x$path, ".gitignore")
@@ -58,8 +60,6 @@ do_init.report <- function(x, repo, import) {
     filename <- file.path(x$path, "report.org")
     writeLines(to_orgmode(x), con = filename)
     git2r::add(repo, filename)
-
-    do_init(x$chapters, repo, import)
 
     invisible()
 }
@@ -79,8 +79,26 @@ do_init.chapter <- function(x, repo, import) {
     filename <- file.path(x$path, "text.tex")
     if (!import_from(import, x$path, x$title, "text.tex"))
         writeLines(lorem_ipsum(x$title), con = filename)
-
     git2r::add(repo, filename)
+
+    if (!is.null(import)) {
+        files <- list.files(path = file.path(import, "chapters", x$title),
+                            pattern = paste0("^figure-[0-9]+[.]tex$"))
+        lapply(files, function(filename) {
+            file.copy(file.path(import, "chapters", x$title, filename),
+                      file.path(x$path, filename))
+            git2r::add(repo, file.path(x$path, filename))
+        })
+
+        files <- list.files(path = file.path(import, "chapters", x$title),
+                            pattern = paste0("^table-[0-9]+[.]tex$"))
+        lapply(files, function(filename) {
+            file.copy(file.path(import, "chapters", x$title, filename),
+                      file.path(x$path, filename))
+            git2r::add(repo, file.path(x$path, filename))
+        })
+    }
+
     invisible()
 }
 
