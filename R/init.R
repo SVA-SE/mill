@@ -64,25 +64,40 @@ do_init.chapter <- function(x, repo, import) {
     dir.create(x$path, recursive = TRUE)
     filename <- file.path(x$path, "text.tex")
 
-    if (is.null(import)) {
+    if (!import_from(import, x$path, x$title, "text.tex"))
         writeLines(lorem_ipsum(x$title), con = filename)
-    } else {
-        from <- file.path(import, "chapters", from, "text.tex")
-        if (file.exists(from)) {
-            file.copy(from, filename)
-        } else {
-            from <- gsub("[[:space:]]", "_", x$title)
-            from <- file.path(import, "chapters", from, "text.tex")
-            if (file.exists(from)) {
-                file.copy(from, filename)
-            } else {
-                writeLines(lorem_ipsum(x$title), con = filename)
-            }
-        }
-    }
 
     git2r::add(repo, filename)
     invisible()
+}
+
+##' @param from The path to the root folder of the other report to
+##'     import the chapter from.
+##' @param to The path of the chapter to import to.
+##' @param title The title of the chapter.
+##' @param filename The filename of the file to import.
+##' @return TRUE if the file to import existed, else FALSE.
+##' @keywords internal
+import_from <- function(from, to, title, filename) {
+    if (!is.null(from)) {
+        f_to <- file.path(to, filename)
+
+        f_from <- file.path(from, "chapters", title, filename)
+        if (file.exists(f_from)) {
+            file.copy(f_from, f_to)
+            return(TRUE)
+        }
+
+        ## Check if spaces have been replaced with underscores.
+        title <- gsub("[[:space:]]", "_", title)
+        f_from <- file.path(from, "chapters", title, filename)
+        if (file.exists(f_from)) {
+            file.copy(f_from, f_to)
+            return(TRUE)
+        }
+    }
+
+    return(FALSE)
 }
 
 ##' @keywords internal
