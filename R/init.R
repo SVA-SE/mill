@@ -181,7 +181,7 @@ to_orgmode.chapters <- function(x) {
 to_orgmode.chapter <- function(x) {
     paste0("** TODO [[file:chapters/",
            gsub("[[:space:]]", "%20", x$title),
-           "][",
+           "/text.tex][",
            x$title,
           "]]")
 }
