@@ -194,7 +194,7 @@ to_orgmode.report <- function(x) {
 }
 
 to_orgmode.chapters <- function(x) {
-    c("* [[file+emacs:chapters][Chapters]] [%]",
+    c("* [[file+emacs:chapters][Chapters]] [0%]",
       unlist(lapply(x, function(y) to_orgmode(y))))
 }
 
