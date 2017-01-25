@@ -71,8 +71,12 @@ do_init.chapters <- function(x, repo, import) {
 
 do_init.chapter <- function(x, repo, import) {
     dir.create(x$path, recursive = TRUE)
-    filename <- file.path(x$path, "text.tex")
 
+    filename <- file.path(x$path, ".gitignore")
+    writeLines("text.log", con = filename)
+    git2r::add(repo, filename)
+
+    filename <- file.path(x$path, "text.tex")
     if (!import_from(import, x$path, x$title, "text.tex"))
         writeLines(lorem_ipsum(x$title), con = filename)
 
