@@ -51,6 +51,10 @@ do_init.report <- function(x, repo, import) {
     writeLines("", con = filename)
     git2r::add(repo, filename)
 
+    filename <- file.path(x$path, "report.Rproj")
+    writeLines(Rproj_file(), con = filename)
+    git2r::add(repo, filename)
+
     filename <- file.path(x$path, "report.org")
     writeLines(to_orgmode(x), con = filename)
     git2r::add(repo, filename)
@@ -74,6 +78,23 @@ do_init.chapter <- function(x, repo, import) {
 
     git2r::add(repo, filename)
     invisible()
+}
+
+##' @keywords internal
+Rproj_file <- function() {
+    c("Version: 1.0",
+      "",
+      "RestoreWorkspace: No",
+      "SaveWorkspace: No",
+      "AlwaysSaveHistory: No",
+      "",
+      "EnableCodeIndexing: Yes",
+      "UseSpacesForTab: Yes",
+      "NumSpacesForTab: 2",
+      "Encoding: UTF-8",
+      "",
+      "RnwWeave: Sweave",
+      "LaTeX: pdfLaTeX")
 }
 
 ##' @param from The path to the root folder of the other report to
