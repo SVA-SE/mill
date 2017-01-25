@@ -10,8 +10,9 @@
 init_report <- function(path = ".", import = NULL, force = FALSE) {
     report <- load_report(path)
 
-    init_clean(file.path(report$path, "chapters"), force)
     init_clean(file.path(report$path, ".git"), force)
+    init_clean(file.path(report$path, ".gitignore"), force)
+    init_clean(file.path(report$path, "chapters"), force)
     init_clean(file.path(report$path, "report.org"), force)
 
     repo <- git2r::init(report$path)
@@ -45,6 +46,10 @@ do_init <- function(x, repo, import) UseMethod("do_init")
 
 do_init.report <- function(x, repo, import) {
     git2r::add(repo, file.path(x$path, "report.yml"))
+
+    filename <- file.path(x$path, ".gitignore")
+    writeLines("", con = filename)
+    git2r::add(repo, filename)
 
     filename <- file.path(x$path, "report.org")
     writeLines(to_orgmode(x), con = filename)
