@@ -2,6 +2,7 @@
 % Please edit documentation in R/init.R
 \name{import_from}
 \alias{import_from}
+\title{Import a chapter from another report}
 \usage{
 import_from(from, to, title, filename)
 }
@@ -17,6 +18,9 @@ import the chapter from.}
 }
 \value{
 TRUE if the file to import existed, else FALSE.
+}
+\description{
+Import a chapter from another report
 }
 \keyword{internal}
 
