@@ -158,11 +158,7 @@ lorem_ipsum_paragraph <- function() {
 to_orgmode <- function(x) UseMethod("to_orgmode")
 
 to_orgmode.report <- function(x) {
-    c("#+TODO: TODO(t!) UPDATE(u!) SUBMITTED(s!) CONVERTED(c!) AUTHOR-FEEDBACK(a!) TYPESET(y!) PROOF(p!) AUTHOR-OK(o!) REVIEW(r!) EDITOR(e!) | DONE(d@/!)",
-      "#+STARTUP: indent",
-      "#+STARTUP: hidestars",
-      paste0("#+TITLE: ", x$report),
-      "",
+    c(to_orgmode(x$chapters),
       "* Time",
       "#+BEGIN: clocktable :maxlevel 2 :scope file",
       "#+CAPTION: Clock summary at [2015-12-20 Sun 21:28]",
@@ -170,8 +166,11 @@ to_orgmode.report <- function(x) {
       "|--------------+--------|",
       "| *Total time* | *0:00* |",
       "#+END:",
-      "",
-      to_orgmode(x$chapters))
+      "* Org-mode configuration",
+      "#+TODO: TODO(t!) UPDATE(u!) SUBMITTED(s!) CONVERTED(c!) AUTHOR-FEEDBACK(a!) TYPESET(y!) PROOF(p!) AUTHOR-OK(o!) REVIEW(r!) EDITOR(e!) | DONE(d@/!)",
+      "#+STARTUP: indent",
+      "#+STARTUP: hidestars",
+      paste0("#+TITLE: ", x$report))
 }
 
 to_orgmode.chapters <- function(x) {
