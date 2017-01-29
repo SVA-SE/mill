@@ -81,25 +81,23 @@ do_init.chapter <- function(x, repo, import) {
         writeLines(lorem_ipsum(x$title), con = filename)
     git2r::add(repo, filename)
 
+    import_text_input(x, repo, import, "^figure-[^.]+[.](tex)|(R)|(csv)$")
+    import_text_input(x, repo, import, "^table-[^.]+[.]tex$")
+
+    invisible()
+}
+
+##' @keywords internal
+import_text_input <- function(x, repo, import, pattern) {
     if (!is.null(import)) {
         files <- list.files(path = file.path(import, "chapters", x$title),
-                            pattern = paste0("^figure-[0-9]+[.]tex$"))
-        lapply(files, function(filename) {
-            file.copy(file.path(import, "chapters", x$title, filename),
-                      file.path(x$path, filename))
-            git2r::add(repo, file.path(x$path, filename))
-        })
-
-        files <- list.files(path = file.path(import, "chapters", x$title),
-                            pattern = paste0("^table-[0-9]+[.]tex$"))
+                            pattern = pattern)
         lapply(files, function(filename) {
             file.copy(file.path(import, "chapters", x$title, filename),
                       file.path(x$path, filename))
             git2r::add(repo, file.path(x$path, filename))
         })
     }
-
-    invisible()
 }
 
 ##' @keywords internal
