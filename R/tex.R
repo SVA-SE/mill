@@ -19,13 +19,13 @@ clean_tex <- function(tex) {
     ## Simplify
     ## e.g. \ref{fig:some-chapter:4}
     ## to \ref{fig:4}
-    pattern <- "[\\]ref[{]fig:[^:]*:([0-9]*)[}]"
+    pattern <- "[\\]ref[{]fig:[^:]*:([^}]*)[}]"
     tex <- gsub(pattern, "\\\\ref{fig:\\1}", tex)
 
     ## Simplify
     ## e.g. \ref{tab:some-chapter:4}
     ## to \ref{tab:4}
-    pattern <- "[\\]ref[{]tab:[^:]*:([0-9]*)[}]"
+    pattern <- "[\\]ref[{]tab:[^:]*:([^}]*)[}]"
     tex <- gsub(pattern, "\\\\ref{tab:\\1}", tex)
 
     ## Remove '\\\\'
