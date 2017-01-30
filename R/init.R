@@ -202,8 +202,8 @@ to_orgmode.chapter <- function(x) {
                     "][", x$title, "]]")
 
     lines <- c(lines,
-               orgmode_file_items(x$path, x$title, "table"),
-               orgmode_file_items(x$path, x$title, "figure"))
+               orgmode_file_items(x$path, x$title, "figure"),
+               orgmode_file_items(x$path, x$title, "table"))
 
     lines
 }
