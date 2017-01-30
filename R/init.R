@@ -213,7 +213,7 @@ orgmode_file_items <- function(path, title, file_type) {
     items <- character()
 
     files <- list.files(path = path,
-                        pattern = paste0("^", file_type, "-[0-9]+[.]tex$"))
+                        pattern = paste0("^", file_type, "-[^.]+[.]tex$"))
 
     if (length(files)) {
         items <- sapply(files, function(filename) {
