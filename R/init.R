@@ -73,6 +73,7 @@ do_init.chapter <- function(x, repo, import) {
     dir.create(x$path, recursive = TRUE)
 
     filename <- file.path(x$path, ".gitignore")
+    writeLines("auto", con = filename)
     writeLines("text.log", con = filename)
     git2r::add(repo, filename)
 
