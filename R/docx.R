@@ -1,4 +1,34 @@
 ##' @export
+export_docx <- function(x, to) UseMethod("export_docx")
+
+##' @export
+export_docx.report <- function(x, to) {
+    export_docx(x$chapters, to)
+    invisible()
+}
+
+##' @export
+export_docx.chapters <- function(x, to) {
+    lapply(x, function(y) export_docx(y, file.path(to, "chapters")))
+    invisible()
+}
+
+##' @export
+export_docx.chapter <- function(x, to) {
+    from <- paste0(file.path(x$path, x$title), ".docx")
+    if (!file.exists(from))
+        to_docx(x)
+
+    to <- file.path(to, x$title)
+    if (!dir.exists(to))
+        dir.create(to, recursive = TRUE)
+    to <- paste0(file.path(to, x$title), ".docx")
+    file.copy(from, to, overwrite = TRUE)
+        
+    invisible()
+}
+
+##' @export
 to_docx <- function(x) UseMethod("to_docx")
 
 ##' @export
