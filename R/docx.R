@@ -48,5 +48,8 @@ to_docx.chapter <- function(x) {
     tex <- clean_tex(readLines(file.path(x$path, "text.tex")))
     filename <- tempfile(pattern = "text-", tmpdir = x$path, fileext = ".tex")
     writeLines(tex, con = filename)
+    unlink(file.path(x$path, "text.docx"))
+    system(paste0("pandoc ", filename, " -o text.docx"))
+    unlink(filename)
     invisible()
 }
