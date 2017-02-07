@@ -45,6 +45,8 @@ to_docx.chapters <- function(x) {
 
 ##' @export
 to_docx.chapter <- function(x) {
-    stop("Not implemented")
+    tex <- clean_tex(readLines(file.path(x$path, "text.tex")))
+    filename <- tempfile(pattern = "text-", tmpdir = x$path, fileext = ".tex")
+    writeLines(tex, con = filename)
     invisible()
 }
