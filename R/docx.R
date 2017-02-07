@@ -46,10 +46,11 @@ to_docx.chapters <- function(x) {
 ##' @export
 to_docx.chapter <- function(x) {
     tex <- clean_tex(readLines(file.path(x$path, "text.tex")))
-    filename <- tempfile(pattern = "text-", tmpdir = x$path, fileext = ".tex")
-    writeLines(tex, con = filename)
-    unlink(file.path(x$path, "text.docx"))
-    system(paste0("pandoc ", filename, " -o text.docx"))
+    f_tex <- tempfile(pattern = "text-", tmpdir = x$path, fileext = ".tex")
+    writeLines(tex, con = f_tex)
+    f_docx <- file.path(x$path, "text.docx")
+    unlink(f_docx)
+    system(paste0("pandoc \"", f_tex, "\" -o \"", f_docx, "\""))
     unlink(filename)
     invisible()
 }
