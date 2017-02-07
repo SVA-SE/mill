@@ -51,6 +51,6 @@ to_docx.chapter <- function(x) {
     f_docx <- file.path(x$path, "text.docx")
     unlink(f_docx)
     system(paste0("pandoc \"", f_tex, "\" -o \"", f_docx, "\""))
-    unlink(filename)
+    unlink(f_tex)
     invisible()
 }
