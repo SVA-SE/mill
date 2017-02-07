@@ -15,7 +15,7 @@ export_docx.chapters <- function(x, to) {
 
 ##' @export
 export_docx.chapter <- function(x, to) {
-    from <- paste0(file.path(x$path, x$title), ".docx")
+    from <- file.path(x$path, "text.docx")
     if (!file.exists(from))
         to_docx(x)
 
