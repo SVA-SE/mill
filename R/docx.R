@@ -66,7 +66,7 @@ to_docx.chapter <- function(x, repo = NULL, ...) {
     on.exit(unlink(f_tex))
     f_docx <- file.path(x$path, "text.docx")
     unlink(f_docx)
-    system(paste0("pandoc \"", f_tex, "\" -o \"", f_docx, "\""))
+    pandoc(paste0("\"", f_tex, "\" -o \"", f_docx, "\""))
     if (!is.null(repo))
         git2r::add(repo, f_docx)
     invisible()
