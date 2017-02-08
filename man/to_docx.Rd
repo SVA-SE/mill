@@ -4,15 +4,21 @@
 \alias{to_docx}
 \title{Convert from tex to docx}
 \usage{
-to_docx(x)
+to_docx(x, ...)
 }
 \arguments{
 \item{x}{The object to convert.}
+
+\item{...}{Additional arguments.}
+
+\item{repo}{The git repository to add the 'docx' to.}
 }
 \value{
 invisible NULL.
 }
 \description{
 Use pandoc (http://pandoc.org/) to convert from 'tex' to
-'docx'. The chapter 'text.tex' is converted to 'text.docx'.
+'docx'. The chapter 'text.tex' is converted to 'text.docx'. Each
+chapter 'text.docx' is added, but not commited, to the report git
+repository.
 }
