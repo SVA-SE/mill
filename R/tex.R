@@ -1,5 +1,12 @@
+##' Clean a chapter 'text.tex' file
+##'
+##' Clean a chapter 'text.tex' file and save result to temporary file.
+##' @param path The path to the chapter.
+##' @return The filename to the temporary file.
 ##' @keywords internal
-clean_tex <- function(tex) {
+clean_tex <- function(path) {
+    tex <- readLines(file.path(path, "text.tex"))
+
     ## Remove \begin{multicols}
     pattern <- "[\\]begin[{]multicols[}][{]2[}]"
     tex <- gsub(pattern, "", tex)
@@ -41,5 +48,7 @@ clean_tex <- function(tex) {
     pattern <- "^[\\]includepicture[{][^}]*[}][{][^}]*[}][{][^}]*[}]$"
     tex <- gsub(pattern, "", tex)
 
-    tex
+    filename <- tempfile(pattern = "text-", tmpdir = path, fileext = ".tex")
+    writeLines(tex, con = filename)
+    filename
 }

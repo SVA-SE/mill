@@ -62,14 +62,12 @@ to_docx.chapters <- function(x, repo = NULL, ...) {
 to_docx.chapter <- function(x, repo = NULL, ...) {
     if (length(list(...)) > 0)
         warning("Additional arguments ignored")
-    tex <- clean_tex(readLines(file.path(x$path, "text.tex")))
-    f_tex <- tempfile(pattern = "text-", tmpdir = x$path, fileext = ".tex")
-    writeLines(tex, con = f_tex)
+    f_tex <- clean_tex(x$path)
+    on.exit(unlink(f_tex))
     f_docx <- file.path(x$path, "text.docx")
     unlink(f_docx)
     system(paste0("pandoc \"", f_tex, "\" -o \"", f_docx, "\""))
     if (!is.null(repo))
         git2r::add(repo, f_docx)
-    unlink(f_tex)
     invisible()
 }
