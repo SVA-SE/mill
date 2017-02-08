@@ -6,6 +6,8 @@
 ##'     report.
 ##' @param force The method fails if the folder structure already
 ##'     exists and force equals FALSE.
+##' @importFrom git2r commit
+##' @importFrom git2r init
 ##' @export
 init_report <- function(path = ".", import = NULL, force = FALSE) {
     report <- load_report(path)
@@ -40,10 +42,18 @@ init_clean <- function(path, force) {
     invisible()
 }
 
-##' @importFrom git2r init
+##' Initialize a report structure
+##'
+##' @param x The report object to initialize.
+##' @param repo The git repository to add the report to.
+##' @param import The root path to another report to import chapters
+##'     from.
+##' @return invisible NULL.
+##' @importFrom git2r add
 ##' @keywords internal
 do_init <- function(x, repo, import) UseMethod("do_init")
 
+##' @keywords internal
 do_init.report <- function(x, repo, import) {
     do_init(x$chapters, repo, import)
 
@@ -64,11 +74,13 @@ do_init.report <- function(x, repo, import) {
     invisible()
 }
 
+##' @keywords internal
 do_init.chapters <- function(x, repo, import) {
     lapply(x, function(y) do_init(y, repo, import))
     invisible()
 }
 
+##' @keywords internal
 do_init.chapter <- function(x, repo, import) {
     dir.create(x$path, recursive = TRUE)
 

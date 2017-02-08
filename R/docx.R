@@ -24,10 +24,16 @@ export_docx.chapter <- function(x, to) {
         dir.create(to, recursive = TRUE)
     to <- paste0(file.path(to, x$title), ".docx")
     file.copy(from, to, overwrite = TRUE)
-        
+
     invisible()
 }
 
+##' Convert from tex to docx
+##'
+##' Use pandoc (http://pandoc.org/) to convert from 'tex' to
+##' 'docx'. The chapter 'text.tex' is converted to 'text.docx'.
+##' @param x The object to convert.
+##' @return invisible NULL.
 ##' @export
 to_docx <- function(x) UseMethod("to_docx")
 
