@@ -46,13 +46,11 @@ to_docx <- function(x, ...) UseMethod("to_docx")
 to_docx.report <- function(x, ...) {
     if (length(list(...)) > 0)
         warning("Additional arguments ignored")
-    repo <- git2r::repository(x$path)
-    to_docx(x$chapters, repo)
-    invisible()
+    to_docx(x$chapters, repo = git2r::repository(x$path))
 }
 
 ##' @export
-to_docx.chapters <- function(x, repo, ...) {
+to_docx.chapters <- function(x, repo = NULL, ...) {
     if (length(list(...)) > 0)
         warning("Additional arguments ignored")
     lapply(x, function(y) to_docx(y, repo))
@@ -61,7 +59,7 @@ to_docx.chapters <- function(x, repo, ...) {
 
 ##' @importFrom git2r add
 ##' @export
-to_docx.chapter <- function(x, repo, ...) {
+to_docx.chapter <- function(x, repo = NULL, ...) {
     if (length(list(...)) > 0)
         warning("Additional arguments ignored")
     tex <- clean_tex(readLines(file.path(x$path, "text.tex")))
@@ -70,7 +68,8 @@ to_docx.chapter <- function(x, repo, ...) {
     f_docx <- file.path(x$path, "text.docx")
     unlink(f_docx)
     system(paste0("pandoc \"", f_tex, "\" -o \"", f_docx, "\""))
-    git2r::add(repo, f_docx)
+    if (!is.null(repo))
+        git2r::add(repo, f_docx)
     unlink(f_tex)
     invisible()
 }
