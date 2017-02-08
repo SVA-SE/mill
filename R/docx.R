@@ -41,6 +41,7 @@ export_docx.chapter <- function(x, to) {
 ##' @export
 to_docx <- function(x, ...) UseMethod("to_docx")
 
+##' @importFrom git2r repository
 ##' @export
 to_docx.report <- function(x, ...) {
     if (length(list(...)) > 0)
@@ -58,6 +59,7 @@ to_docx.chapters <- function(x, repo, ...) {
     invisible()
 }
 
+##' @importFrom git2r add
 ##' @export
 to_docx.chapter <- function(x, repo, ...) {
     if (length(list(...)) > 0)
