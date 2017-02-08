@@ -23,4 +23,3 @@ TRUE if the file to import existed, else FALSE.
 Import a chapter from another report
 }
 \keyword{internal}
-

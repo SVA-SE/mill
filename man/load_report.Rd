@@ -12,4 +12,3 @@ load_report(path = ".")
 \description{
 Load configuration for the report
 }
-

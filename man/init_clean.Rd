@@ -19,4 +19,3 @@ invisible NULL
 Clean folder structure before init
 }
 \keyword{internal}
-

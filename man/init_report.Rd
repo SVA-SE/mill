@@ -19,4 +19,3 @@ exists and force equals FALSE.}
 \description{
 Intialize the report folder structure
 }
-
