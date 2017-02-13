@@ -28,6 +28,49 @@ export_docx.chapter <- function(x, to) {
     invisible()
 }
 
+##' Convert from docx to tex
+##'
+##' Use pandoc (http://pandoc.org/) to convert from 'docx' to
+##' 'tex'. The chapter 'text.docx' is converted to 'text.tex'. Each
+##' chapter 'text.tex' is added, but not commited, to the report git
+##' repository.
+##' @param x The object to convert.
+##' @param repo The git repository to add the 'tex' to.
+##' @param ... Additional arguments.
+##' @return invisible NULL.
+##' @export
+from_docx <- function(x, ...) UseMethod("from_docx")
+
+##' @importFrom git2r repository
+##' @export
+from_docx.report <- function(x, ...) {
+    if (length(list(...)) > 0)
+        warning("Additional arguments ignored")
+    from_docx(x$chapters, repo = git2r::repository(x$path))
+}
+
+##' @export
+from_docx.chapters <- function(x, repo = NULL, ...) {
+    if (length(list(...)) > 0)
+        warning("Additional arguments ignored")
+    lapply(x, function(y) from_docx(y, repo))
+    invisible()
+}
+
+##' @importFrom git2r add
+##' @export
+from_docx.chapter <- function(x, repo = NULL, ...) {
+    if (length(list(...)) > 0)
+        warning("Additional arguments ignored")
+    f_tex <- file.path(x$path, "text.tex")
+    unlink(f_tex)
+    f_docx <- file.path(x$path, "text.docx")
+    pandoc(paste0("\"", f_docx, "\" -o \"", f_tex, "\""))
+    if (!is.null(repo))
+        git2r::add(repo, f_tex)
+    invisible()
+}
+
 ##' Convert from tex to docx
 ##'
 ##' Use pandoc (http://pandoc.org/) to convert from 'tex' to
