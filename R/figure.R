@@ -17,26 +17,26 @@ figure_files.chapter <- function(x, fileext) {
 }
 
 ##' @export
-build_figures <- function(x) UseMethod("build_figures")
+build_figures <- function(x, png = FALSE) UseMethod("build_figures", ...)
 
 ##' @export
-build_figures.report <- function(x) {
+build_figures.report <- function(x, png) {
     build_figures(x$chapters)
 }
 
 ##' @export
-build_figures.chapters <- function(x) {
+build_figures.chapters <- function(x, png) {
     lapply(x, function(y) build_figures(y))
     invisible()
 }
 
 ##' @export
-build_figures.chapter <- function(x) {
+build_figures.chapter <- function(x, png) {
     lapply(figure_files(x, "R"), do_build_figure)
     invisible()
 }
 
 ##' @keywords internal
-do_build_figure <- function(figure) {
+do_build_figure <- function(figure, png) {
     source(figure, local = TRUE, chdir = TRUE)
 }
