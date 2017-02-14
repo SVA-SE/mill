@@ -94,7 +94,7 @@ do_init.chapter <- function(x, repo, import) {
         writeLines(lorem_ipsum(x$title), con = filename)
     git2r::add(repo, filename)
 
-    import_text_input(x, repo, import, "^figure-[^.]+[.](tex)|(R)|(csv)$")
+    import_text_input(x, repo, import, figure_pattern())
     import_text_input(x, repo, import, "^table-[^.]+[.]tex$")
 
     invisible()
