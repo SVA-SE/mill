@@ -77,7 +77,7 @@ do_preview_figure <- function(figure) {
              readLines(figure),
              readLines(file.path(assets, "figure-preview/snippet2.tex")))
     writeLines(tex, filename)
-    system(paste("cd ", fig_dir, ";lualatex ", basename(filename)))
+    system(paste("cd ", gsub(" ", "\\\\ ", fig_dir), ";lualatex ", basename(filename)))
     file.copy(paste0(tools::file_path_sans_ext(filename), ".pdf"),
               file.path(fig_dir, fig_name), overwrite = TRUE)
     unlink(paste0(tools::file_path_sans_ext(filename), "*"))
