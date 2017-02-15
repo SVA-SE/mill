@@ -1,3 +1,10 @@
+##' Export docx files
+##'
+##' @param x The object to export.
+##' @param to The destination of the export. If the argument is
+##'     missing, the docx files are exported to a folder named from
+##'     the report title.
+##' @return invisible NULL.
 ##' @export
 export_docx <- function(x, to) UseMethod("export_docx")
 
