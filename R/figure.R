@@ -93,10 +93,10 @@ assets <- function(filename) {
 ##'
 ##' @param texname Run LuaTeX on texname.
 ##' @keywords internal
-luatex <- function(filename) {
-    wd <- setwd(dirname(filename))
+luatex <- function(texname) {
+    wd <- setwd(dirname(texname))
     onexit(setwd(wd))
-    system(paste0("lualatex ", shQuote(basename(filename))))
+    system(paste0("lualatex ", shQuote(basename(texname))))
 }
 
 ##' @keywords internal
