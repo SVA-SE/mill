@@ -114,8 +114,7 @@ to_docx.chapters <- function(x, repo = NULL, ...) {
 to_docx.chapter <- function(x, repo = NULL, ...) {
     if (length(list(...)) > 0)
         warning("Additional arguments ignored")
-    f_tex <- clean_tex(x$path)
-    on.exit(unlink(f_tex))
+    f_tex <- file.path(x$path, "text.tex")
     f_docx <- file.path(x$path, "text.docx")
     unlink(f_docx)
     pandoc(paste0("\"", f_tex, "\" -o \"", f_docx, "\""))
