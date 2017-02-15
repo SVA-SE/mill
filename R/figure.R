@@ -6,7 +6,7 @@ figure_pattern <- function(fileext = c("all", "R", "tex", "csv", "pdf")) {
                       csv = "csv$",
                       tex = "tex$",
                       pdf = "pdf$")
-    
+
     paste0("^figure-[^.]+[.]", fileext)
 }
 
@@ -44,9 +44,6 @@ do_build_figure <- function(figure, png) {
     source(figure, local = TRUE, chdir = TRUE)
 }
 
-
-###########################################################33
-
 ##' @export
 preview_figures <- function(x) UseMethod("preview_figures")
 
@@ -67,18 +64,55 @@ preview_figures.chapter <- function(x) {
     invisible()
 }
 
+##' Embed a tex file in a context
+##'
+##' @param tex The tex file to embed.
+##' @param pre_tex A tex snippet to add before the tex file.
+##' @param post_tex A tex snippet to add after the tex file.
+##' @return The filename to the temporary file with the embeded tex.
+##' @keywords internal
+embed_tex <- function(tex, pre_tex, post_tex) {
+    filename <- tempfile(tmpdir = dirname(tex), fileext = ".tex")
+    writeLines(c(readLines(pre_tex), readLines(tex), readLines(post_tex)),
+               filename)
+    filename
+}
+
+##' Get the assets directory
+##'
+##' Determine the assets directory given a chapter file in the report
+##' project.
+##' @param filename The filename.
+##' @return path to the assets directory.
+##' @keywords internal
+assets <- function(filename) {
+    file.path(dirname(dirname(dirname(filename))), "assets")
+}
+
+##' Run LuaTeX
+##'
+##' @param texname Run LuaTeX on texname.
+##' @keywords internal
+luatex <- function(filename) {
+    wd <- setwd(dirname(filename))
+    onexit(setwd(wd))
+    system(paste0("lualatex ", shQuote(basename(filename))))
+}
+
 ##' @keywords internal
 do_preview_figure <- function(figure) {
-    fig_dir <- dirname(figure)
-    fig_name <- paste0("preview-", tools::file_path_sans_ext(basename(figure)), ".pdf")
-    filename <- tempfile(tmpdir = fig_dir, fileext = ".tex")
-    assets <- file.path(dirname(dirname(fig_dir)), "assets")
-    tex <- c(readLines(file.path(assets, "figure-preview/snippet1.tex")),
-             readLines(figure),
-             readLines(file.path(assets, "figure-preview/snippet2.tex")))
-    writeLines(tex, filename)
-    system(paste("cd ", gsub(" ", "\\\\ ", fig_dir), ";lualatex ", basename(filename)))
-    file.copy(paste0(tools::file_path_sans_ext(filename), ".pdf"),
-              file.path(fig_dir, fig_name), overwrite = TRUE)
-    unlink(paste0(tools::file_path_sans_ext(filename), "*"))
+    ## Create a tex file with the context to create a preview.
+    a <- assets(figure)
+    pre_tex <- file.path(a, "figure-preview/pre-snippet.tex")
+    post_tex <- file.path(a, "figure-preview/post-snippet.tex")
+    preview <- embed_tex(figure, pre_tex, post_tex)
+    onexit(unlink(paste0(tools::file_path_sans_ext(preview), "*")))
+
+    ## Build the preview pdf file.
+    luatex(preview)
+
+    ## Copy the pdf preview to 'preview-figure.pdf'
+    from <- paste0(tools::file_path_sans_ext(preview), ".pdf")
+    to <- paste0("preview-", tools::file_path_sans_ext(basename(figure)), ".pdf")
+    file.copy(from, file.path(dirname(figure), to), overwrite = TRUE)
 }
