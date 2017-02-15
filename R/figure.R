@@ -17,22 +17,22 @@ figure_files.chapter <- function(x, fileext) {
 }
 
 ##' @export
-build_figures <- function(x, png = FALSE) UseMethod("build_figures", ...)
+build_figures <- function(x, png) UseMethod("build_figures", ...)
 
 ##' @export
-build_figures.report <- function(x, png) {
-    build_figures(x$chapters)
+build_figures.report <- function(x, png = FALSE) {
+    build_figures(x$chapters, png)
 }
 
 ##' @export
-build_figures.chapters <- function(x, png) {
-    lapply(x, function(y) build_figures(y))
+build_figures.chapters <- function(x, png = FALSE) {
+    lapply(x, function(y) build_figures(y, png))
     invisible()
 }
 
 ##' @export
-build_figures.chapter <- function(x, png) {
-    lapply(figure_files(x, "R"), do_build_figure)
+build_figures.chapter <- function(x, png = FALSE) {
+    lapply(figure_files(x, "R"), do_build_figure, png)
     invisible()
 }
 
