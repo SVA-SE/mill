@@ -1,3 +1,10 @@
+##' Export docx files
+##'
+##' @param x The object to export.
+##' @param to The destination of the export. If the argument is
+##'     missing, the docx files are exported to a folder named from
+##'     the report title.
+##' @return invisible NULL.
 ##' @export
 export_docx <- function(x, to) UseMethod("export_docx")
 
@@ -107,8 +114,7 @@ to_docx.chapters <- function(x, repo = NULL, ...) {
 to_docx.chapter <- function(x, repo = NULL, ...) {
     if (length(list(...)) > 0)
         warning("Additional arguments ignored")
-    f_tex <- clean_tex(x$path)
-    on.exit(unlink(f_tex))
+    f_tex <- file.path(x$path, "text.tex")
     f_docx <- file.path(x$path, "text.docx")
     unlink(f_docx)
     pandoc(paste0("\"", f_tex, "\" -o \"", f_docx, "\""))
