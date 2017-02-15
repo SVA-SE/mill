@@ -1,9 +1,9 @@
 ##' @export
-export_docx <- function(x, to = NULL) UseMethod("export_docx")
+export_docx <- function(x, to) UseMethod("export_docx")
 
 ##' @export
 export_docx.report <- function(x, to) {
-    if (is.null(to))
+    if (missing(to))
         to <- x$report
     export_docx(x$chapters, to)
     invisible()
