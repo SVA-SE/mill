@@ -140,13 +140,12 @@ get_labels.report <- function(x) {
 ##' @export
 get_labels.chapters <- function(x) {
     lapply(x, function(y) get_labels(y))
-    invisible()
 }
 
 ##' @export
 get_labels.chapter <- function(x) {
-    lapply(figure_files(x, "tex"), get_label)
-    invisible()
+    labels <- lapply(figure_files(x, "tex"), get_label)
+    do.call("c", labels)
 }
 
 ##' Get the label from a figure path
@@ -164,5 +163,5 @@ get_label <- function(figure) {
         label <- substr(a[x], start[x], end[x])
         return(label)
     })
-    return(labels)
+    do.call("c", labels)
 }
