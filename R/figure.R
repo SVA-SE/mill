@@ -147,26 +147,31 @@ get_labels.chapters <- function(x) {
 
 ##' @export
 get_labels.chapter <- function(x) {
-    sapply(figure_files(x, "tex"), get_label)
+    unlist(lapply(figure_files(x, "tex"), get_label))
 }
 
 ##' Get the label from a figure path
 ##'
 ##' @keywords internal
 get_label <- function(figure, format = c("latex", "word")) {
-    a <- readLines(figure)
-    pos <- regexpr("\\\\label\\{(.*)\\}", a, perl =TRUE)
-    start <- attr(pos, "capture.start")
-    end <- start + attr(pos, "capture.length") -1
-    match <- start != -1
-    if (length(which(match)) == 0)
-        return(NULL)
-    sapply(which(match), function(x) {
-        label <- substr(a[x], start[x], end[x])
-        if (identical(format, "word")) {
+    format <- match.arg(format)
+    tex <- readLines(figure)
+    m <- regmatches(tex, regexec("[\\]label[{]([^}]*)", tex))
+    labels <- unlist(lapply(m, function(x) {if (length(x)) x[2] else x}))
+    format_labels(labels, format)
+}
+
+##' Format the label from a figure path
+##'
+##' @keywords internal
+format_labels <- function(labels, format = c("latex", "word")) {
+    format <- match.arg(format)
+    if (identical(format, "word")) {
+        labels <- unlist(lapply(labels, function(label) {
             a <- strsplit(label, ":")[[1]]
-            label <- paste(a[1], a[length(a)], sep = ":")
-        }
-        return(label)
-    })
+            paste(a[1], a[length(a)], sep = ":")
+        }))
+        return(labels)
+    }
+    return(labels)
 }
