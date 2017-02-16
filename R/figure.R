@@ -92,11 +92,25 @@ assets <- function(filename) {
 ##' Run LuaTeX
 ##'
 ##' @param texname Run LuaTeX on texname.
+##' @param clean logical. If \code{TRUE}, auxiliary files (aux, log)
+##'     created by LuaTeX are removed.
+##' @return invisible NULL.
 ##' @keywords internal
-luatex <- function(texname) {
+luatex <- function(texname, clean = TRUE) {
     wd <- setwd(dirname(texname))
     onexit(setwd(wd))
-    system(paste0("lualatex ", shQuote(basename(texname))))
+
+    texname <- basename(texname)
+    stopifnot(file.exists(texname))
+    system(paste0("lualatex ", shQuote(texname)))
+
+    if (identical(clean, TRUE)) {
+        f <- tools::file_path_sans_ext(texname)
+        file.remove(paste0(f, ".aux"))
+        file.remove(paste0(f, ".log"))
+    }
+
+    invisible()
 }
 
 ##' @keywords internal
@@ -106,7 +120,7 @@ do_preview_figure <- function(figure) {
     pre_tex <- file.path(a, "figure-preview/pre-snippet.tex")
     post_tex <- file.path(a, "figure-preview/post-snippet.tex")
     preview <- embed_tex(figure, pre_tex, post_tex)
-    onexit(unlink(paste0(tools::file_path_sans_ext(preview), "*")))
+    onexit(unlink(preview))
 
     ## Build the preview pdf file.
     luatex(preview)
