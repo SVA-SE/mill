@@ -85,7 +85,10 @@ preview_figures.chapter <- function(x) {
 ##' @keywords internal
 embed_tex <- function(tex, pre_tex, post_tex) {
     filename <- tempfile(tmpdir = dirname(tex), fileext = ".tex")
-    writeLines(c(readLines(pre_tex), readLines(tex), readLines(post_tex)),
+    writeLines(c(readLines(pre_tex),
+                 get_label(tex, "word"),
+                 readLines(tex),
+                 readLines(post_tex)),
                filename)
     filename
 }
@@ -144,14 +147,13 @@ get_labels.chapters <- function(x) {
 
 ##' @export
 get_labels.chapter <- function(x) {
-    labels <- lapply(figure_files(x, "tex"), get_label)
-    do.call("c", labels)
+    sapply(figure_files(x, "tex"), get_label)
 }
 
 ##' Get the label from a figure path
 ##'
 ##' @keywords internal
-get_label <- function(figure) {
+get_label <- function(figure, format = c("latex", "word")) {
     a <- readLines(figure)
     pos <- regexpr("\\\\label\\{(.*)\\}", a, perl =TRUE)
     start <- attr(pos, "capture.start")
@@ -159,9 +161,12 @@ get_label <- function(figure) {
     match <- start != -1
     if (length(which(match)) == 0)
         return(NULL)
-    labels <- lapply(which(match), function(x) {
+    sapply(which(match), function(x) {
         label <- substr(a[x], start[x], end[x])
+        if (identical(format, "word")) {
+            a <- strsplit(label, ":")[[1]]
+            label <- paste(a[1], a[length(a)], sep = ":")
+        }
         return(label)
     })
-    do.call("c", labels)
 }
