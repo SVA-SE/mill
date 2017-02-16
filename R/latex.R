@@ -1,13 +1,14 @@
 ##' Select a luatex system call
 ##'
-##' 
+##' @return character string, giving the luatex command to run. On
+##'     Windows: \code{texify --pdf --engine=luatex
+##'     --max-iterations=50}, else \code{lualatex}.
 ##' @keywords internal
-select_luatex <- function() {
+luatex_cmd <- function() {
     if(.Platform$OS.type == "windows")
-        return("texify --pdf --engine=luatex --max-iterations=50 ")
-    return("lualatex ")
+        return("texify --pdf --engine=luatex --max-iterations=50")
+    return("lualatex")
 }
-
 
 ##' Run LuaTeX
 ##'
@@ -22,7 +23,7 @@ luatex <- function(texname, clean = TRUE) {
 
     texname <- basename(texname)
     stopifnot(file.exists(texname))
-    system(paste0(select_luatex(), shQuote(texname)))
+    system(paste(luatex_cmd(), shQuote(texname)))
 
     if (identical(clean, TRUE)) {
         f <- tools::file_path_sans_ext(texname)
