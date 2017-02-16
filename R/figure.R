@@ -89,30 +89,6 @@ assets <- function(filename) {
     file.path(dirname(dirname(dirname(filename))), "assets")
 }
 
-##' Run LuaTeX
-##'
-##' @param texname Run LuaTeX on texname.
-##' @param clean logical. If \code{TRUE}, auxiliary files (aux, log)
-##'     created by LuaTeX are removed.
-##' @return invisible NULL.
-##' @keywords internal
-luatex <- function(texname, clean = TRUE) {
-    wd <- setwd(dirname(texname))
-    onexit(setwd(wd))
-
-    texname <- basename(texname)
-    stopifnot(file.exists(texname))
-    system(paste0("lualatex ", shQuote(texname)))
-
-    if (identical(clean, TRUE)) {
-        f <- tools::file_path_sans_ext(texname)
-        file.remove(paste0(f, ".aux"))
-        file.remove(paste0(f, ".log"))
-    }
-
-    invisible()
-}
-
 ##' @keywords internal
 do_preview_figure <- function(figure) {
     ## Create a tex file with the context to create a preview.
