@@ -115,3 +115,18 @@ as.data.frame.contacts <- function(x) {
 as.data.frame.contributor <- function(x) {
     data.frame(name = x$name, email = x$email, organisation = x$organisation)
 }
+
+##' @export
+`[.report` <- function(x, i) {
+    if (is.character(i))
+        i <- grep(i, sapply(x$chapters, "[", "title"), ignore.case = TRUE)
+    x$chapters[i]
+}
+
+##' @export
+`[[.report` <- function(x, i) {
+    if (is.character(i))
+        i <- grep(i, sapply(x$chapters, "[", "title"), ignore.case = TRUE)
+    stopifnot(identical(length(i), 1L))
+    x$chapters[[i]]
+}
