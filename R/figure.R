@@ -124,3 +124,45 @@ preview_figure <- function(figure) {
         file.remove(to)
     file.rename(from, to)
 }
+
+##' Get figure labels
+##'
+##' @param x The report object or chapter object
+##' @return invisible NULL
+##' @export
+get_labels <- function(x) UseMethod("get_labels")
+
+##' @export
+get_labels.report <- function(x) {
+    get_labels(x$chapters)
+}
+
+##' @export
+get_labels.chapters <- function(x) {
+    lapply(x, function(y) get_labels(y))
+    invisible()
+}
+
+##' @export
+get_labels.chapter <- function(x) {
+    lapply(figure_files(x, "tex"), get_label)
+    invisible()
+}
+
+##' Get the label from a figure path
+##'
+##' @keywords internal
+get_label <- function(figure) {
+    a <- readLines(figure)
+    pos <- regexpr("\\\\label\\{(.*)\\}", a, perl =TRUE)
+    start <- attr(pos, "capture.start")
+    end <- start + attr(pos, "capture.length") -1
+    match <- start != -1
+    if (length(which(match)) == 0)
+        return(NULL)
+    labels <- lapply(which(match), function(x) {
+        label <- substr(a[x], start[x], end[x])
+        return(label)
+    })
+    return(labels)
+}
