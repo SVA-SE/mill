@@ -12,13 +12,13 @@ select_luatex <- function() {
 ##' Run LuaTeX
 ##'
 ##' @param texname Run LuaTeX on texname.
-##' @param clean logical. If \code{TRUE}, auxiliary files (aux, log)
-##'     created by LuaTeX are removed.
+##' @param clean logical. If \code{TRUE}, auxiliary files (aux, log,
+##'     out) created by LuaTeX are removed.
 ##' @return invisible NULL.
 ##' @keywords internal
 luatex <- function(texname, clean = TRUE) {
     wd <- setwd(dirname(texname))
-    onexit(setwd(wd))
+    on.exit(setwd(wd))
 
     texname <- basename(texname)
     stopifnot(file.exists(texname))
@@ -28,6 +28,7 @@ luatex <- function(texname, clean = TRUE) {
         f <- tools::file_path_sans_ext(texname)
         file.remove(paste0(f, ".aux"))
         file.remove(paste0(f, ".log"))
+        file.remove(paste0(f, ".out"))
     }
 
     invisible()

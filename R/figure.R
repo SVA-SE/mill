@@ -96,13 +96,16 @@ do_preview_figure <- function(figure) {
     pre_tex <- file.path(a, "figure-preview/pre-snippet.tex")
     post_tex <- file.path(a, "figure-preview/post-snippet.tex")
     preview <- embed_tex(figure, pre_tex, post_tex)
-    onexit(unlink(preview))
+    on.exit(unlink(preview))
 
     ## Build the preview pdf file.
     luatex(preview)
 
     ## Copy the pdf preview to 'preview-figure.pdf'
     from <- paste0(tools::file_path_sans_ext(preview), ".pdf")
-    to <- paste0("preview-", tools::file_path_sans_ext(basename(figure)), ".pdf")
-    file.copy(from, file.path(dirname(figure), to), overwrite = TRUE)
+    to <- file.path(dirname(figure),
+                    paste0("preview-", tools::file_path_sans_ext(basename(figure)), ".pdf"))
+    if (file.exists(to))
+        file.remove(to)
+    file.rename(from, to)
 }
