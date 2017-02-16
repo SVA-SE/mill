@@ -9,8 +9,8 @@ luatex(texname, clean = TRUE)
 \arguments{
 \item{texname}{Run LuaTeX on texname.}
 
-\item{clean}{logical. If \code{TRUE}, auxiliary files (aux, log)
-created by LuaTeX are removed.}
+\item{clean}{logical. If \code{TRUE}, auxiliary files (aux, log,
+out) created by LuaTeX are removed.}
 }
 \value{
 invisible NULL.

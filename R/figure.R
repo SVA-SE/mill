@@ -19,31 +19,43 @@ figure_files.chapter <- function(x, fileext = "all") {
                full.names = TRUE)
 }
 
+##' Build figures
+##'
+##' @param x The report object or chapter object
+##' @return invisible NULL
 ##' @export
-build_figures <- function(x, png) UseMethod("build_figures")
+build_figures <- function(x) UseMethod("build_figures")
 
 ##' @export
-build_figures.report <- function(x, png = FALSE) {
-    build_figures(x$chapters, png)
+build_figures.report <- function(x) {
+    build_figures(x$chapters)
 }
 
 ##' @export
-build_figures.chapters <- function(x, png = FALSE) {
-    lapply(x, function(y) build_figures(y, png))
+build_figures.chapters <- function(x) {
+    lapply(x, function(y) build_figures(y))
     invisible()
 }
 
 ##' @export
-build_figures.chapter <- function(x, png = FALSE) {
-    lapply(figure_files(x, "R"), do_build_figure, png)
+build_figures.chapter <- function(x) {
+    lapply(figure_files(x, "R"), build_figure)
     invisible()
 }
 
-##' @keywords internal
-do_build_figure <- function(figure, png) {
+##' Build a figure
+##'
+##' @param figure The path to the figure R script
+##' @export
+build_figure <- function(figure) {
     source(figure, local = TRUE, chdir = TRUE)
 }
 
+
+##' Preview figures
+##'
+##' @param x The report object or chapter object
+##' @return invisible NULL
 ##' @export
 preview_figures <- function(x) UseMethod("preview_figures")
 
@@ -60,7 +72,7 @@ preview_figures.chapters <- function(x) {
 
 ##' @export
 preview_figures.chapter <- function(x) {
-    lapply(figure_files(x, "tex"), do_preview_figure)
+    lapply(figure_files(x, "tex"), preview_figure)
     invisible()
 }
 
@@ -89,8 +101,11 @@ assets <- function(filename) {
     file.path(dirname(dirname(dirname(filename))), "assets")
 }
 
-##' @keywords internal
-do_preview_figure <- function(figure) {
+##' Preview a figure
+##'
+##' @param figure The path to the figure tex file
+##' @export
+preview_figure <- function(figure) {
     ## Create a tex file with the context to create a preview.
     a <- assets(figure)
     pre_tex <- file.path(a, "figure-preview/pre-snippet.tex")
