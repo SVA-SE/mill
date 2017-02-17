@@ -76,21 +76,15 @@ preview_figures.chapter <- function(x) {
     invisible()
 }
 
-##' Embed a tex file in a context
+##' Concatenate .tex files
 ##'
-##' @param tex The tex file to embed.
-##' @param pre_tex A tex snippet to add before the tex file.
-##' @param post_tex A tex snippet to add after the tex file.
+##' @param tex A vector of .tex file paths
 ##' @return The filename to the temporary file with the embeded tex.
 ##' @keywords internal
-embed_tex <- function(tex, pre_tex, post_tex) {
-    filename <- tempfile(tmpdir = dirname(tex), fileext = ".tex")
-    writeLines(c(readLines(pre_tex),
-                 get_label(tex, "word"),
-                 readLines(tex),
-                 readLines(post_tex)),
-               filename)
-    filename
+c_tex <- function(tex) {
+    filename <- tempfile(fileext = ".tex")
+    writeLines(unlist(lapply(tex, readLines)), filename)
+    return(filename)
 }
 
 ##' Get the assets directory
@@ -113,7 +107,11 @@ preview_figure <- function(figure) {
     a <- assets(figure)
     pre_tex <- file.path(a, "figure-preview/pre-snippet.tex")
     post_tex <- file.path(a, "figure-preview/post-snippet.tex")
-    preview <- embed_tex(figure, pre_tex, post_tex)
+    labelfile <- tempfile(fileext = ".tex")
+    writeLines(get_label(figure, "word"), labelfile)
+    preview_tex <- c_tex(c(pre_tex, labelfile, figure, post_tex))
+    preview <- tempfile(tmpdir = dirname(figure), fileext = ".tex")
+    file.copy(preview_tex, preview, overwrite = TRUE)
     on.exit(unlink(preview))
 
     ## Build the preview pdf file.
