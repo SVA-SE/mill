@@ -76,6 +76,28 @@ preview_figures.chapter <- function(x) {
     invisible()
 }
 
+##' Get Assets
+##'
+##' @param x The report object or chapter object
+##' @return invisible NULL
+##' @export
+assets <- function(x) UseMethod("assets")
+
+##' @export
+assets.report <- function(report) {
+    file.path(report$path, "assets")
+}
+
+##' @keywords internal
+assets.chapters <- function(chapters) {
+    "Not implimented"
+}
+
+##' @export
+assets.chapter <- function(chapter) {
+    file.path(dirname(dirname(chapter$path)), "assets")
+}
+
 ##' Get the assets directory
 ##'
 ##' Determine the assets directory given a chapter file in the report
@@ -83,7 +105,7 @@ preview_figures.chapter <- function(x) {
 ##' @param filename The filename.
 ##' @return path to the assets directory.
 ##' @keywords internal
-assets <- function(filename) {
+assets.character <- function(filename) {
     file.path(dirname(dirname(dirname(filename))), "assets")
 }
 
@@ -98,6 +120,7 @@ preview_figure <- function(figure) {
     ## Create a tex file with the context to create a preview.
     a <- assets(figure)
     tex <- c(readLines(file.path(a, "figure-preview/pre-snippet.tex")),
+             "\\captionsetup{labelformat = empty}",
              "\\begin{document}",
              "\\begin{LARGE}",
              explain_labeling(),

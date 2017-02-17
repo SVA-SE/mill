@@ -2,18 +2,16 @@
 % Please edit documentation in R/figure.R
 \name{assets}
 \alias{assets}
-\title{Get the assets directory}
+\title{Get Assets}
 \usage{
-assets(filename)
+assets(x)
 }
 \arguments{
-\item{filename}{The filename.}
+\item{x}{The report object or chapter object}
 }
 \value{
-path to the assets directory.
+invisible NULL
 }
 \description{
-Determine the assets directory given a chapter file in the report
-project.
+Get Assets
 }
-\keyword{internal}
