@@ -82,6 +82,7 @@ from_docx.chapter <- function(x, repo = NULL, ...) {
     tex <- readLines(f_tex)
     tex <- convert_docx_ref_to_ref(tex, x$title)
     tex <- make_labels_chapter_specific(tex, x$title)
+    tex <- step_section(tex, "up")
     writeLines(tex, file.path(x$path, "text.tex"))
 
     if (!is.null(repo))
@@ -113,6 +114,39 @@ make_labels_chapter_specific <- function(tex, title) {
     pattern <- "[\\]label[{]([^}]*)[}]"
     replacement <- paste0("\\\\label{sec:", title, ":", "\\1}")
     gsub(pattern, replacement, tex)
+}
+
+##' Step up the section levels
+##'
+##' Going 'up':
+##' 1st section -> chapter
+##' 2nd subsection -> section
+##' 3rd subsubsection -> subsection
+##' 4th paragraph -> subsubsection
+##'
+##' Going 'down':
+##' 1st subsubsection -> paragraph
+##' 2nd subsection -> subsubsection
+##' 3rd section -> subsection
+##' 4th chapter -> section
+##' 
+##' @param tex The tex character vector
+##' @param direction go 'up' or 'down'
+##' @return tex character vector
+##' @keywords internal
+step_section <- function(tex, direction = c('up', 'down')) {
+    direction <- match.arg(direction)
+    patterns <- c("\\\\chapter\\{",
+                  "\\\\section\\{",
+                  "\\\\subsection\\{",
+                  "\\\\subsubsection\\{",
+                  "\\\\paragraph\\{")
+    if (direction == 'down')
+        patterns <- rev(patterns)
+    for (i in 1:4) {
+        tex <- gsub(patterns[i + 1], patterns[i], tex)
+    }
+    return(tex)
 }
 
 ##' Convert from tex to docx
@@ -150,8 +184,16 @@ to_docx.chapter <- function(x, repo = NULL, ...) {
     if (length(list(...)) > 0)
         warning("Additional arguments ignored")
     f_tex <- file.path(x$path, "text.tex")
+    tex <- readLines(f_tex)
+    
+    ## Clean up changes made in from_docx_chapter()
+    tex <- step_section(tex, "down")
+    f_tex <- tempfile(fileext = ".tex")
+    writeLines(tex, f_tex)
     f_docx <- file.path(x$path, "text.docx")
     unlink(f_docx)
+
+    ## Convert to docx
     pandoc(paste0("\"", f_tex, "\" -o \"", f_docx, "\""))
     if (!is.null(repo))
         git2r::add(repo, f_docx)
