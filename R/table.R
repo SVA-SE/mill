@@ -52,6 +52,7 @@ preview_table <- function(table) {
     ## Create a tex file with the context to create a preview.
     a <- assets(table)
     tex <- c(readLines(file.path(a, "figure-preview/pre-snippet.tex")),
+             "\\captionsetup{labelformat = empty}",
              "\\begin{document}",
              "\\begin{LARGE}",
              explain_labeling(),

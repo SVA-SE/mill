@@ -24,6 +24,7 @@ luatex <- function(texname, clean = TRUE) {
     texname <- basename(texname)
     stopifnot(file.exists(texname))
     system(paste(luatex_cmd(), shQuote(texname)))
+    system(paste(luatex_cmd(), shQuote(texname)))
 
     if (identical(clean, TRUE)) {
         f <- tools::file_path_sans_ext(texname)
