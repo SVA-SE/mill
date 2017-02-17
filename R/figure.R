@@ -102,7 +102,9 @@ preview_figure <- function(figure) {
              "\\begin{LARGE}",
              explain_labeling(),
              "\\newline\\newline",
+             "\\hl{",
              get_label(figure, "word"),
+             "}",
              "\\end{LARGE}",
              readLines(figure),
              "\\end{document}")
