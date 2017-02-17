@@ -99,7 +99,11 @@ preview_figure <- function(figure) {
     a <- assets(figure)
     tex <- c(readLines(file.path(a, "figure-preview/pre-snippet.tex")),
              "\\begin{document}",
+             "\\begin{LARGE}",
+             explain_labeling(),
+             "\\newline\\newline",
              get_label(figure, "word"),
+             "\\end{LARGE}",
              readLines(figure),
              "\\end{document}")
     writeLines(tex, preview)
@@ -156,10 +160,18 @@ format_labels <- function(labels, format = c("latex", "word")) {
     format <- match.arg(format)
     if (identical(format, "word")) {
         labels <- unlist(lapply(labels, function(label) {
-            a <- strsplit(label, ":")[[1]]
-            paste(a[1], a[length(a)], sep = ":")
+            gsub("([^:]*)[:][^:]*[:]([^:]*)", "{[}\\1:\\2{]}", labels)
         }))
         return(labels)
     }
     return(labels)
+}
+
+##' Format the label from a figure path
+##'
+##' @keywords internal
+explain_labeling <- function() {
+    paste("\\noindent To reference this figure or table in the word document",
+          "you need to insert the following \\textbf{label} into",
+          "the text:")
 }
