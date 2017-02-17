@@ -159,9 +159,7 @@ get_label <- function(figure, format = c("latex", "word")) {
 format_labels <- function(labels, format = c("latex", "word")) {
     format <- match.arg(format)
     if (identical(format, "word")) {
-        labels <- unlist(lapply(labels, function(label) {
-            gsub("([^:]*)[:][^:]*[:]([^:]*)", "{[}\\1:\\2{]}", labels)
-        }))
+        labels <- gsub("([^:]*)[:][^:]*[:]([^:]*)", "{[}\\1:\\2{]}", labels)
         return(labels)
     }
     return(labels)
@@ -172,6 +170,6 @@ format_labels <- function(labels, format = c("latex", "word")) {
 ##' @keywords internal
 explain_labeling <- function() {
     paste("\\noindent To reference this figure or table in the word document",
-          "you need to insert the following \\textbf{label} into",
+          "you need to insert the following \\textbf{label(s)} into",
           "the text:")
 }
