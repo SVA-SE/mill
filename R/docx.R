@@ -80,7 +80,7 @@ from_docx.chapter <- function(x, repo = NULL, ...) {
 
     ## Tweak incoming tex file
     tex <- readLines(f_tex)
-    tex <- convert_docx_ref_to_href(tex, x$title)
+    tex <- convert_docx_ref_to_ref(tex, x$title)
     tex <- make_labels_chapter_specific(tex, x$title)
     writeLines(tex, file.path(x$path, "text.tex"))
 
@@ -89,16 +89,16 @@ from_docx.chapter <- function(x, repo = NULL, ...) {
     invisible()
 }
 
-##' Convert the docx references to tex href
+##' Convert the docx references to tex ref
 ##'
 ##' @param tex The tex character vector
 ##' @param title The chapter title
 ##' @return tex character vector
 ##' @keywords internal
-convert_docx_ref_to_href <- function(tex, title) {
+convert_docx_ref_to_ref <- function(tex, title) {
     title <- gsub("[[:space:]]+", "-", tolower(title))
     pattern <- "[{][[][}]([^:]*)[:]([^{]*)[{}[]][}]"
-    replacement <- paste0("\\\\href{\\1:", title, ":\\2}")
+    replacement <- paste0("\\\\ref{\\1:", title, ":\\2}")
     gsub(pattern, replacement, tex)
 }
 
