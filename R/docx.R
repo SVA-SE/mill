@@ -106,7 +106,6 @@ convert_docx_ref_to_ref <- function(tex, title) {
 ##' Convert the tex ref to docx ref
 ##'
 ##' @param tex The tex character vector
-##' @param title The chapter title
 ##' @return tex character vector
 ##' @keywords internal
 convert_ref_to_docx_ref <- function(tex) {
