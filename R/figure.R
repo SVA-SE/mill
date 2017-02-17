@@ -76,23 +76,6 @@ preview_figures.chapter <- function(x) {
     invisible()
 }
 
-##' Embed a tex file in a context
-##'
-##' @param tex The tex file to embed.
-##' @param pre_tex A tex snippet to add before the tex file.
-##' @param post_tex A tex snippet to add after the tex file.
-##' @return The filename to the temporary file with the embeded tex.
-##' @keywords internal
-embed_tex <- function(tex, pre_tex, post_tex) {
-    filename <- tempfile(tmpdir = dirname(tex), fileext = ".tex")
-    writeLines(c(readLines(pre_tex),
-                 get_label(tex, "word"),
-                 readLines(tex),
-                 readLines(post_tex)),
-               filename)
-    filename
-}
-
 ##' Get the assets directory
 ##'
 ##' Determine the assets directory given a chapter file in the report
@@ -109,12 +92,17 @@ assets <- function(filename) {
 ##' @param figure The path to the figure tex file
 ##' @export
 preview_figure <- function(figure) {
+    preview <- tempfile(tmpdir = dirname(figure), fileext = ".tex")
+    on.exit(unlink(preview))
+
     ## Create a tex file with the context to create a preview.
     a <- assets(figure)
-    pre_tex <- file.path(a, "figure-preview/pre-snippet.tex")
-    post_tex <- file.path(a, "figure-preview/post-snippet.tex")
-    preview <- embed_tex(figure, pre_tex, post_tex)
-    on.exit(unlink(preview))
+    tex <- c(readLines(file.path(a, "figure-preview/pre-snippet.tex")),
+             "\\begin{document}",
+             get_label(figure, "word"),
+             readLines(figure),
+             "\\end{document}")
+    writeLines(tex, preview)
 
     ## Build the preview pdf file.
     luatex(preview)

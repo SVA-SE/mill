@@ -4,7 +4,7 @@
 \alias{get_label}
 \title{Get the label from a figure path}
 \usage{
-get_label(figure)
+get_label(figure, format = c("latex", "word"))
 }
 \description{
 Get the label from a figure path
