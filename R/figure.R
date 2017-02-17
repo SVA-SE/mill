@@ -98,9 +98,10 @@ preview_figure <- function(figure) {
     ## Create a tex file with the context to create a preview.
     a <- assets(figure)
     tex <- c(readLines(file.path(a, "figure-preview/pre-snippet.tex")),
+             "\\begin{document}",
              get_label(figure, "word"),
              readLines(figure),
-             readLines(file.path(a, "figure-preview/post-snippet.tex")))
+             "\\end{document}")
     writeLines(tex, preview)
 
     ## Build the preview pdf file.
