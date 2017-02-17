@@ -103,6 +103,18 @@ convert_docx_ref_to_ref <- function(tex, title) {
     gsub(pattern, replacement, tex)
 }
 
+##' Convert the tex ref to docx ref
+##'
+##' @param tex The tex character vector
+##' @param title The chapter title
+##' @return tex character vector
+##' @keywords internal
+convert_ref_to_docx_ref <- function(tex) {
+    pattern <- "\\\\ref[{]([^:]*)[:][^:]*[:]([^}]*)[}]"
+    replacement <- "[\\1:\\2]"
+    gsub(pattern, replacement, tex)
+}
+
 ##' Make tex labels chapter specific in the report
 ##'
 ##' @param tex The tex character vector
@@ -188,6 +200,7 @@ to_docx.chapter <- function(x, repo = NULL, ...) {
     
     ## Clean up changes made in from_docx_chapter()
     tex <- step_section(tex, "down")
+    tex <- convert_ref_to_docx_ref(tex)
     f_tex <- tempfile(fileext = ".tex")
     writeLines(tex, f_tex)
     f_docx <- file.path(x$path, "text.docx")
