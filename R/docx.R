@@ -71,13 +71,48 @@ from_docx.chapters <- function(x, repo = NULL, ...) {
 from_docx.chapter <- function(x, repo = NULL, ...) {
     if (length(list(...)) > 0)
         warning("Additional arguments ignored")
-    f_tex <- file.path(x$path, "text.tex")
-    unlink(f_tex)
+
+    ## Convert the docx to a temporary tex file.
+    f_tex <- tempfile(fileext = ".tex")
+    on.exit(file.remove(f_tex))
     f_docx <- file.path(x$path, "text.docx")
-    pandoc(paste0("\"", f_docx, "\" -o \"", f_tex, "\""))
+    pandoc(paste(shQuote(f_docx), "-o", shQuote(f_tex)))
+
+    ## Tweak incoming tex file
+    tex <- readLines(f_tex)
+    tex <- convert_docx_ref_to_href(tex, x$title)
+    tex <- make_labels_chapter_specific(tex, x$title)
+    writeLines(tex, file.path(x$path, "text.tex"))
+
     if (!is.null(repo))
-        git2r::add(repo, f_tex)
+        git2r::add(repo, file.path(x$path, "text.tex"))
     invisible()
+}
+
+##' Convert the docx references to tex href
+##'
+##' @param tex The tex character vector
+##' @param title The chapter title
+##' @return tex character vector
+##' @keywords internal
+convert_docx_ref_to_href <- function(tex, title) {
+    title <- gsub("[[:space:]]+", "-", tolower(title))
+    pattern <- "[{][[][}]([^:]*)[:]([^{]*)[{}[]][}]"
+    replacement <- paste0("\\\\href{\\1:", title, ":\\2}")
+    gsub(pattern, replacement, tex)
+}
+
+##' Make tex labels chapter specific in the report
+##'
+##' @param tex The tex character vector
+##' @param title The chapter title
+##' @return tex character vector
+##' @keywords internal
+make_labels_chapter_specific <- function(tex, title) {
+    title <- gsub("[[:space:]]+", "-", tolower(title))
+    pattern <- "[\\]label[{]([^}]*)[}]"
+    replacement <- paste0("\\\\label{sec:", title, ":", "\\1}")
+    gsub(pattern, replacement, tex)
 }
 
 ##' Convert from tex to docx
