@@ -17,7 +17,8 @@ text_files.chapter <- function(x, fileext = "tex") {
 
 ##' Preview chapters
 ##'
-##' @param x The report object or chapter object
+##' @param x The report object, chapter object or the path to the text
+##'     tex file.
 ##' @return invisible NULL
 ##' @export
 preview_text <- function(x) UseMethod("preview_text")
@@ -33,19 +34,16 @@ preview_text.chapters <- function(x) {
     invisible()
 }
 
-##' Preview a chapter text
-##'
-##' @param chapter The path to the text tex file
 ##' @export
-preview_text.chapter <- function(chapter) {
-    preview <- tempfile(tmpdir = chapter$path, fileext = ".tex")
+preview_text.chapter <- function(x) {
+    preview <- tempfile(tmpdir = x$path, fileext = ".tex")
     on.exit(unlink(preview))
 
     ## read in the pieces of the chapter
-    a <- assets(chapter)
-    text <- readLines(text_files(chapter))
-    figures <- do.call("c", lapply(figure_files(chapter, "tex"), readLines))
-    tables <- do.call("c", lapply(table_files(chapter, "tex"), readLines))
+    a <- assets(x)
+    text <- readLines(text_files(x))
+    figures <- do.call("c", lapply(figure_files(x, "tex"), readLines))
+    tables <- do.call("c", lapply(table_files(x, "tex"), readLines))
 
     ## Stitch together the chapter
     tex <- c(readLines(file.path(a, "figure-preview/pre-snippet.tex")),
@@ -61,7 +59,7 @@ preview_text.chapter <- function(chapter) {
 
     ## Copy the pdf preview to 'preview-figure.pdf'
     from <- paste0(tools::file_path_sans_ext(preview), ".pdf")
-    to <- file.path(chapter$path,
+    to <- file.path(x$path,
                     paste0("preview-text.pdf"))
     if (file.exists(to))
         file.remove(to)
