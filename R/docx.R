@@ -150,14 +150,14 @@ make_labels_chapter_specific <- function(tex, title) {
 ##' @param direction go 'up' or 'down'
 ##' @return tex character vector
 ##' @keywords internal
-step_section <- function(tex, direction = c('up', 'down')) {
+step_section <- function(tex, direction = c("up", "down")) {
     direction <- match.arg(direction)
     patterns <- c("\\\\chapter\\{",
                   "\\\\section\\{",
                   "\\\\subsection\\{",
                   "\\\\subsubsection\\{",
                   "\\\\paragraph\\{")
-    if (direction == 'down')
+    if (direction == "down")
         patterns <- rev(patterns)
     for (i in 1:4) {
         tex <- gsub(patterns[i + 1], patterns[i], tex)
