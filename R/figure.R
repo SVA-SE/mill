@@ -13,9 +13,30 @@ figure_pattern <- function(fileext = c("all", "R", "tex", "xlsx", "pdf")) {
 ##' @keywords internal
 figure_files <- function(x, fileext) UseMethod("figure_files")
 
+##' @keywords internal
 figure_files.chapter <- function(x, fileext = "all") {
     list.files(path = x$path,
                pattern = figure_pattern(fileext),
+               full.names = TRUE)
+}
+
+##' @keywords internal
+preview_pattern <- function(items = c("all", "figure", "table")) {
+    items <- switch(match.arg(items),
+                    all    = "((table)|(figure))",
+                    figure = "figure",
+                    table  = "table")
+
+    paste0("^preview-", items, "-[^.]*[.]pdf$")
+}
+
+##' @keywords internal
+preview_files <- function(x, items) UseMethod("preview_files")
+
+##' @keywords internal
+preview_files.chapter <- function(x, items = "all") {
+    list.files(path = x$path,
+               pattern = preview_pattern(items),
                full.names = TRUE)
 }
 
