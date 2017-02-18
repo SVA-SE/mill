@@ -1,11 +1,11 @@
 ##' @keywords internal
 figure_pattern <- function(fileext = c("all", "R", "tex", "xlsx", "pdf")) {
     fileext <- switch(match.arg(fileext),
-                      all = "(tex)|(R)|(csv)|(pdf)$",
-                      R   = "R$",
+                      all  = "(tex)|(R)|(csv)|(pdf)$",
+                      R    = "R$",
                       xlsx = "xlsx$",
-                      tex = "tex$",
-                      pdf = "pdf$")
+                      tex  = "tex$",
+                      pdf  = "pdf$")
 
     paste0("^figure-[^.]+[.]", fileext)
 }
