@@ -10,10 +10,27 @@ figure_pattern <- function(fileext = c("all", "R", "tex", "xlsx", "pdf")) {
     paste0("^figure-[^.]+[.]", fileext)
 }
 
-##' @keywords internal
+##' @export
 figure_files <- function(x, fileext) UseMethod("figure_files")
 
-##' @keywords internal
+##' @export
+figure_files.report <- function(x, fileext = "all") {
+    figure_files(x$chapters, fileext)
+}
+
+##' @export
+figure_files.chapters <- function(x, fileext = "all") {
+    unlist(lapply(x, function(y) figure_files(y, fileext)))
+}
+
+##' @export
+figure_files.chapter <- function(x, fileext = "all") {
+    list.files(path = x$path,
+               pattern = figure_pattern(fileext),
+               full.names = TRUE)
+}
+
+##' @export
 figure_files.chapter <- function(x, fileext = "all") {
     list.files(path = x$path,
                pattern = figure_pattern(fileext),
