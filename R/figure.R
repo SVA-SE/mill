@@ -78,35 +78,26 @@ preview_figures.chapter <- function(x) {
 
 ##' Get Assets
 ##'
-##' @param x The report object or chapter object
-##' @return invisible NULL
+##' Determine the assets directory given a report, chapter or chapter
+##' file in the report project.
+##' @param x The report object, chapter object or filename.
+##' @return character string with path to assets.
 ##' @export
 assets <- function(x) UseMethod("assets")
 
 ##' @export
-assets.report <- function(report) {
-    file.path(report$path, "assets")
-}
-
-##' @keywords internal
-assets.chapters <- function(chapters) {
-    "Not implimented"
+assets.report <- function(x) {
+    file.path(x$path, "assets")
 }
 
 ##' @export
-assets.chapter <- function(chapter) {
-    file.path(dirname(dirname(chapter$path)), "assets")
+assets.chapter <- function(x) {
+    file.path(dirname(dirname(x$path)), "assets")
 }
 
-##' Get the assets directory
-##'
-##' Determine the assets directory given a chapter file in the report
-##' project.
-##' @param filename The filename.
-##' @return path to the assets directory.
 ##' @keywords internal
-assets.character <- function(filename) {
-    file.path(dirname(dirname(dirname(filename))), "assets")
+assets.character <- function(x) {
+    file.path(dirname(dirname(dirname(x))), "assets")
 }
 
 ##' Preview a figure
