@@ -1,4 +1,4 @@
-##' Export docx files
+##' Export files
 ##'
 ##' @param x The object to export.
 ##' @param to The destination of the export. If the argument is
@@ -6,24 +6,24 @@
 ##'     the report title.
 ##' @return invisible NULL.
 ##' @export
-export_docx <- function(x, to) UseMethod("export_docx")
+export <- function(x, to) UseMethod("export")
 
 ##' @export
-export_docx.report <- function(x, to) {
+export.report <- function(x, to) {
     if (missing(to))
         to <- x$report
-    export_docx(x$chapters, to)
+    export(x$chapters, to)
     invisible()
 }
 
 ##' @export
-export_docx.chapters <- function(x, to) {
-    lapply(x, function(y) export_docx(y, file.path(to, "chapters")))
+export.chapters <- function(x, to) {
+    lapply(x, function(y) export(y, file.path(to, "chapters")))
     invisible()
 }
 
 ##' @export
-export_docx.chapter <- function(x, to) {
+export.chapter <- function(x, to) {
     from <- file.path(x$path, "text.docx")
     if (!file.exists(from))
         to_docx(x)
@@ -140,7 +140,7 @@ make_labels_chapter_specific <- function(tex, title) {
 ##' 2nd subsection -> subsubsection
 ##' 3rd section -> subsection
 ##' 4th chapter -> section
-##' 
+##'
 ##' @param tex The tex character vector
 ##' @param direction go 'up' or 'down'
 ##' @return tex character vector
@@ -196,7 +196,7 @@ to_docx.chapter <- function(x, repo = NULL, ...) {
         warning("Additional arguments ignored")
     f_tex <- file.path(x$path, "text.tex")
     tex <- readLines(f_tex)
-    
+
     ## Clean up changes made in from_docx_chapter()
     tex <- step_section(tex, "down")
     tex <- convert_ref_to_docx_ref(tex)
