@@ -24,15 +24,20 @@ export.chapters <- function(x, to) {
 
 ##' @export
 export.chapter <- function(x, to) {
-    from <- file.path(x$path, "text.docx")
-    if (!file.exists(from))
-        to_docx(x)
-
     to <- file.path(to, x$title)
     if (!dir.exists(to))
         dir.create(to, recursive = TRUE)
-    to <- paste0(file.path(to, x$title), ".docx")
-    file.copy(from, to, overwrite = TRUE)
+
+    ## Export text.docx to renamed title.docx
+    from <- file.path(x$path, "text.docx")
+    if (!file.exists(from))
+        to_docx(x)
+    file.copy(from, paste0(file.path(to, x$title), ".docx"), overwrite = TRUE)
+
+    ## Export data and preview files
+    lapply(c(figure_files(x, "xlsx"), preview_files(x)), function(from) {
+        file.copy(from, file.path(to, basename(from)), overwrite = TRUE)
+    })
 
     invisible()
 }
