@@ -211,7 +211,7 @@ to_docx.chapter <- function(x, repo = NULL, ...) {
     unlink(f_docx)
 
     ## Convert to docx
-    pandoc(paste0("\"", f_tex, "\" -o \"", f_docx, "\""))
+    pandoc(paste(shQuote(f_tex), "-o", shQuote(f_docx)))
     if (!is.null(repo))
         git2r::add(repo, f_docx)
     invisible()
