@@ -7,7 +7,8 @@
 preview_text(x)
 }
 \arguments{
-\item{x}{The report object or chapter object}
+\item{x}{The report object, chapter object or the path to the text
+tex file.}
 }
 \value{
 invisible NULL

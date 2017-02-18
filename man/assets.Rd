@@ -7,11 +7,12 @@
 assets(x)
 }
 \arguments{
-\item{x}{The report object or chapter object}
+\item{x}{The report object, chapter object or filename.}
 }
 \value{
-invisible NULL
+character string with path to assets.
 }
 \description{
-Get Assets
+Determine the assets directory given a report, chapter or chapter
+file in the report project.
 }

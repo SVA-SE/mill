@@ -8,8 +8,6 @@ convert_ref_to_docx_ref(tex)
 }
 \arguments{
 \item{tex}{The tex character vector}
-
-\item{title}{The chapter title}
 }
 \value{
 tex character vector
