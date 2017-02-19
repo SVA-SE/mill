@@ -4,15 +4,17 @@
 \alias{references}
 \title{TeX references}
 \usage{
-references(x, reftype)
+references(x, cmd, reftype)
 }
 \arguments{
 \item{x}{the report or chapter object.}
 
+\item{cmd}{what to search for, either \\label{.} or \\ref{.}.}
+
 \item{reftype}{the type of references to search for.}
 }
 \value{
-character vector with found references.
+data.frame with the found references.
 }
 \description{
 TeX references

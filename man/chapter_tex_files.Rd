@@ -4,12 +4,10 @@
 \alias{chapter_tex_files}
 \title{Get the chapter tex files}
 \usage{
-chapter_tex_files(x, include = c("all", "text", "figures", "tables"))
+chapter_tex_files(x)
 }
 \arguments{
 \item{x}{the chapter object}
-
-\item{include}{the type of chapter tex files to include.}
 }
 \description{
 Get the chapter tex files

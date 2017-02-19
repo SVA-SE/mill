@@ -5,11 +5,13 @@
 \title{Create a regular expression pattern to search for labels or
 references}
 \usage{
-reference_pattern(what = c("label", "ref"), reftype = c("all", "sec", "fig",
+reference_pattern(cmd = c("label", "ref"), reftype = c("all", "sec", "fig",
   "tab"))
 }
 \arguments{
-\item{what}{pattern to search: either \\label{.} or \\ref{.}.}
+\item{cmd}{what to search for, either \\label{.} or \\ref{.}.}
+
+\item{reftype}{the type of references to search for.}
 }
 \description{
 Create a regular expression pattern to search for labels or
