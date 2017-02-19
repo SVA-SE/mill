@@ -20,6 +20,13 @@ check <- function(path = ".") {
         return(invisible(TRUE))
     if (check_tex_to_docx_round_trip(report, repo))
         return(invisible(TRUE))
+    if (check_reference_format(report))
+        return(invisible(TRUE))
+    if (check_missing_figure_reference_files(report))
+        return(invisible(TRUE))
+    if (check_missing_table_reference_files(report))
+        return(invisible(TRUE))
+
     invisible(FALSE)
 }
 
@@ -105,4 +112,111 @@ check_tex_to_docx_round_trip.chapter <- function(x, repo) {
     if (file.path("chapters", x$title, "text.tex") %in% unstaged)
         return(TRUE)
     FALSE
+}
+
+##' Check reference format
+##'
+##' @param x the report or chapter object.
+##' @keywords internal
+check_reference_format <- function(x)
+    UseMethod("check_reference_format")
+
+check_reference_format.report <- function(x) {
+    cat("* checking reference format ... ")
+
+    ref_all <- references(x, "all")
+    ref_fig <- references(x, "fig")
+    ref_tab <- references(x, "tab")
+
+    ref <- setdiff(ref_all, c(ref_fig, ref_tab))
+    if (length(ref)) {
+        cat("ERROR\n    ")
+        cat(ref, sep = "\n    ")
+        return(TRUE)
+    }
+
+    cat("OK\n")
+    FALSE
+}
+
+##' Check for missing figure reference files
+##'
+##' Check for figure references in the 'text.tex' file that does not
+##' have a corresponding 'figure.tex' file.
+##' @param x the report or chapter object.
+##' @keywords internal
+check_missing_figure_reference_files <- function(x)
+    UseMethod("check_missing_figure_reference_files")
+
+check_missing_figure_reference_files.report <- function(x) {
+    cat("* checking missing figure reference files ... ")
+
+    ref <- check_missing_figure_reference_files(x$chapters)
+    if (length(ref)) {
+        cat("ERROR\n    ")
+        cat(sub(x$path, ".", ref), sep = "\n    ")
+        return(TRUE)
+    }
+
+    cat("OK\n")
+    FALSE
+}
+
+check_missing_figure_reference_files.chapters <- function(x) {
+    unlist(lapply(x, function(y) check_missing_figure_reference_files(y)))
+}
+
+check_missing_figure_reference_files.chapter <- function(x) {
+    ## Expected figure files
+    ref_fig <- references(x, "fig")
+    ref_fig_files <- sub("\\\\ref[{]fig:[^:]+:([^}]+)[}]",
+                         "figure-\\1.tex",
+                         ref_fig)
+    ref_fig_files <- file.path(x$path, ref_fig_files)
+
+    ## Observed figure files
+    fig_files <- figure_files(x, "tex")
+
+    setdiff(ref_fig_files, fig_files)
+}
+
+##' Check for missing table reference files
+##'
+##' Check for table references in the 'text.tex' file that does not
+##' have a corresponding 'table.tex' file.
+##' @param x the report or chapter object.
+##' @keywords internal
+check_missing_table_reference_files <- function(x)
+    UseMethod("check_missing_table_reference_files")
+
+check_missing_table_reference_files.report <- function(x) {
+    cat("* checking missing table reference files ... ")
+
+    ref <- check_missing_table_reference_files(x$chapters)
+    if (length(ref)) {
+        cat("ERROR\n    ")
+        cat(sub(x$path, ".", ref), sep = "\n    ")
+        return(TRUE)
+    }
+
+    cat("OK\n")
+    FALSE
+}
+
+check_missing_table_reference_files.chapters <- function(x) {
+    unlist(lapply(x, function(y) check_missing_table_reference_files(y)))
+}
+
+check_missing_table_reference_files.chapter <- function(x) {
+    ## Expected table files
+    ref_tab <- references(x, "tab")
+    ref_tab_files <- sub("\\\\ref[{]tab:[^:]+:([^}]+)[}]",
+                         "table-\\1.tex",
+                         ref_tab)
+    ref_tab_files <- file.path(x$path, ref_tab_files)
+
+    ## Observed table files
+    tab_files <- file.path(x$path, list.files(x$path, "^table-[^.]*[.]tex"))
+
+    setdiff(ref_tab_files, tab_files)
 }
