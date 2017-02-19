@@ -43,14 +43,14 @@ luatex <- function(texname, clean = TRUE) {
 ##' @param reftype the type of references to search for.
 ##' @return data.frame with the found references.
 ##' @export
-references <- function(x, cmd, reftype, include) UseMethod("references")
+references <- function(x, cmd, reftype) UseMethod("references")
 
 ##' @export
 references.report <- function(x,
                               cmd     = c("label", "ref"),
                               reftype = c("all", "sec", "fig", "tab"))
 {
-    references(x$chapters, cmd, reftype, include)
+    references(x$chapters, cmd, reftype)
 }
 
 ##' @export
@@ -59,7 +59,7 @@ references.chapters <- function(x,
                                 reftype = c("all", "sec", "fig", "tab"))
 {
     do.call("rbind",
-            lapply(x, function(y) references(y, cmd, reftype, include)))
+            lapply(x, function(y) references(y, cmd, reftype)))
 }
 
 ##' @export
@@ -68,7 +68,7 @@ references.chapter <- function(x,
                                reftype = c("all", "sec", "fig", "tab"))
 {
     pattern <- reference_pattern(cmd, reftype)
-    files <- chapter_tex_files(x, include)
+    files <- chapter_tex_files(x)
 
     do.call("rbind", (lapply(files, function(filename) {
         tex <- readLines(filename)
