@@ -6,12 +6,17 @@ text_pattern <- function(fileext = c("tex")) {
     paste0("^text[.]", fileext)
 }
 
-##' @keywords internal
-text_files <- function(x, fileext) UseMethod("text_files")
+##' Get the path(s) of the chapter text.tex file(s)
+##'
+##' @export
+##' @param x The chapter object
+##' @return path
+text_files <- function(x) UseMethod("text_files")
 
-text_files.chapter <- function(x, fileext = "tex") {
+##' @export
+text_files.chapter <- function(x) {
     list.files(path = x$path,
-               pattern = text_pattern(fileext),
+               pattern = text_pattern(),
                full.names = TRUE)
 }
 
