@@ -4,6 +4,8 @@
 ##' @return invisible \code{FALSE} if OK, else invisible \code{TRUE}.
 ##' @export
 check <- function(path = ".") {
+    cat("* using 'relax' version", as.character(packageVersion("relax")), "\n")
+
     cat("* loading report ... ")
     report <- tryCatch(load_report(path), error = function(e) NULL)
     if (is.null(report)) {
