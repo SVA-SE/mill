@@ -34,7 +34,7 @@ interactive_replace <- function(x, pattern, replacement) {
 ##' @examples
 ##' r <- load_report()
 ##' pattern <- "([[:digit:]]{4, })"
-##' replacement <- " \\\numprint{\\1}"
+##' replacement <- "\\\numprint{\\1}"
 ##' interactive_replace(r[["Campy"]], pattern, replacement) 
 interactive_replace.chapter <- function(x, pattern, replacement) {
 
@@ -80,7 +80,12 @@ interactive_replace.character <- function(x, pattern, replacement) {
                          stop = (match + attr(match, "match.length") - 1))
 
     ## Ask the user a question
-    cat(paste0("\n\nReplace ", blue(match_text), "?"))
+    cat(paste0("\n\n Do you want to replace\n\n",
+               blue(match_text), " ?",
+               " with --> ",
+               blue(sub(pattern, replacement, match_text))
+               )
+        )
     selection <- utils::menu(c("yes", "no"), title = "")
 
     ## If the user answers 'no' return the original text and continue
