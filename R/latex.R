@@ -73,19 +73,53 @@ references.chapter <- function(x, reftype = c("all", "fig", "tab")) {
 ##' @param x The report object or chapter object
 ##' @return invisible NULL
 ##' @export
-get_labels <- function(x) UseMethod("get_labels")
+get_labels <- function(x, labeltype, include) UseMethod("get_labels")
 
 ##' @export
-get_labels.report <- function(x) {
-    get_labels(x$chapters)
+get_labels.report <- function(x,
+                              labeltype = c("all", "sec", "fig", "tab"),
+                              include   = c("all", "text", "figures", "tables"))
+{
+    get_labels(x$chapters, labeltype, include)
 }
 
 ##' @export
-get_labels.chapters <- function(x) {
-    lapply(x, function(y) get_labels(y))
+get_labels.chapters <- function(x,
+                                labeltype = c("all", "sec", "fig", "tab"),
+                                include   = c("all", "text", "figures", "tables"))
+{
+    unlist(lapply(x, function(y) get_labels(y, labeltype, include)))
 }
 
 ##' @export
-get_labels.chapter <- function(x) {
-    unlist(lapply(figure_files(x, "tex"), get_label))
+get_labels.chapter <- function(x,
+                               labeltype = c("all", "sec", "fig", "tab"),
+                               include   = c("all", "text", "figures", "tables"))
+{
+    pattern <- switch(match.arg(labeltype),
+                      all = "[^}]*",
+                      sec = "sec:[^:]+:[^}]+",
+                      fig = "fig:[^:]+:[^}]+",
+                      tab = "tab:[^:]+:[^}]+")
+    pattern <- paste0("[\\]label[{]", pattern, "[}]")
+
+    include <- match.arg(include)
+    if (identical(include, "all"))
+        include <- c("text", "figures", "tables")
+    files <- NULL
+    if ("text" %in% include)
+        files <- c(files, file.path(x$path, "text.tex"))
+    if ("figures" %in% include)
+        files <- c(files, figure_files(x, "tex"))
+    if ("tables" %in% include)
+        files <- c(files,
+                   file.path(x$path, list.files(x$path, "^table-[^.]*[.]tex")))
+
+    unlist(lapply(files, function(filename) {
+        tex <- readLines(filename)
+        m <- regmatches(tex, gregexpr(pattern, tex))
+        unlist(lapply(m, function(y) {
+            regmatches(y, regexec(pattern, y))
+        }))
+    }))
 }
