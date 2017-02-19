@@ -17,4 +17,3 @@ character vector with found references.
 \description{
 TeX references
 }
-\keyword{internal}
