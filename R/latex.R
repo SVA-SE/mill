@@ -127,3 +127,24 @@ get_labels.chapter <- function(x,
         data.frame(filename = character(0), lbl = character(0))
     })))
 }
+
+##' Get the chapter tex files
+##'
+##' @param x the chapter object
+##' @param include the type of chapter tex files to include.
+##' @keywords internal
+chapter_tex_files <- function(x, include = c("all", "text", "figures", "tables")) {
+    stopifnot(is(x, "chapter"))
+    include <- match.arg(include)
+    if (identical(include, "all"))
+        include <- c("text", "figures", "tables")
+    files <- NULL
+    if ("text" %in% include)
+        files <- c(files, file.path(x$path, "text.tex"))
+    if ("figures" %in% include)
+        files <- c(files, figure_files(x, "tex"))
+    if ("tables" %in% include)
+        files <- c(files,
+                   file.path(x$path, list.files(x$path, "^table-[^.]*[.]tex")))
+    files
+}
