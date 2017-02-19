@@ -88,7 +88,7 @@ get_labels.chapters <- function(x,
                                 labeltype = c("all", "sec", "fig", "tab"),
                                 include   = c("all", "text", "figures", "tables"))
 {
-    unlist(lapply(x, function(y) get_labels(y, labeltype, include)))
+    do.call("rbind", lapply(x, function(y) get_labels(y, labeltype, include)))
 }
 
 ##' @export
@@ -115,11 +115,15 @@ get_labels.chapter <- function(x,
         files <- c(files,
                    file.path(x$path, list.files(x$path, "^table-[^.]*[.]tex")))
 
-    unlist(lapply(files, function(filename) {
+    do.call("rbind", (lapply(files, function(filename) {
         tex <- readLines(filename)
         m <- regmatches(tex, gregexpr(pattern, tex))
-        unlist(lapply(m, function(y) {
+        lbl <- unlist(lapply(m, function(y) {
             regmatches(y, regexec(pattern, y))
         }))
-    }))
+
+        if (length(lbl))
+            return(data.frame(filename = filename, label = lbl))
+        data.frame(filename = character(0), lbl = character(0))
+    })))
 }
