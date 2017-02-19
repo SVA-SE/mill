@@ -67,3 +67,25 @@ references.chapter <- function(x, reftype = c("all", "fig", "tab")) {
         regmatches(x, regexec(pattern, x))
     }))
 }
+
+##' Get figure labels
+##'
+##' @param x The report object or chapter object
+##' @return invisible NULL
+##' @export
+get_labels <- function(x) UseMethod("get_labels")
+
+##' @export
+get_labels.report <- function(x) {
+    get_labels(x$chapters)
+}
+
+##' @export
+get_labels.chapters <- function(x) {
+    lapply(x, function(y) get_labels(y))
+}
+
+##' @export
+get_labels.chapter <- function(x) {
+    unlist(lapply(figure_files(x, "tex"), get_label))
+}
