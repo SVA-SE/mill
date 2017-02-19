@@ -35,3 +35,35 @@ luatex <- function(texname, clean = TRUE) {
 
     invisible()
 }
+
+##' TeX references
+##'
+##' @param x the report or chapter object.
+##' @param reftype the type of references to search for.
+##' @return character vector with found references.
+##' @keywords internal
+references <- function(x, reftype) UseMethod("references")
+
+##' @keywords internal
+references.report <- function(x, reftype = c("all", "fig", "tab")) {
+    references(x$chapters, reftype)
+}
+
+##' @keywords internal
+references.chapters <- function(x, reftype = c("all", "fig", "tab")) {
+    unlist(lapply(x, function(y) references(y, reftype)))
+}
+
+##' @keywords internal
+references.chapter <- function(x, reftype = c("all", "fig", "tab")) {
+    pattern <- switch(match.arg(reftype),
+                      all = "\\\\ref[{][^}]*[}]",
+                      fig = "\\\\ref[{]fig:[^:]+:[^}]+[}]",
+                      tab = "\\\\ref[{]tab:[^:]+:[^}]+[}]")
+
+    tex <- readLines(file.path(x$path, "text.tex"))
+    m <- regmatches(tex, gregexpr(pattern, tex))
+    unlist(lapply(m, function(x) {
+        regmatches(x, regexec(pattern, x))
+    }))
+}
