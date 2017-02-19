@@ -73,47 +73,35 @@ references.chapter <- function(x, reftype = c("all", "fig", "tab")) {
 ##' @param x The report object or chapter object
 ##' @return invisible NULL
 ##' @export
-get_labels <- function(x, labeltype, include) UseMethod("get_labels")
+get_labels <- function(x, what, reftype, include)
+    UseMethod("get_labels")
 
 ##' @export
 get_labels.report <- function(x,
-                              labeltype = c("all", "sec", "fig", "tab"),
-                              include   = c("all", "text", "figures", "tables"))
+                              what    = c("label", "ref"),
+                              reftype = c("all", "sec", "fig", "tab"),
+                              include = c("all", "text", "figures", "tables"))
 {
-    get_labels(x$chapters, labeltype, include)
+    get_labels(x$chapters, reftype, include)
 }
 
 ##' @export
 get_labels.chapters <- function(x,
-                                labeltype = c("all", "sec", "fig", "tab"),
-                                include   = c("all", "text", "figures", "tables"))
+                                what    = c("label", "ref"),
+                                reftype = c("all", "sec", "fig", "tab"),
+                                include = c("all", "text", "figures", "tables"))
 {
-    do.call("rbind", lapply(x, function(y) get_labels(y, labeltype, include)))
+    do.call("rbind", lapply(x, function(y) get_labels(y, reftype, include)))
 }
 
 ##' @export
 get_labels.chapter <- function(x,
-                               labeltype = c("all", "sec", "fig", "tab"),
-                               include   = c("all", "text", "figures", "tables"))
+                               what    = c("label", "ref"),
+                               reftype = c("all", "sec", "fig", "tab"),
+                               include = c("all", "text", "figures", "tables"))
 {
-    pattern <- switch(match.arg(labeltype),
-                      all = "[^}]*",
-                      sec = "sec:[^:]+:[^}]+",
-                      fig = "fig:[^:]+:[^}]+",
-                      tab = "tab:[^:]+:[^}]+")
-    pattern <- paste0("[\\]label[{]", pattern, "[}]")
-
-    include <- match.arg(include)
-    if (identical(include, "all"))
-        include <- c("text", "figures", "tables")
-    files <- NULL
-    if ("text" %in% include)
-        files <- c(files, file.path(x$path, "text.tex"))
-    if ("figures" %in% include)
-        files <- c(files, figure_files(x, "tex"))
-    if ("tables" %in% include)
-        files <- c(files,
-                   file.path(x$path, list.files(x$path, "^table-[^.]*[.]tex")))
+    pattern <- reference_patter(what, reftype)
+    files <- chapter_tex_files(x, include)
 
     do.call("rbind", (lapply(files, function(filename) {
         tex <- readLines(filename)
@@ -126,6 +114,31 @@ get_labels.chapter <- function(x,
             return(data.frame(filename = filename, label = lbl))
         data.frame(filename = character(0), lbl = character(0))
     })))
+}
+
+##' Create a regular expression pattern to search for labels or
+##' references
+##' @param what pattern to search: either \\label{.} or \\ref{.}.
+##' @keywords internal
+reference_pattern <- function(what    = c("label", "ref"),
+                              reftype = c("all", "sec", "fig", "tab"))
+{
+    reftype <- match.arg(reftype)
+    if (identical(reftype, "all")) {
+        marker <- "[^}]*"
+    } else {
+        marker <- paste0(reftype, ":[^:]+:[^}]+")
+    }
+    paste0("[\\]", match.arg(what), "[{]", marker, "[}]")
+}
+
+##' Get the chapter table tex files
+##'
+##' @param x the chapter object
+##' @keywords internal
+chapter_table_tex_files <- function(x) {
+    stopifnot(is(x, "chapter"))
+    file.path(x$path, list.files(x$path, "^table-[^.]*[.]tex"))
 }
 
 ##' Get the chapter tex files
@@ -144,7 +157,6 @@ chapter_tex_files <- function(x, include = c("all", "text", "figures", "tables")
     if ("figures" %in% include)
         files <- c(files, figure_files(x, "tex"))
     if ("tables" %in% include)
-        files <- c(files,
-                   file.path(x$path, list.files(x$path, "^table-[^.]*[.]tex")))
+        files <- c(files, chapter_table_tex_files(x))
     files
 }
