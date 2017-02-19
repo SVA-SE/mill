@@ -20,16 +20,13 @@ check <- function(path = ".") {
         return(invisible(TRUE))
     if (check_expect_pandoc_is_installed())
         return(invisible(TRUE))
-    if (check_tex_to_docx_round_trip(report, repo))
-        return(invisible(TRUE))
-    if (check_reference_format(report))
-        return(invisible(TRUE))
-    if (check_missing_figure_reference_files(report))
-        return(invisible(TRUE))
-    if (check_missing_table_reference_files(report))
-        return(invisible(TRUE))
 
-    invisible(FALSE)
+    result <- check_tex_to_docx_round_trip(report, repo)
+    result <- c(result, check_reference_format(report))
+    result <- c(result, check_missing_figure_reference_files(report))
+    result <- c(result, check_missing_table_reference_files(report))
+
+    invisible(any(result))
 }
 
 ##' Check that repository is clean
@@ -126,11 +123,11 @@ check_reference_format <- function(x)
 check_reference_format.report <- function(x) {
     cat("* checking reference format ... ")
 
-    ref_all <- references(x, "all")
-    ref_fig <- references(x, "fig")
-    ref_tab <- references(x, "tab")
+    ref_all <- references(x, cmd = "ref", reftype = "all")
+    ref_fig <- references(x, cmd = "ref", reftype = "fig")
+    ref_tab <- references(x, cmd = "ref", reftype = "tab")
 
-    ref <- setdiff(ref_all, c(ref_fig, ref_tab))
+    ref <- setdiff(ref_all$tex, c(ref_fig$tex, ref_tab$tex))
     if (length(ref)) {
         cat("ERROR\n    ")
         cat(ref, sep = "\n    ")
@@ -170,10 +167,10 @@ check_missing_figure_reference_files.chapters <- function(x) {
 
 check_missing_figure_reference_files.chapter <- function(x) {
     ## Expected figure files
-    ref_fig <- references(x, "fig")
-    ref_fig_files <- sub("\\\\ref[{]fig:[^:]+:([^}]+)[}]",
+    ref_fig <- references(x, cmd = "ref", reftype = "fig")
+    ref_fig_files <- sub("[\\]ref[{]fig:[^:]+:([^}]+)[}]",
                          "figure-\\1.tex",
-                         ref_fig)
+                         ref_fig$tex)
     ref_fig_files <- file.path(x$path, ref_fig_files)
 
     ## Observed figure files
@@ -211,10 +208,10 @@ check_missing_table_reference_files.chapters <- function(x) {
 
 check_missing_table_reference_files.chapter <- function(x) {
     ## Expected table files
-    ref_tab <- references(x, "tab")
+    ref_tab <- references(x, "ref", "tab")
     ref_tab_files <- sub("\\\\ref[{]tab:[^:]+:([^}]+)[}]",
                          "table-\\1.tex",
-                         ref_tab)
+                         ref_tab$tex)
     ref_tab_files <- file.path(x$path, ref_tab_files)
 
     ## Observed table files
