@@ -1,25 +1,3 @@
-##' @keywords internal
-text_pattern <- function(fileext = c("tex")) {
-    fileext <- switch(match.arg(fileext),
-                      tex = "tex$")
-
-    paste0("^text[.]", fileext)
-}
-
-##' Get the path(s) of the chapter text.tex file(s)
-##'
-##' @keywords internal
-##' @param x The chapter object
-##' @return path
-text_files <- function(x) UseMethod("text_files")
-
-##' @export
-text_files.chapter <- function(x) {
-    list.files(path = x$path,
-               pattern = text_pattern(),
-               full.names = TRUE)
-}
-
 ##' Preview chapters
 ##'
 ##' @param x The report object, chapter object or the path to the text
@@ -46,7 +24,7 @@ preview_text.chapter <- function(x) {
 
     ## read in the pieces of the chapter
     a <- assets(x)
-    text <- readLines(text_files(x))
+    text <- readLines(chapter_tex_files(x, "text"))
     figures <- do.call("c", lapply(figure_files(x, "tex"), readLines))
     tables <- do.call("c", lapply(table_files(x, "tex"), readLines))
 
