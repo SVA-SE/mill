@@ -4,7 +4,7 @@
 \alias{get_labels}
 \title{Get figure labels}
 \usage{
-get_labels(x, labeltype, include)
+get_labels(x, what, reftype, include)
 }
 \arguments{
 \item{x}{The report object or chapter object}
