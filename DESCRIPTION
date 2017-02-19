@@ -1,7 +1,7 @@
 Package: relax
 Type: Package
 Title: Authoring Reports
-Version: 0.0.1
+Version: 0.0.2
 Authors@R: c(person("Stefan", "Widgren", role = c("aut", "cre"),
              email = "stefan.widgren@gmail.com"))
 Description: Utilities for authoring reports.
