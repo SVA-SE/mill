@@ -8,7 +8,7 @@ text_pattern <- function(fileext = c("tex")) {
 
 ##' Get the path(s) of the chapter text.tex file(s)
 ##'
-##' @export
+##' @keywords internal
 ##' @param x The chapter object
 ##' @return path
 text_files <- function(x) UseMethod("text_files")

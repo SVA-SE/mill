@@ -15,3 +15,4 @@ path
 \description{
 Get the path(s) of the chapter text.tex file(s)
 }
+\keyword{internal}
