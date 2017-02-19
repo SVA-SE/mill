@@ -95,54 +95,6 @@ references.chapter <- function(x,
     })))
 }
 
-##' Get figure labels
-##'
-##' @param x The report object or chapter object
-##' @return invisible NULL
-##' @export
-get_labels <- function(x, what, reftype, include)
-    UseMethod("get_labels")
-
-##' @export
-get_labels.report <- function(x,
-                              what    = c("label", "ref"),
-                              reftype = c("all", "sec", "fig", "tab"),
-                              include = c("all", "text", "figures", "tables"))
-{
-    get_labels(x$chapters, reftype, include)
-}
-
-##' @export
-get_labels.chapters <- function(x,
-                                what    = c("label", "ref"),
-                                reftype = c("all", "sec", "fig", "tab"),
-                                include = c("all", "text", "figures", "tables"))
-{
-    do.call("rbind", lapply(x, function(y) get_labels(y, reftype, include)))
-}
-
-##' @export
-get_labels.chapter <- function(x,
-                               what    = c("label", "ref"),
-                               reftype = c("all", "sec", "fig", "tab"),
-                               include = c("all", "text", "figures", "tables"))
-{
-    pattern <- reference_patter(what, reftype)
-    files <- chapter_tex_files(x, include)
-
-    do.call("rbind", (lapply(files, function(filename) {
-        tex <- readLines(filename)
-        m <- regmatches(tex, gregexpr(pattern, tex))
-        lbl <- unlist(lapply(m, function(y) {
-            regmatches(y, regexec(pattern, y))
-        }))
-
-        if (length(lbl))
-            return(data.frame(filename = filename, label = lbl))
-        data.frame(filename = character(0), lbl = character(0))
-    })))
-}
-
 ##' Create a regular expression pattern to search for labels or
 ##' references
 ##' @param cmd what to search for, either \\label{.} or \\ref{.}.
