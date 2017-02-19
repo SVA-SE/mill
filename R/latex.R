@@ -63,8 +63,8 @@ references.chapter <- function(x, reftype = c("all", "fig", "tab")) {
 
     tex <- readLines(file.path(x$path, "text.tex"))
     m <- regmatches(tex, gregexpr(pattern, tex))
-    unlist(lapply(m, function(x) {
-        regmatches(x, regexec(pattern, x))
+    unlist(lapply(m, function(y) {
+        regmatches(y, regexec(pattern, y))
     }))
 }
 
