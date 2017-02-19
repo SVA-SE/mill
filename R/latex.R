@@ -39,33 +39,60 @@ luatex <- function(texname, clean = TRUE) {
 ##' TeX references
 ##'
 ##' @param x the report or chapter object.
+##' @param cmd what to search for, either \\label{.} or \\ref{.}.
 ##' @param reftype the type of references to search for.
-##' @return character vector with found references.
+##' @return data.frame with the found references.
 ##' @export
-references <- function(x, reftype) UseMethod("references")
+references <- function(x, cmd, reftype, include) UseMethod("references")
 
 ##' @export
-references.report <- function(x, reftype = c("all", "fig", "tab")) {
-    references(x$chapters, reftype)
+references.report <- function(x,
+                              cmd     = c("label", "ref"),
+                              reftype = c("all", "sec", "fig", "tab"))
+{
+    references(x$chapters, cmd, reftype, include)
 }
 
 ##' @export
-references.chapters <- function(x, reftype = c("all", "fig", "tab")) {
-    unlist(lapply(x, function(y) references(y, reftype)))
+references.chapters <- function(x,
+                                cmd     = c("label", "ref"),
+                                reftype = c("all", "sec", "fig", "tab"))
+{
+    do.call("rbind",
+            lapply(x, function(y) references(y, cmd, reftype, include)))
 }
 
 ##' @export
-references.chapter <- function(x, reftype = c("all", "fig", "tab")) {
-    pattern <- switch(match.arg(reftype),
-                      all = "\\\\ref[{][^}]*[}]",
-                      fig = "\\\\ref[{]fig:[^:]+:[^}]+[}]",
-                      tab = "\\\\ref[{]tab:[^:]+:[^}]+[}]")
+references.chapter <- function(x,
+                               cmd     = c("label", "ref"),
+                               reftype = c("all", "sec", "fig", "tab"))
+{
+    pattern <- reference_pattern(cmd, reftype)
+    files <- chapter_tex_files(x, include)
 
-    tex <- readLines(file.path(x$path, "text.tex"))
-    m <- regmatches(tex, gregexpr(pattern, tex))
-    unlist(lapply(m, function(y) {
-        regmatches(y, regexec(pattern, y))
-    }))
+    do.call("rbind", (lapply(files, function(filename) {
+        tex <- readLines(filename)
+        m <- regmatches(tex, gregexpr(pattern, tex))
+        m <- unlist(lapply(m, function(y) {
+            regmatches(y, regexec(pattern, y))
+        }))
+
+        if (length(m)) {
+            return(data.frame(filename = file.path("chapters",
+                                                   x$title,
+                                                   basename(filename)),
+                              tex = m,
+                              cmd = sub("[\\]([^{]+)[{][^}]*[}]", "\\1", m),
+                              marker = sub("[\\][^{]+[{]([^}]*)[}]", "\\1", m),
+                              stringsAsFactors = FALSE))
+        }
+
+        data.frame(filename = character(0),
+                   tex = character(0),
+                   cmd = character(0),
+                   marker = character(0),
+                   stringsAsFactors = FALSE)
+    })))
 }
 
 ##' Get figure labels
@@ -118,18 +145,20 @@ get_labels.chapter <- function(x,
 
 ##' Create a regular expression pattern to search for labels or
 ##' references
-##' @param what pattern to search: either \\label{.} or \\ref{.}.
+##' @param cmd what to search for, either \\label{.} or \\ref{.}.
+##' @param reftype the type of references to search for.
 ##' @keywords internal
-reference_pattern <- function(what    = c("label", "ref"),
+reference_pattern <- function(cmd     = c("label", "ref"),
                               reftype = c("all", "sec", "fig", "tab"))
 {
-    reftype <- match.arg(reftype)
+    cmd <- match.arg(cmd, choices = cmd)
+    reftype <- match.arg(reftype, choices = reftype)
     if (identical(reftype, "all")) {
         marker <- "[^}]*"
     } else {
         marker <- paste0(reftype, ":[^:]+:[^}]+")
     }
-    paste0("[\\]", match.arg(what), "[{]", marker, "[}]")
+    paste0("[\\]", cmd, "[{]", marker, "[}]")
 }
 
 ##' Get the chapter table tex files
@@ -137,26 +166,17 @@ reference_pattern <- function(what    = c("label", "ref"),
 ##' @param x the chapter object
 ##' @keywords internal
 chapter_table_tex_files <- function(x) {
-    stopifnot(is(x, "chapter"))
+    stopifnot(methods::is(x, "chapter"))
     file.path(x$path, list.files(x$path, "^table-[^.]*[.]tex"))
 }
 
 ##' Get the chapter tex files
 ##'
 ##' @param x the chapter object
-##' @param include the type of chapter tex files to include.
 ##' @keywords internal
-chapter_tex_files <- function(x, include = c("all", "text", "figures", "tables")) {
-    stopifnot(is(x, "chapter"))
-    include <- match.arg(include)
-    if (identical(include, "all"))
-        include <- c("text", "figures", "tables")
-    files <- NULL
-    if ("text" %in% include)
-        files <- c(files, file.path(x$path, "text.tex"))
-    if ("figures" %in% include)
-        files <- c(files, figure_files(x, "tex"))
-    if ("tables" %in% include)
-        files <- c(files, chapter_table_tex_files(x))
-    files
+chapter_tex_files <- function(x) {
+    stopifnot(methods::is(x, "chapter"))
+    c(file.path(x$path, "text.tex"),
+      figure_files(x, "tex"),
+      chapter_table_tex_files(x))
 }
