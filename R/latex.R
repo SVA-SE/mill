@@ -39,25 +39,23 @@ luatex <- function(texname, clean = TRUE) {
 ##' TeX references
 ##'
 ##' @param x the report or chapter object.
-##' @param cmd what to search for, either \\label{.} or \\ref{.}.
 ##' @return data.frame with the found references.
 ##' @export
-references <- function(x, cmd) UseMethod("references")
+references <- function(x) UseMethod("references")
 
 ##' @export
-references.report <- function(x, cmd = c("label", "ref")) {
-    references(x$chapters, cmd)
+references.report <- function(x) {
+    references(x$chapters)
 }
 
 ##' @export
-references.chapters <- function(x, cmd = c("label", "ref")) {
-    do.call("rbind",
-            lapply(x, function(y) references(y, cmd)))
+references.chapters <- function(x) {
+    do.call("rbind", lapply(x, function(y) references(y)))
 }
 
 ##' @export
-references.chapter <- function(x, cmd = c("label", "ref")) {
-    pattern <- reference_pattern(cmd)
+references.chapter <- function(x) {
+    pattern <- "[\\]label[{][^}]*[}]|[\\]ref[{][^}]*[}]"
     files <- chapter_tex_files(x)
 
     do.call("rbind", (lapply(files, function(filename) {
@@ -88,14 +86,6 @@ references.chapter <- function(x, cmd = c("label", "ref")) {
                    reftype  = reftype,
                    stringsAsFactors = FALSE)
     })))
-}
-
-##' Create a regular expression pattern to search for labels or
-##' references
-##' @param cmd what to search for, either \\label{.} or \\ref{.}.
-##' @keywords internal
-reference_pattern <- function(cmd = c("label", "ref")) {
-    paste0("[\\]", cmd, "[{][^}]*[}]")
 }
 
 ##' Get the chapter table tex files
