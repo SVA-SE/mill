@@ -123,14 +123,15 @@ check_reference_format <- function(x)
 check_reference_format.report <- function(x) {
     cat("* checking reference format ... ")
 
-    ref_all <- references(x, cmd = "ref", reftype = "all")
-    ref_fig <- references(x, cmd = "ref", reftype = "fig")
-    ref_tab <- references(x, cmd = "ref", reftype = "tab")
+    ref <- references(x, cmd = "ref")
+    ref_all <- ref$tex
+    ref_fig <- ref$tex[ref$reftype == "fig"]
+    ref_tab <- ref$tex[ref$reftype == "tab"]
 
-    ref <- setdiff(ref_all$tex, c(ref_fig$tex, ref_tab$tex))
-    if (length(ref)) {
+    d <- setdiff(ref$tex, c(ref_fig, ref_tab))
+    if (length(d)) {
         cat("ERROR\n    ")
-        cat(ref, sep = "\n    ")
+        cat(d, sep = "\n    ")
         return(TRUE)
     }
 
@@ -167,7 +168,8 @@ check_missing_figure_reference_files.chapters <- function(x) {
 
 check_missing_figure_reference_files.chapter <- function(x) {
     ## Expected figure files
-    ref_fig <- references(x, cmd = "ref", reftype = "fig")
+    ref_fig <- references(x, cmd = "ref")
+    ref_fig <- ref_fig[ref_fig$reftype == "fig", ]
     ref_fig_files <- sub("[\\]ref[{]fig:[^:]+:([^}]+)[}]",
                          "figure-\\1.tex",
                          ref_fig$tex)
@@ -208,7 +210,8 @@ check_missing_table_reference_files.chapters <- function(x) {
 
 check_missing_table_reference_files.chapter <- function(x) {
     ## Expected table files
-    ref_tab <- references(x, "ref", "tab")
+    ref_tab <- references(x, "ref")
+    ref_tab <- ref_tab[ref_tab$reftype == "tab", ]
     ref_tab_files <- sub("\\\\ref[{]tab:[^:]+:([^}]+)[}]",
                          "table-\\1.tex",
                          ref_tab$tex)
