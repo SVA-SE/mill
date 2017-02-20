@@ -123,7 +123,8 @@ check_reference_format <- function(x)
 check_reference_format.report <- function(x) {
     cat("* checking reference format ... ")
 
-    ref <- references(x, cmd = "ref")
+    ref <- references(x)
+    ref <- ref[ref$cmd == "ref", ]
     ref_all <- ref$tex
     ref_fig <- ref$tex[ref$reftype == "fig"]
     ref_tab <- ref$tex[ref$reftype == "tab"]
@@ -167,13 +168,18 @@ check_missing_figure_reference_files.chapters <- function(x) {
 }
 
 check_missing_figure_reference_files.chapter <- function(x) {
-    ## Expected figure files
-    ref_fig <- references(x, cmd = "ref")
-    ref_fig <- ref_fig[ref_fig$reftype == "fig", ]
-    ref_fig_files <- sub("[\\]ref[{]fig:[^:]+:([^}]+)[}]",
-                         "figure-\\1.tex",
-                         ref_fig$tex)
-    ref_fig_files <- file.path(x$path, ref_fig_files)
+    ## Get references for figure files
+    ref <- references(x)
+    ref <- ref[ref$cmd == "ref" & ref$reftype == "fig", ]
+
+    ## Expected files from figure references: 'fig:chapter:id'
+    if (nrow(ref)) {
+        id <- sapply(strsplit(ref$marker, ":"), "[", 3)
+        filename <- paste0("figure-", id, ".tex")
+        ref_fig_files <- file.path(x$path, filename)
+    } else {
+        ref_fig_files <- character(0)
+    }
 
     ## Observed figure files
     fig_files <- figure_files(x, "tex")
@@ -209,13 +215,18 @@ check_missing_table_reference_files.chapters <- function(x) {
 }
 
 check_missing_table_reference_files.chapter <- function(x) {
-    ## Expected table files
-    ref_tab <- references(x, "ref")
-    ref_tab <- ref_tab[ref_tab$reftype == "tab", ]
-    ref_tab_files <- sub("\\\\ref[{]tab:[^:]+:([^}]+)[}]",
-                         "table-\\1.tex",
-                         ref_tab$tex)
-    ref_tab_files <- file.path(x$path, ref_tab_files)
+    ## Get references for table files
+    ref <- references(x)
+    ref <- ref[ref$cmd == "ref" & ref$reftype == "tab", ]
+
+    ## Expected files from table references: 'tab:chapter:id'
+    if (nrow(ref)) {
+        id <- sapply(strsplit(ref$marker, ":"), "[", 3)
+        filename <- paste0("table-", id, ".tex")
+        ref_tab_files <- file.path(x$path, filename)
+    } else {
+        ref_tab_files <- character(0)
+    }
 
     ## Observed table files
     tab_files <- file.path(x$path, list.files(x$path, "^table-[^.]*[.]tex"))
