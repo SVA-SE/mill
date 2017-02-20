@@ -40,34 +40,24 @@ luatex <- function(texname, clean = TRUE) {
 ##'
 ##' @param x the report or chapter object.
 ##' @param cmd what to search for, either \\label{.} or \\ref{.}.
-##' @param reftype the type of references to search for.
 ##' @return data.frame with the found references.
 ##' @export
-references <- function(x, cmd, reftype) UseMethod("references")
+references <- function(x, cmd) UseMethod("references")
 
 ##' @export
-references.report <- function(x,
-                              cmd     = c("label", "ref"),
-                              reftype = c("all", "sec", "fig", "tab"))
-{
-    references(x$chapters, cmd, reftype)
+references.report <- function(x, cmd = c("label", "ref")) {
+    references(x$chapters, cmd)
 }
 
 ##' @export
-references.chapters <- function(x,
-                                cmd     = c("label", "ref"),
-                                reftype = c("all", "sec", "fig", "tab"))
-{
+references.chapters <- function(x, cmd = c("label", "ref")) {
     do.call("rbind",
-            lapply(x, function(y) references(y, cmd, reftype)))
+            lapply(x, function(y) references(y, cmd)))
 }
 
 ##' @export
-references.chapter <- function(x,
-                               cmd     = c("label", "ref"),
-                               reftype = c("all", "sec", "fig", "tab"))
-{
-    pattern <- reference_pattern(cmd, reftype)
+references.chapter <- function(x, cmd = c("label", "ref")) {
+    pattern <- reference_pattern(cmd)
     files <- chapter_tex_files(x)
 
     do.call("rbind", (lapply(files, function(filename) {
@@ -78,19 +68,24 @@ references.chapter <- function(x,
         }))
 
         if (length(m)) {
-            return(data.frame(filename = file.path("chapters",
-                                                   x$title,
-                                                   basename(filename)),
-                              tex = m,
-                              cmd = sub("[\\]([^{]+)[{][^}]*[}]", "\\1", m),
-                              marker = sub("[\\][^{]+[{]([^}]*)[}]", "\\1", m),
-                              stringsAsFactors = FALSE))
+            filename = file.path("chapters", x$title, basename(filename))
+            tex <- m
+            cmd <- sub("[\\]([^{]+)[{][^}]*[}]", "\\1", tex)
+            marker <- sub("[\\][^{]+[{]([^}]*)[}]", "\\1", tex)
+            reftype <- sapply(strsplit(marker, ":"), "[", 1)
+        } else {
+            filename = character(0)
+            tex <- character(0)
+            cmd <- character(0)
+            marker <- character(0)
+            reftype <- character(0)
         }
 
-        data.frame(filename = character(0),
-                   tex = character(0),
-                   cmd = character(0),
-                   marker = character(0),
+        data.frame(filename = filename,
+                   tex      = tex,
+                   cmd      = cmd,
+                   marker   = marker,
+                   reftype  = reftype,
                    stringsAsFactors = FALSE)
     })))
 }
@@ -98,19 +93,9 @@ references.chapter <- function(x,
 ##' Create a regular expression pattern to search for labels or
 ##' references
 ##' @param cmd what to search for, either \\label{.} or \\ref{.}.
-##' @param reftype the type of references to search for.
 ##' @keywords internal
-reference_pattern <- function(cmd     = c("label", "ref"),
-                              reftype = c("all", "sec", "fig", "tab"))
-{
-    cmd <- match.arg(cmd, choices = cmd)
-    reftype <- match.arg(reftype, choices = reftype)
-    if (identical(reftype, "all")) {
-        marker <- "[^}]*"
-    } else {
-        marker <- paste0(reftype, ":[^:]+:[^}]+")
-    }
-    paste0("[\\]", cmd, "[{]", marker, "[}]")
+reference_pattern <- function(cmd = c("label", "ref")) {
+    paste0("[\\]", cmd, "[{][^}]*[}]")
 }
 
 ##' Get the chapter table tex files
