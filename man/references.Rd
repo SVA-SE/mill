@@ -4,12 +4,10 @@
 \alias{references}
 \title{TeX references}
 \usage{
-references(x, cmd)
+references(x)
 }
 \arguments{
 \item{x}{the report or chapter object.}
-
-\item{cmd}{what to search for, either \\label{.} or \\ref{.}.}
 }
 \value{
 data.frame with the found references.
