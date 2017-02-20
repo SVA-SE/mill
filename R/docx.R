@@ -9,6 +9,11 @@
 export <- function(x, to) UseMethod("export")
 
 ##' @export
+export.default <- function(x, to) {
+    export(load_report())
+}
+
+##' @export
 export.report <- function(x, to) {
     if (missing(to))
         to <- x$report
