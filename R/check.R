@@ -6,6 +6,11 @@
 check <- function(path = ".") {
     cat("* using 'relax' version", as.character(packageVersion("relax")), "\n")
 
+    if (check_expect_pandoc_is_installed())
+        return(invisible(TRUE))
+    if (check_expect_readxl_is_installed())
+        return(invisible(TRUE))
+
     cat("* loading report ... ")
     report <- tryCatch(load_report(path), error = function(e) NULL)
     if (is.null(report)) {
@@ -17,8 +22,6 @@ check <- function(path = ".") {
 
     repo <- git2r::repository(report$path)
     if (check_expect_clean_repository(report, repo))
-        return(invisible(TRUE))
-    if (check_expect_pandoc_is_installed())
         return(invisible(TRUE))
 
     result <- check_tex_to_docx_round_trip(report, repo)
@@ -70,6 +73,23 @@ check_expect_pandoc_is_installed <- function() {
     }
 
     cat("OK\n   ", output[ver], "\n")
+    FALSE
+}
+
+##' Check that readxl is installed
+##'
+##' readxl is required to check consistency between 'report.yml' and
+##' exportd 'Authors.xlsx'.
+##' @keywords internal
+check_expect_readxl_is_installed <- function() {
+    cat("* checking that 'readxl' is installed ... ")
+
+    if (!requireNamespace("readxl", quietly=TRUE)) {
+        cat("ERROR\n")
+        return(TRUE)
+    }
+
+    cat("OK\n    readxl", format(packageVersion("readxl")), "\n")
     FALSE
 }
 
