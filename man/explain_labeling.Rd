@@ -2,11 +2,11 @@
 % Please edit documentation in R/figure.R
 \name{explain_labeling}
 \alias{explain_labeling}
-\title{Format the label from a figure path}
+\title{Explain the labeling}
 \usage{
 explain_labeling()
 }
 \description{
-Format the label from a figure path
+Explain the labeling
 }
 \keyword{internal}

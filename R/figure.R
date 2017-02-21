@@ -197,7 +197,7 @@ format_labels <- function(labels, format = c("latex", "word")) {
     return(labels)
 }
 
-##' Format the label from a figure path
+##'Explain the labeling
 ##'
 ##' @keywords internal
 explain_labeling <- function() {
