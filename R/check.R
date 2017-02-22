@@ -6,6 +6,11 @@
 check <- function(path = ".") {
     cat("* using 'relax' version", as.character(packageVersion("relax")), "\n")
 
+    if (check_expect_pandoc_is_installed())
+        return(invisible(TRUE))
+    if (check_expect_readxl_is_installed())
+        return(invisible(TRUE))
+
     cat("* loading report ... ")
     report <- tryCatch(load_report(path), error = function(e) NULL)
     if (is.null(report)) {
@@ -17,8 +22,6 @@ check <- function(path = ".") {
 
     repo <- git2r::repository(report$path)
     if (check_expect_clean_repository(report, repo))
-        return(invisible(TRUE))
-    if (check_expect_pandoc_is_installed())
         return(invisible(TRUE))
 
     result <- check_tex_to_docx_round_trip(report, repo)
@@ -73,6 +76,23 @@ check_expect_pandoc_is_installed <- function() {
     FALSE
 }
 
+##' Check that readxl is installed
+##'
+##' readxl is required to check consistency between 'report.yml' and
+##' exportd 'Authors.xlsx'.
+##' @keywords internal
+check_expect_readxl_is_installed <- function() {
+    cat("* checking that 'readxl' is installed ... ")
+
+    if (!requireNamespace("readxl", quietly=TRUE)) {
+        cat("ERROR\n")
+        return(TRUE)
+    }
+
+    cat("OK\n    readxl", format(packageVersion("readxl")), "\n")
+    FALSE
+}
+
 ##' Check conversion between 'tex' and 'docx'
 ##'
 ##' Checking that converting to 'docx' from 'tex' and converting back
@@ -123,14 +143,16 @@ check_reference_format <- function(x)
 check_reference_format.report <- function(x) {
     cat("* checking reference format ... ")
 
-    ref_all <- references(x, cmd = "ref", reftype = "all")
-    ref_fig <- references(x, cmd = "ref", reftype = "fig")
-    ref_tab <- references(x, cmd = "ref", reftype = "tab")
+    ref <- references(x)
+    ref <- ref[ref$cmd == "ref", ]
+    ref_all <- ref$tex
+    ref_fig <- ref$tex[ref$reftype == "fig"]
+    ref_tab <- ref$tex[ref$reftype == "tab"]
 
-    ref <- setdiff(ref_all$tex, c(ref_fig$tex, ref_tab$tex))
-    if (length(ref)) {
+    d <- setdiff(ref$tex, c(ref_fig, ref_tab))
+    if (length(d)) {
         cat("ERROR\n    ")
-        cat(ref, sep = "\n    ")
+        cat(d, sep = "\n    ")
         return(TRUE)
     }
 
@@ -166,12 +188,18 @@ check_missing_figure_reference_files.chapters <- function(x) {
 }
 
 check_missing_figure_reference_files.chapter <- function(x) {
-    ## Expected figure files
-    ref_fig <- references(x, cmd = "ref", reftype = "fig")
-    ref_fig_files <- sub("[\\]ref[{]fig:[^:]+:([^}]+)[}]",
-                         "figure-\\1.tex",
-                         ref_fig$tex)
-    ref_fig_files <- file.path(x$path, ref_fig_files)
+    ## Get references for figure files
+    ref <- references(x)
+    ref <- ref[ref$cmd == "ref" & ref$reftype == "fig", ]
+
+    ## Expected files from figure references: 'fig:chapter:id'
+    if (nrow(ref)) {
+        id <- sapply(strsplit(ref$marker, ":"), "[", 3)
+        filename <- paste0("figure-", id, ".tex")
+        ref_fig_files <- file.path(x$path, filename)
+    } else {
+        ref_fig_files <- character(0)
+    }
 
     ## Observed figure files
     fig_files <- figure_files(x, "tex")
@@ -207,12 +235,18 @@ check_missing_table_reference_files.chapters <- function(x) {
 }
 
 check_missing_table_reference_files.chapter <- function(x) {
-    ## Expected table files
-    ref_tab <- references(x, "ref", "tab")
-    ref_tab_files <- sub("\\\\ref[{]tab:[^:]+:([^}]+)[}]",
-                         "table-\\1.tex",
-                         ref_tab$tex)
-    ref_tab_files <- file.path(x$path, ref_tab_files)
+    ## Get references for table files
+    ref <- references(x)
+    ref <- ref[ref$cmd == "ref" & ref$reftype == "tab", ]
+
+    ## Expected files from table references: 'tab:chapter:id'
+    if (nrow(ref)) {
+        id <- sapply(strsplit(ref$marker, ":"), "[", 3)
+        filename <- paste0("table-", id, ".tex")
+        ref_tab_files <- file.path(x$path, filename)
+    } else {
+        ref_tab_files <- character(0)
+    }
 
     ## Observed table files
     tab_files <- file.path(x$path, list.files(x$path, "^table-[^.]*[.]tex"))
