@@ -98,8 +98,8 @@ chapter_tex_files <- function(x, type = c("all", "text", "fig", "table")) {
     stopifnot(methods::is(x, "chapter"))
 
     text_files <- NULL
-    fig_files <- NULL
-    tab_file <- NULL
+    fig_files  <- NULL
+    tab_files  <- NULL
 
     if (type %in% c("all", "text"))
         text_files <- file.path(x$path, "text.tex")
