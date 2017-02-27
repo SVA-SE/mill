@@ -25,9 +25,14 @@ preview_text.chapter <- function(x) {
     ## read in the pieces of the chapter
     a <- assets(x)
     text <- readLines(chapter_tex_files(x, "text"))
-    figures <- do.call("c", lapply(figure_files(x, "tex"), readLines))
-    tables <- do.call("c", lapply(table_files(x, "tex"), readLines))
-
+    figures <- NULL
+    tables <- NULL
+    chapter_figure_files <- basename(figure_files(x, "tex"))
+    chapter_table_files <- basename(table_files(x, "tex"))
+    if (length(chapter_figure_files))
+        figures <- paste0("\\input{", chapter_figure_files, "}")
+    if (length(chapter_table_files))
+        tables <- paste0("\\input{", chapter_table_files, "}")
     ## Stitch together the chapter
     tex <- c(readLines(file.path(a, "figure-preview/pre-snippet.tex")),
              "\\begin{document}",
