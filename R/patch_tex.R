@@ -2,7 +2,7 @@
 ##'
 ##' This function does the interactive replacement for a chapter. An
 ##' example to add numprint{} might be:
-##' 
+##'
 ##' @param pattern A regular expression with a single capture
 ##' @param replacement The replacement expression Referring to the
 ##'     first capture with "\\1".
@@ -14,7 +14,7 @@
 ##' r <- load_report()
 ##' pattern <- "([[:digit:]]{4, })"
 ##' replacement <- "\\\\numprint{\\1}"
-##' interactive_replace(r[["Campy"]], pattern, replacement) 
+##' interactive_replace(r[["Campy"]], pattern, replacement)
 interactive_replace <- function(x, pattern, replacement) {
     UseMethod("interactive_replace")
 }
@@ -23,7 +23,7 @@ interactive_replace <- function(x, pattern, replacement) {
 ##'
 ##' This function does the interactive replacement for a chapter. An
 ##' example to add numprint{} might be:
-##' 
+##'
 ##' @param pattern A regular expression with a single capture
 ##' @param replacement The replacement expression Referring to the
 ##'     first capture with "\\1".
@@ -35,7 +35,7 @@ interactive_replace <- function(x, pattern, replacement) {
 ##' r <- load_report()
 ##' pattern <- "([[:digit:]]{4, })"
 ##' replacement <- "\\\\numprint{\\1}"
-##' interactive_replace(r[["Campy"]], pattern, replacement) 
+##' interactive_replace(r[["Campy"]], pattern, replacement)
 interactive_replace.chapter <- function(x, pattern, replacement) {
 
     ## Get the text
@@ -115,4 +115,28 @@ interactive_replace.character <- function(x, pattern, replacement) {
 ##' @keywords internal
 blue <- function(text) {
     paste0("\033[34m", text, "\033[39m")
+}
+
+##' Apply_patch
+##'
+##' @export
+##' @param x A chapter
+apply_patch <- function(x) {
+    UseMethod("apply_patch")
+}
+
+##' Apply_patch
+##'
+##' Apply the patch to the chapter
+##'
+##' @param x A chapter
+##' @return the path to typeset.tex
+##' @export
+apply_patch.chapter <- function(x) {
+    tex <- shQuote(file.path(x$path, "text.tex"))
+    patch <-  shQuote(file.path(x$path, "typeset.patch"))
+    typeset <-  shQuote(file.path(x$path, "typeset.tex"))
+    command <- paste("patch", tex, patch, "-o", typeset)
+    system(command)
+    return(typeset)
 }
