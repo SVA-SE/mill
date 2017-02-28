@@ -39,7 +39,7 @@ interactive_replace <- function(x, pattern, replacement) {
 interactive_replace.chapter <- function(x, pattern, replacement) {
 
     ## Get the text
-    y <- readLines(chapter_tex_files(x, "text"))
+    y <- readLines(file.path(x$path, "typeset.tex"))
 
     ## Show lines of text and run interactive replace over the lines
     ## of text.
