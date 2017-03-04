@@ -40,37 +40,48 @@ contributors <- function(sheet) {
     result
 }
 
+##' @keywords internal
+authors <- function(sheet, title) {
+    stopifnot(is.data.frame(sheet))
+    result <- lapply(grep(title, sheet$Chapter), function(i) {
+        contributor(sheet[i, ])
+    })
+    class(result) <- "authors"
+    result
+}
+
+##' @keywords internal
+chapters <- function(sheet, path) {
+    stopifnot(is.data.frame(sheet))
+    stopifnot("Chapter" %in% colnames(sheet))
+    titles <- sort(unique(trim(unlist(strsplit(sheet$Chapter, ";")))))
+    result <- lapply(titles, function(title) {
+        structure(list(title = title,
+                       path = file.path(path, "chapters", title),
+                       authors = authors(sheet, title)),
+                  .Names = c("title", "path", "authors"),
+                  class = "chapter")
+    })
+    class(result) <- "chapters"
+    result
+}
+
 ##' Load configuration for the report
 ##'
 ##' @param path The path to the root folder of the project.
-##' @importFrom yaml yaml.load_file
+##' @importFrom readxl read_excel
+##' @importFrom readxl excel_sheets
 ##' @export
 load_report <- function(path = ".") {
     path <- normalizePath(path, mustWork = TRUE)
-    r <- yaml.load_file(file.path(path, "report.yml"))
-    r$path <- path
-    class(r) <- "report"
+    filename <- file.path(path, "report.xlsx")
+    df <- read_excel(filename)
 
-    class(r$contributors) <- "contributors"
-    for (i in seq_len(length(r$contributors)))
-        class(r$contributors[[i]]) <- "contributor"
-
-    class(r$chapters) <- "chapters"
-    for (i in seq_len(length(r$chapters))) {
-        path <- file.path(r$path, "chapters", r$chapters[[i]]$title)
-        r$chapters[[i]]$path <- path
-        class(r$chapters[[i]]) <- "chapter"
-
-        class(r$chapters[[i]]$contacts) <- "contacts"
-        for (j in seq_len(length(r$chapters[[i]]$contacts)))
-            class(r$chapters[[i]]$contacts[[j]]) <- "contributor"
-
-        class(r$chapters[[i]]$authors) <- "authors"
-        for (j in seq_len(length(r$chapters[[i]]$authors)))
-            class(r$chapters[[i]]$authors[[j]]) <- "contributor"
-    }
-
-    r
+    structure(list(report       = excel_sheets(filename)[1],
+                   path         = path,
+                   contributors = contributors(df),
+                   chapters     = chapters(df, path)),
+              class = "report")
 }
 
 ##' @method summary report
@@ -111,7 +122,7 @@ print.chapters <- function(x, ...) {
 ##' @export
 print.chapter <- function(x, ..., indent = "") {
     cat(indent, x$title, "\n", sep = "")
-    print(x$contacts, indent = paste0(indent, "  "))
+    ##print(x$contacts, indent = paste0(indent, "  "))
     print(x$authors, indent = paste0(indent, "  "))
     cat("\n")
 }
