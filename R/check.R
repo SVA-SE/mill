@@ -8,8 +8,6 @@ check <- function(path = ".") {
 
     if (check_expect_pandoc_is_installed())
         return(invisible(TRUE))
-    if (check_expect_readxl_is_installed())
-        return(invisible(TRUE))
 
     cat("* loading report ... ")
     report <- tryCatch(load_report(path), error = function(e) NULL)
@@ -73,23 +71,6 @@ check_expect_pandoc_is_installed <- function() {
     }
 
     cat("OK\n   ", output[ver], "\n")
-    FALSE
-}
-
-##' Check that readxl is installed
-##'
-##' readxl is required to check consistency between 'report.yml' and
-##' exportd 'Authors.xlsx'.
-##' @keywords internal
-check_expect_readxl_is_installed <- function() {
-    cat("* checking that 'readxl' is installed ... ")
-
-    if (!requireNamespace("readxl", quietly=TRUE)) {
-        cat("ERROR\n")
-        return(TRUE)
-    }
-
-    cat("OK\n    readxl", format(packageVersion("readxl")), "\n")
     FALSE
 }
 
