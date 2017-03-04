@@ -7,25 +7,36 @@ trim <- function(str) {
     sub("\\s*$", "", sub("^\\s*", "", str))
 }
 
+##' Contributor
+##'
+##' Extract one contributor from one row of the project excel sheet.
+##' @param row the row with the contributor.
+##' @return a contributor object
+##' @keywords internal
+contributor <- function(row) {
+    stopifnot(is.data.frame(row))
+    stopifnot(all(c("Name", "Email", "Organisation") %in%
+                  colnames(row)))
+    stopifnot(nrow(row) == 1)
+    structure(list(name = trim(row$Name[1]),
+                   email = trim(row$Email[1]),
+                   organisation = trim(row$Organisation[1])),
+              .Names = c("name", "email", "organisation"),
+              class = "contributor")
+}
+
 ##' Contributors
 ##'
 ##' Extract the contributors from the project excel sheet.
 ##' @param sheet a data.frame defining the project.
 ##' @return a list with contributors
+##' @keywords internal
 contributors <- function(sheet) {
     stopifnot(is.data.frame(sheet))
-    stopifnot(all(c("Name", "Email", "Organisation") %in% colnames(sheet)))
-
     result <- lapply(seq_len(nrow(sheet)), function(i) {
-        structure(list(name = trim(sheet$Name[i]),
-                       email = trim(sheet$Email[i]),
-                       organisation = trim(sheet$Organisation[i])),
-                  .Names = c("name", "email", "organisation"),
-                  class = "contributor")
+        contributor(sheet[i, ])
     })
-
     class(result) <- "contributors"
-
     result
 }
 
