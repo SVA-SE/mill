@@ -7,6 +7,6 @@ Authors@R: c(person("Stefan", "Widgren", role = c("aut", "cre"),
 Description: Utilities for authoring reports.
 Imports:
     git2r,
-    yaml
+    readxl
 LazyData: TRUE
 RoxygenNote: 6.0.1
