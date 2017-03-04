@@ -88,22 +88,25 @@ references.chapter <- function(x) {
     })))
 }
 
-##' Get the chapter table tex files
-##'
-##' @param x the chapter object
-##' @keywords internal
-chapter_table_tex_files <- function(x) {
-    stopifnot(methods::is(x, "chapter"))
-    file.path(x$path, list.files(x$path, "^table-[^.]*[.]tex"))
-}
-
 ##' Get the chapter tex files
 ##'
 ##' @param x the chapter object
 ##' @keywords internal
-chapter_tex_files <- function(x) {
+chapter_tex_files <- function(x, type = c("all", "text", "fig", "table")) {
+
+    type = match.arg(type)
     stopifnot(methods::is(x, "chapter"))
-    c(file.path(x$path, "text.tex"),
-      figure_files(x, "tex"),
-      chapter_table_tex_files(x))
+
+    text_files <- NULL
+    fig_files  <- NULL
+    tab_files  <- NULL
+
+    if (type %in% c("all", "text"))
+        text_files <- file.path(x$path, "text.tex")
+    if (type %in% c("all", "fig"))
+        fig_files <- figure_files(x, "tex")
+    if (type %in% c("all", "table"))
+        tab_files <- table_files(x, "tex")
+
+    c(text_files, fig_files, tab_files)
 }

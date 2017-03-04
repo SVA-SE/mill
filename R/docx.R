@@ -93,6 +93,7 @@ from_docx.chapter <- function(x, repo = NULL, ...) {
     tex <- convert_docx_ref_to_ref(tex, x$title)
     tex <- make_labels_chapter_specific(tex, x$title)
     tex <- step_section(tex, "up")
+    tex <- asterisk(tex, "add")
     writeLines(tex, file.path(x$path, "text.tex"))
 
     if (!is.null(repo))
@@ -170,6 +171,27 @@ step_section <- function(tex, direction = c("up", "down")) {
     return(tex)
 }
 
+##' Add asterisk to sections
+##'
+##' @param tex The tex character vector
+##' @return tex character vector
+##' @keywords internal
+asterisk <- function(tex, direction = c("add", "remove")) {
+    replacement <- switch(match.arg(direction),
+                          add = "\\1*\\3",
+                          remove = "\\1\\3"
+                          )
+    patterns <- c("(\\\\chapter)([\\*]?)(\\{)",
+                  "(\\\\section)([\\*]?)(\\{)",
+                  "(\\\\subsection)([\\*]?)(\\{)",
+                  "(\\\\subsubsection)([\\*]?)(\\{)",
+                  "(\\\\paragraph)([\\*]?)(\\{)")
+    for (i in 1:5) {
+            tex <- gsub(patterns[i], replacement, tex)
+        }
+    return(tex)
+}
+
 ##' Convert from tex to docx
 ##'
 ##' Use pandoc (http://pandoc.org/) to convert from 'tex' to
@@ -208,6 +230,7 @@ to_docx.chapter <- function(x, repo = NULL, ...) {
     tex <- readLines(f_tex)
 
     ## Clean up changes made in from_docx_chapter()
+    tex <- asterisk(tex, "remove")
     tex <- step_section(tex, "down")
     tex <- convert_ref_to_docx_ref(tex)
     f_tex <- tempfile(fileext = ".tex")

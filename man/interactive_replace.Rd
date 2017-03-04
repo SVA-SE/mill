@@ -25,5 +25,5 @@ example to add numprint{} might be:
 r <- load_report()
 pattern <- "([[:digit:]]{4, })"
 replacement <- "\\\\\\\\numprint{\\\\1}"
-interactive_replace(r[["Campy"]], pattern, replacement) 
+interactive_replace(r[["Campy"]], pattern, replacement)
 }

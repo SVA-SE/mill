@@ -21,19 +21,17 @@ preview_text.chapters <- function(x) {
 preview_text.chapter <- function(x) {
     preview <- tempfile(tmpdir = x$path, fileext = ".tex")
     on.exit(unlink(preview))
+    on.exit(unlink(file.path(x$path, "typeset.tex")), add = TRUE)
 
     ## read in the pieces of the chapter
     a <- assets(x)
-    text <- readLines(chapter_tex_files(x, "text"))
-    figures <- do.call("c", lapply(figure_files(x, "tex"), readLines))
-    tables <- do.call("c", lapply(table_files(x, "tex"), readLines))
+    apply_patch(x)
+    text <- readLines(file.path(x$path, "typeset.tex"))
 
     ## Stitch together the chapter
     tex <- c(readLines(file.path(a, "figure-preview/pre-snippet.tex")),
              "\\begin{document}",
              text,
-             figures,
-             tables,
              "\\end{document}")
     writeLines(tex, preview)
 
