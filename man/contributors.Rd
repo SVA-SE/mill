@@ -15,3 +15,4 @@ a list with contributors
 \description{
 Extract the contributors from the project excel sheet.
 }
+\keyword{internal}
