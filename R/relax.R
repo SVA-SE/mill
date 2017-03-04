@@ -1,3 +1,12 @@
+##' Trim whitespace
+##'
+##' @param str character string to trim
+##' @return trimmed character string
+##' @keywords internal
+trim <- function(str) {
+    sub("\\s*$", "", sub("^\\s*", "", str))
+}
+
 ##' Load configuration for the report
 ##'
 ##' @param path The path to the root folder of the project.
