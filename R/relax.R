@@ -7,6 +7,28 @@ trim <- function(str) {
     sub("\\s*$", "", sub("^\\s*", "", str))
 }
 
+##' Contributors
+##'
+##' Extract the contributors from the project excel sheet.
+##' @param sheet a data.frame defining the project.
+##' @return a list with contributors
+contributors <- function(sheet) {
+    stopifnot(is.data.frame(sheet))
+    stopifnot(all(c("Name", "Email", "Organisation") %in% colnames(sheet)))
+
+    result <- lapply(seq_len(nrow(sheet)), function(i) {
+        structure(list(name = trim(sheet$Name[i]),
+                       email = trim(sheet$Email[i]),
+                       organisation = trim(sheet$Organisation[i])),
+                  .Names = c("name", "email", "organisation"),
+                  class = "contributor")
+    })
+
+    class(result) <- "contributors"
+
+    result
+}
+
 ##' Load configuration for the report
 ##'
 ##' @param path The path to the root folder of the project.
