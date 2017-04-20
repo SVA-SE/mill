@@ -47,6 +47,49 @@ export.chapter <- function(x, to) {
     invisible()
 }
 
+##' Import files
+##'
+##' @param x The object to import.
+##' @param from The source of the import. If the argument is missing,
+##'     the docx files are imported from a folder named from the
+##'     report title.
+##' @return invisible NULL.
+##' @export
+import <- function(x, from) UseMethod("import")
+
+##' @export
+import.default <- function(x, from) {
+    import(load_report())
+}
+
+##' @export
+import.report <- function(x, from) {
+    if (missing(from))
+        from <- x$report
+    import(x$chapters, from)
+    invisible()
+}
+
+##' @export
+import.chapters <- function(x, from) {
+    lapply(x, function(y) import(y, file.path(from, "chapters")))
+    invisible()
+}
+
+##' @export
+import.chapter <- function(x, from) {
+    from <- file.path(from, x$title)
+    if (!dir.exists(from))
+        stop("Invalid directory")
+
+    ## Import title.docx to text.docx
+    from <- paste0(file.path(from, x$title), ".docx")
+    to <- file.path(x$path, "text.docx")
+    file.copy(from, to, overwrite = TRUE)
+
+    invisible()
+}
+
 ##' Convert from docx to tex
 ##'
 ##' Use pandoc (http://pandoc.org/) to convert from 'docx' to
