@@ -87,8 +87,11 @@ check_tex_to_docx_round_trip.report <- function(x, repo) {
     on.exit(git2r::reset(git2r::commits(repo, n = 1)[[1]], "hard"))
     cat("* checking 'tex' to 'docx' round trip ... ")
 
-    if (check_tex_to_docx_round_trip(x$chapters, repo)) {
+    l <- check_tex_to_docx_round_trip(x$chapters, repo)
+    l <- l[!sapply(l, is.null)]
+    if (length(l)) {
         cat("ERROR\n")
+        lapply(l, function(filename) cat("   ", filename, "\n"))
         return(TRUE)
     }
 
@@ -98,7 +101,7 @@ check_tex_to_docx_round_trip.report <- function(x, repo) {
 
 ##' @keywords internal
 check_tex_to_docx_round_trip.chapters <- function(x, repo) {
-    any(sapply(x, function(y) check_tex_to_docx_round_trip(y, repo)))
+    sapply(x, function(y) check_tex_to_docx_round_trip(y, repo))
 }
 
 ##' @keywords internal
@@ -110,8 +113,8 @@ check_tex_to_docx_round_trip.chapter <- function(x, repo) {
     from_docx(x)
     unstaged <- unlist(git2r::status(repo)$unstaged)
     if (file.path("chapters", x$title, "text.tex") %in% unstaged)
-        return(TRUE)
-    FALSE
+        return(file.path("chapters", x$title, "text.tex"))
+    NULL
 }
 
 ##' Check reference format
