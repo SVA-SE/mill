@@ -117,6 +117,15 @@ blue <- function(text) {
     paste0("\033[34m", text, "\033[39m")
 }
 
+##' Make text bold yellow
+##'
+##' Make text bold yellow for console output. Copied from the crayon package.
+##'
+##' @keywords internal
+yellow <- function(text) {
+    paste0("\033[1m\033[33m", text, "\033[39m\033[22m")
+}
+
 ##' Apply_patch
 ##'
 ##' @export

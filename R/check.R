@@ -12,10 +12,10 @@ check <- function(path = ".") {
     cat("* loading report ... ")
     report <- tryCatch(load_report(path), error = function(e) NULL)
     if (is.null(report)) {
-        cat("ERROR\n")
+        cat(yellow("ERROR\n"))
         return(invisible(TRUE))
     }
-    cat("OK\n    ")
+    cat(blue("OK\n    "))
     cat(capture.output(report), sep = "\n    ")
 
     repo <- git2r::repository(report$path)
@@ -44,11 +44,11 @@ check_expect_clean_repository.report <- function(x, repo) {
     ## Check if the working tree is clean
     d <- git2r::diff(repo)
     if (length(d@files)) {
-        cat("ERROR\n")
+        cat(yellow("ERROR\n"))
         return(TRUE)
     }
 
-    cat("OK\n    ")
+    cat(blue("OK\n    "))
     cat(capture.output(git2r::repository()), sep = "\n    ")
     FALSE
 }
@@ -66,11 +66,11 @@ check_expect_pandoc_is_installed <- function() {
                        error = function(e) character(0))
     ver <- grep("^pandoc[[:space:]]+[.0-9]*", output)
     if (!length(ver)) {
-        cat("ERROR\n")
+        cat(yellow("ERROR\n"))
         return(TRUE)
     }
 
-    cat("OK\n   ", output[ver], "\n")
+    cat(blue("OK\n   "), output[ver], "\n")
     FALSE
 }
 
@@ -90,12 +90,12 @@ check_tex_to_docx_round_trip.report <- function(x, repo) {
     l <- check_tex_to_docx_round_trip(x$chapters, repo)
     l <- l[!sapply(l, is.null)]
     if (length(l)) {
-        cat("ERROR\n")
+        cat(yellow("ERROR\n"))
         lapply(l, function(filename) cat("   ", filename, "\n"))
         return(TRUE)
     }
 
-    cat("OK\n")
+    cat(blue("OK\n"))
     FALSE
 }
 
@@ -135,12 +135,12 @@ check_reference_format.report <- function(x) {
 
     d <- setdiff(ref$tex, c(ref_fig, ref_tab))
     if (length(d)) {
-        cat("ERROR\n    ")
+        cat(yellow("ERROR\n    "))
         cat(d, sep = "\n    ")
         return(TRUE)
     }
 
-    cat("OK\n")
+    cat(blue("OK\n"))
     FALSE
 }
 
@@ -158,12 +158,12 @@ check_missing_figure_reference_files.report <- function(x) {
 
     ref <- check_missing_figure_reference_files(x$chapters)
     if (length(ref)) {
-        cat("ERROR\n    ")
+        cat(yellow("ERROR\n    "))
         cat(sub(x$path, ".", ref), sep = "\n    ")
         return(TRUE)
     }
 
-    cat("OK\n")
+    cat(blue("OK\n"))
     FALSE
 }
 
@@ -205,12 +205,12 @@ check_missing_table_reference_files.report <- function(x) {
 
     ref <- check_missing_table_reference_files(x$chapters)
     if (length(ref)) {
-        cat("ERROR\n    ")
+        cat("yellow(ERROR\n    )")
         cat(sub(x$path, ".", ref), sep = "\n    ")
         return(TRUE)
     }
 
-    cat("OK\n")
+    cat(blue("OK\n"))
     FALSE
 }
 
