@@ -8,6 +8,8 @@ check <- function(path = ".") {
 
     if (check_expect_pandoc_is_installed())
         return(invisible(TRUE))
+    if (check_expect_patch_is_installed())
+        return(invisible(TRUE))
 
     cat("* loading report ... ")
     report <- tryCatch(load_report(path), error = function(e) NULL)
@@ -65,6 +67,26 @@ check_expect_pandoc_is_installed <- function() {
                               ignore.stderr = TRUE),
                        error = function(e) character(0))
     ver <- grep("^pandoc[[:space:]]+[.0-9]*", output)
+    if (!length(ver)) {
+        cat(yellow("ERROR\n"))
+        return(TRUE)
+    }
+
+    cat(blue("OK\n   "), output[ver], "\n")
+    FALSE
+}
+
+##' Check that GNU patch is installed
+##'
+##' patch is required to check that applying patches work.
+##' @keywords internal
+check_expect_patch_is_installed <- function() {
+    cat("* checking that 'patch' is installed ... ")
+
+    output <- tryCatch(system("patch --version", intern = TRUE,
+                              ignore.stderr = TRUE),
+                       error = function(e) character(0))
+    ver <- grep("^GNU patch[[:space:]]+[.0-9]*", output)
     if (!length(ver)) {
         cat(yellow("ERROR\n"))
         return(TRUE)
