@@ -25,6 +25,7 @@ check <- function(path = ".") {
         return(invisible(TRUE))
 
     result <- check_tex_to_docx_round_trip(report, repo)
+    result <- c(result, check_apply_typeset_patch(report))
     result <- c(result, check_reference_format(report))
     result <- c(result, check_missing_figure_reference_files(report))
     result <- c(result, check_missing_table_reference_files(report))
@@ -137,6 +138,50 @@ check_tex_to_docx_round_trip.chapter <- function(x, repo) {
     if (file.path("chapters", x$title, "text.tex") %in% unstaged)
         return(file.path("chapters", x$title, "text.tex"))
     NULL
+}
+
+##' Check apply patch 'typeset.patch' to 'text.tex'
+##'
+##' Checking that applying patches doesn't generate warnings or
+##' errors.
+##' @keywords internal
+check_apply_typeset_patch <- function(x)
+    UseMethod("check_apply_typeset_patch")
+
+##' @keywords internal
+check_apply_typeset_patch.report <- function(x) {
+    cat("* checking apply typeset patch ... ")
+
+    l <- check_apply_typeset_patch(x$chapters)
+    l <- l[!sapply(l, is.null)]
+    if (length(l)) {
+        cat(yellow("ERROR\n"))
+        lapply(l, function(filename) cat("   ", filename, "\n"))
+        return(TRUE)
+    }
+
+    cat(blue("OK\n"))
+    FALSE
+}
+
+##' @keywords internal
+check_apply_typeset_patch.chapters <- function(x) {
+    sapply(x, function(y) check_apply_typeset_patch(y))
+}
+
+##' @keywords internal
+check_apply_typeset_patch.chapter <- function(x) {
+    owd <- setwd(x$path)
+    on.exit(setwd(owd))
+    output <- tryCatch(system2("patch",
+                               args = c("text.tex", "-i", "typeset.patch",
+                                        "-o", "typeset.tex"),
+                               stdout = TRUE, stderr = TRUE),
+                       warning = function(w) w)
+    if (identical(output,
+                  "patching file typeset.tex (read from text.tex)"))
+        return(NULL)
+    return(file.path("chapters", x$title, "typeset.patch"))
 }
 
 ##' Check reference format
