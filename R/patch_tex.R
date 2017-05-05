@@ -142,12 +142,17 @@ apply_patch <- function(x) {
 ##' @return the path to typeset.tex
 ##' @export
 apply_patch.chapter <- function(x) {
-    tex <- shQuote(file.path(x$path, "text.tex"))
-    patch <-  shQuote(file.path(x$path, "typeset.patch"))
-    typeset <-  shQuote(file.path(x$path, "typeset.tex"))
-    command <- paste("patch", tex, patch, "-o", typeset)
-    system(command)
-    return(typeset)
+    owd <- setwd(x$path)
+    on.exit(setwd(owd))
+    output <- tryCatch(system2("patch",
+                               args = c("text.tex", "-i", "typeset.patch",
+                                        "-o", "typeset.tex"),
+                               stdout = TRUE, stderr = TRUE),
+                       warning = function(w) w)
+    if (identical(output,
+                  "patching file typeset.tex (read from text.tex)"))
+        return(typeset)
+    stop(paste("Unable to apply patch: ", file.path(x$path, "typeset.patch")))
 }
 
 ##' Build_patch
