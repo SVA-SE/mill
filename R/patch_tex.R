@@ -139,7 +139,7 @@ apply_patch <- function(x) {
 ##' Apply the patch to the chapter
 ##'
 ##' @param x A chapter
-##' @return the path to typeset.tex
+##' @return invisible(NULL)
 ##' @export
 apply_patch.chapter <- function(x) {
     owd <- setwd(x$path)
@@ -149,10 +149,13 @@ apply_patch.chapter <- function(x) {
                                         "-o", "typeset.tex"),
                                stdout = TRUE, stderr = TRUE),
                        warning = function(w) w)
-    if (identical(output,
-                  "patching file typeset.tex (read from text.tex)"))
-        return(typeset)
-    stop(paste("Unable to apply patch: ", file.path(x$path, "typeset.patch")))
+    if (!identical(output,
+                   "patching file typeset.tex (read from text.tex)")) {
+        cat(output, "\n")
+        stop(paste("Unable to apply patch: ", x$title))
+    }
+
+    invisible(NULL)
 }
 
 ##' Build_patch
