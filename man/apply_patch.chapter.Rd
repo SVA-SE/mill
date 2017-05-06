@@ -10,7 +10,7 @@
 \item{x}{A chapter}
 }
 \value{
-the path to typeset.tex
+invisible(NULL)
 }
 \description{
 Apply the patch to the chapter

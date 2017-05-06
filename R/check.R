@@ -2,9 +2,12 @@
 ##'
 ##' @param path The path to the report.
 ##' @return invisible \code{FALSE} if OK, else invisible \code{TRUE}.
+##' @importFrom utils capture.output
+##' @importFrom utils packageVersion
 ##' @export
 check <- function(path = ".") {
-    cat("* using 'relax' version", as.character(packageVersion("relax")), "\n")
+    cat("* using 'relax' version",
+        as.character(utils::packageVersion("relax")), "\n")
 
     if (check_expect_pandoc_is_installed())
         return(invisible(TRUE))
@@ -18,7 +21,7 @@ check <- function(path = ".") {
         return(invisible(TRUE))
     }
     cat(blue("OK\n    "))
-    cat(capture.output(report), sep = "\n    ")
+    cat(utils::capture.output(report), sep = "\n    ")
 
     repo <- git2r::repository(report$path)
     if (check_expect_clean_repository(report, repo))
