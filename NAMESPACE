@@ -3,6 +3,7 @@
 S3method("[",report)
 S3method("[[",report)
 S3method(apply_patch,chapter)
+S3method(apply_patch,report)
 S3method(as.data.frame,report)
 S3method(assets,chapter)
 S3method(assets,report)

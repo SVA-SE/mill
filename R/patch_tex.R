@@ -134,6 +134,15 @@ apply_patch <- function(x) {
     UseMethod("apply_patch")
 }
 
+##' Apply_patch.report
+##'
+##' @export
+##' @param x A report object
+apply_patch.report <- function(x) {
+    lapply(x$chapters, function(y) apply_patch(y))
+    invisible()
+}
+
 ##' Apply_patch
 ##'
 ##' Apply the patch to the chapter
