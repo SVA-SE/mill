@@ -49,9 +49,14 @@ preview_table <- function(table) {
     preview <- tempfile(tmpdir = dirname(table), fileext = ".tex")
     on.exit(unlink(preview))
 
-    ## Create a tex file with the context to create a preview.
+    ## Read in the pieces of the table
     a <- assets(table)
-    tex <- c(readLines(file.path(a, "figure-preview/pre-snippet.tex")),
+    text <- readLines(table)
+    presnippet <- readLines(file.path(a, "latex/pre-snippet.tex"))
+    presnippet <- gsub("assets/", paste0(a, "/"), presnippet)
+
+    ## Create a tex file with the context to create a preview.
+    tex <- c(presnippet,
              "\\captionsetup{labelformat = empty}",
              "\\begin{document}",
              "\\begin{LARGE}",
@@ -61,7 +66,7 @@ preview_table <- function(table) {
              get_label(table, "word"),
              "}",
              "\\end{LARGE}",
-             readLines(table),
+             text,
              "\\end{document}")
     writeLines(tex, preview)
 
