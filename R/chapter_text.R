@@ -10,30 +10,34 @@ to_pdf.report <- function(x, ...) {
     ## Nuke previous build
     unlink("build", recursive = TRUE)
     dir.create("build")
+    wd <- setwd(file.path(x$path, "build"))
+    on.exit(setwd(wd))
 
     lapply(x$chapters, function(y) to_pdf(y, build = FALSE, ...))
 
     ## Copy the directories in assets: cover, front-matter and back-matter
     lapply(c("cover", "front-matter", "back-matter"), function(dir) {
-        files <- list.files(file.path("assets", dir), pattern = "[^auto]")
+        files <- list.files(file.path("../assets", dir), pattern = "[^auto]")
         lapply(files, function(filename) {
-            file.copy(file.path("assets", dir, filename), to = filename)
+            file.copy(file.path("../assets", dir, filename), to = filename)
         })
     })
 
+    ## Copy fonts
+    file.copy("../assets/fonts", ".", recursive = TRUE)
+
     ## We need to build report...
-    a <- assets(x)
-    presnippet <- readLines(file.path(a, "latex/pre-snippet.tex"))
-    text <- readLines(file.path(a, "latex/report.tex"))
+    presnippet <- readLines("../assets/latex/pre-snippet.tex")
+    text <- readLines("../assets/latex/report.tex")
     ## Stitch together the chapter
     tex <- c(presnippet,
              "\\begin{document}",
              text,
              "\\end{document}")
-    writeLines(tex, "build/report.tex")
+    writeLines(tex, "report.tex")
 
     ## Build the preview pdf file.
-    luatex("build/report.tex")
+    luatex("report.tex")
 
     invisible()
 }
