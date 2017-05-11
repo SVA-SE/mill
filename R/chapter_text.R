@@ -13,6 +13,14 @@ to_pdf.report <- function(x, ...) {
 
     lapply(x$chapters, function(y) to_pdf(y, build = FALSE, ...))
 
+    ## Copy the directories in assets: cover, front-matter and back-matter
+    lapply(c("cover", "front-matter", "back-matter"), function(dir) {
+        files <- list.files(file.path("assets", dir), pattern = "[^auto]")
+        lapply(files, function(filename) {
+            file.copy(file.path("assets", dir, filename), to = filename)
+        })
+    })
+
     ## We need to build report...
     a <- assets(x)
     presnippet <- readLines(file.path(a, "latex/pre-snippet.tex"))
