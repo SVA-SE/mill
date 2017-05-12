@@ -73,6 +73,8 @@ to_pdf.chapter <- function(x, build = TRUE, ...) {
     } else {
         file.copy("typeset.tex", paste0("../../build/",
                                         gsub(" ", "-", tolower(x$title)), ".tex"))
+
+        ## Copy the figures (.pdf and .tex) and tables (.tex)
         ref <- references(x)
         lapply(ref[ref$reftype == "fig", "marker"], function(marker) {
             marker <- paste0(gsub(":", "_", marker), c(".pdf", ".tex"))
@@ -81,6 +83,13 @@ to_pdf.chapter <- function(x, build = TRUE, ...) {
         lapply(ref[ref$reftype == "tab", "marker"], function(marker) {
             marker <- paste0(gsub(":", "_", marker), ".tex")
             file.copy(marker, paste0("../../build/", marker))
+        })
+
+        ## Copy any images in the chapter
+        files <- list.files(x$path, pattern = "^img_")
+        lapply(files, function(filename) {
+            file.copy(filename, paste0("../../build/", filename))
+            invisible()
         })
     }
 
