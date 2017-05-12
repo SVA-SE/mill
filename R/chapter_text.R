@@ -59,7 +59,7 @@ to_pdf.chapter <- function(x, build = TRUE, ...) {
         ## read in the pieces of the chapter
         a <- assets(x)
         presnippet <- readLines(file.path(a, "latex/pre-snippet.tex"))
-        presnippet <- gsub("../assets/", paste0(a, "/"), presnippet)
+        presnippet <- gsub("fonts/", paste0(a, "/fonts/"), presnippet)
 
         ## Stitch together the chapter
         tex <- c(presnippet,
@@ -110,7 +110,7 @@ build_text.report <- function(x) {
     a <- assets(x)
     apply_patch(x)
     presnippet <- readLines(file.path(a, "latex/pre-snippet.tex"))
-    presnippet <- gsub("assets/", paste0(a, "/"), presnippet)
+    presnippet <- gsub("fonts/", paste0(a, "/fonts/"), presnippet)
     text <- readLines(file.path(a, "latex/report.tex"))
     ## Stitch together the chapter
     tex <- c(presnippet,
@@ -147,7 +147,7 @@ build_text.chapter <- function(x) {
     apply_patch(x)
     text <- readLines(file.path(x$path, "typeset.tex"))
     presnippet <- readLines(file.path(a, "latex/pre-snippet.tex"))
-    presnippet <- gsub("../assets/", paste0(a, "/"), presnippet)
+    presnippet <- gsub("fonts/", paste0(a, "/fonts/"), presnippet)
     ## Stitch together the chapter
     tex <- c(presnippet,
              "\\begin{document}",
