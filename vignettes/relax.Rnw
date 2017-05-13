@@ -1,0 +1,90 @@
+%% -*- mode: LaTeX; coding: utf-8; -*-
+\documentclass[nojss]{jss}
+
+% *** use this command to write comments; it is easy to spot in the text!
+\newcommand{\comment}[1]{\textcolor{blue}{\{#1\}}}
+\newcommand{\margincomment}[1]{{\textcolor{blue}*} \marginpar{\textcolor{blue}{*\{#1\}}}}
+
+\author{Stefan Widgren\\National Veterinary Institute\\Sweden \And
+  Thomas Rosendal\\National Veterinary Institute\\Sweden}
+
+\Plainauthor{Stefan Widgren, Thomas Rosendal}
+
+\title{\pkg{relax}: An \proglang{R} package for authoring reports}
+
+\Plaintitle{relax: An R package for authoring reports}
+
+\Shorttitle{\pkg{relax}: An R package for authoring reports}
+
+\Abstract{
+
+  \comment{FIXME.}
+
+}
+
+\Keywords{FIXME}
+\Plainkeywords{FIXME}
+
+\Address{
+  Stefan Widgren\\
+  Department of Disease Control and Epidemiology\\
+  National Veterinary Institute\\
+  SE-751 89 Uppsala, Sweden\\
+  E-mail: \email{stefan.widgren@sva.se}\\
+  URL: \url{http://www.sva.se}\\
+  \\
+  Thomas Rosendal\\
+  Department of Disease Control and Epidemiology\\
+  National Veterinary Institute\\
+  SE-751 89 Uppsala, Sweden\\
+  E-mail: \email{thomas.rosendal@sva.se}\\
+  URL: \url{http://www.sva.se}
+}
+
+<<echo=false, results=hide>>=
+options(prompt = "R> ", continue = "+  ", width = 70, useFancyQuotes = FALSE)
+@
+
+\begin{document}
+
+\SweaveOpts{engine=R,eps=FALSE,height=5,width=10}
+%\VignetteIndexEntry{relax: An R package for authoring reports}
+%\VignetteDepends{relax}
+%\VignetteKeywords{FIXME}
+%\VignettePackage{relax}
+
+%**************************************************************************
+
+\section{Introduction}
+
+\comment{FIXME.}
+
+%**************************************************************************
+
+\section{Folder structure}
+\label{sec:folder-structure}
+
+\comment{FIXME.}
+
+\section{Chapter states}
+\label{sec:chapter-states}
+
+\begin{description}
+  \item [TODO] The initial state of each chapter - it means we are
+    responsible for sending the chapter to the author(s) for updating.
+  \item [UPDATE] The chapter has been sent to the author(s) for
+    updating - it means we are waiting for input.
+  \item [SUBMITTED] The author(s) notified that the chapter is updated
+    - we need to import and convert the chapter from docx to tex.
+  \item [TYPESET] The chapter has been typeset in LATEX and a
+    chapter\_name.pdf of the chapter has been produced. It can be sent
+    to the author for feedback.
+  \item [PROOF] The chapter\_name.pdf has been sent to the author for
+    review. We are waiting for feedback from the author.
+  \item [DONE] The chapter has passed the typesetter, author, editor
+    and all automated checks.
+\end{description}
+
+\bibliography{relax}
+
+\end{document}
