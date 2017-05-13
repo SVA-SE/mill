@@ -59,7 +59,7 @@ to_pdf.chapter <- function(x, build = TRUE, ...) {
         ## read in the pieces of the chapter
         a <- assets(x)
         presnippet <- readLines(file.path(a, "latex/pre-snippet.tex"))
-        presnippet <- gsub("../assets/", paste0(a, "/"), presnippet)
+        presnippet <- gsub("fonts/", paste0(a, "/fonts/"), presnippet)
 
         ## Stitch together the chapter
         tex <- c(presnippet,
@@ -73,6 +73,8 @@ to_pdf.chapter <- function(x, build = TRUE, ...) {
     } else {
         file.copy("typeset.tex", paste0("../../build/",
                                         gsub(" ", "-", tolower(x$title)), ".tex"))
+
+        ## Copy the figures (.pdf and .tex) and tables (.tex)
         ref <- references(x)
         lapply(ref[ref$reftype == "fig", "marker"], function(marker) {
             marker <- paste0(gsub(":", "_", marker), c(".pdf", ".tex"))
@@ -81,6 +83,13 @@ to_pdf.chapter <- function(x, build = TRUE, ...) {
         lapply(ref[ref$reftype == "tab", "marker"], function(marker) {
             marker <- paste0(gsub(":", "_", marker), ".tex")
             file.copy(marker, paste0("../../build/", marker))
+        })
+
+        ## Copy any images in the chapter
+        files <- list.files(x$path, pattern = "^img_")
+        lapply(files, function(filename) {
+            file.copy(filename, paste0("../../build/", filename))
+            invisible()
         })
     }
 
@@ -110,7 +119,7 @@ build_text.report <- function(x) {
     a <- assets(x)
     apply_patch(x)
     presnippet <- readLines(file.path(a, "latex/pre-snippet.tex"))
-    presnippet <- gsub("assets/", paste0(a, "/"), presnippet)
+    presnippet <- gsub("fonts/", paste0(a, "/fonts/"), presnippet)
     text <- readLines(file.path(a, "latex/report.tex"))
     ## Stitch together the chapter
     tex <- c(presnippet,
@@ -147,7 +156,7 @@ build_text.chapter <- function(x) {
     apply_patch(x)
     text <- readLines(file.path(x$path, "typeset.tex"))
     presnippet <- readLines(file.path(a, "latex/pre-snippet.tex"))
-    presnippet <- gsub("../assets/", paste0(a, "/"), presnippet)
+    presnippet <- gsub("fonts/", paste0(a, "/fonts/"), presnippet)
     ## Stitch together the chapter
     tex <- c(presnippet,
              "\\begin{document}",
