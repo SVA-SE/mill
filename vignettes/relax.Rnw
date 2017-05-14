@@ -59,6 +59,14 @@ options(prompt = "R> ", continue = "+  ", width = 70, useFancyQuotes = FALSE)
 
 \comment{FIXME.}
 
+The \pkg{relax} package is available from GitHub at
+\mbox{\url{https://github.com/stewid/relax}} and is loaded in
+\proglang{R} with the following command
+
+<<load-relax>>=
+library("relax")
+@
+
 %**************************************************************************
 
 \section{Folder structure}
