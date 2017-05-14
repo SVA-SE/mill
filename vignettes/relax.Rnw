@@ -84,7 +84,7 @@ library("relax")
     updating - it means we are waiting for input.
   \item [SUBMITTED] The author(s) notified that the chapter is updated
     - we need to import and convert the chapter from docx to tex.
-  \item [TYPESET] The chapter has been typeset in LATEX and a
+  \item [TYPESET] The chapter has been typeset in \LaTeX and a
     chapter\_name.pdf of the chapter has been produced. It can be sent
     to the author for feedback.
   \item [PROOF] The chapter\_name.pdf has been sent to the author for
