@@ -6,22 +6,35 @@
 to_pdf <- function(x, ...) UseMethod("to_pdf")
 
 ##' @export
-to_pdf.report <- function(x, ...) {
+to_pdf.report <- function(x, type = c("print", "web"), ...) {
     ## Nuke previous build
     unlink("build", recursive = TRUE)
     dir.create("build")
     wd <- setwd(file.path(x$path, "build"))
     on.exit(setwd(wd))
 
-    lapply(x$chapters, function(y) to_pdf(y, build = FALSE, ...))
+    lapply(x$chapters, function(y) to_pdf(y, build = FALSE, type = type, ...))
 
     ## Copy the directories in assets: cover, front-matter and back-matter
     lapply(c("cover", "front-matter", "back-matter"), function(dir) {
         files <- list.files(file.path("../assets", dir), pattern = "[^auto]")
+        ## Leave the picture files
+        pictures <- files[grepl("^img",files)]
+        files <- files[!grepl("^img",files)]
         lapply(files, function(filename) {
             file.copy(file.path("../assets", dir, filename), to = filename)
         })
-    })
+        if(type == "web") {
+            lapply(pictures, function(picture) {
+                picture2 <- reduce_image(file.path("../assets", dir, picture))
+                file.copy(picture2, to = picture)
+            })
+        } else {
+            lapply(pictures, function(picture) {
+                file.copy(file.path("../assets", dir, picture), to = picture)
+            })
+        }
+        })
 
     ## Copy fonts
     file.copy("../assets/fonts", ".", recursive = TRUE)
@@ -43,7 +56,7 @@ to_pdf.report <- function(x, ...) {
 }
 
 ##' @export
-to_pdf.chapter <- function(x, build = TRUE, ...) {
+to_pdf.chapter <- function(x, build = TRUE, type = c("print", "web"), ...) {
     wd <- setwd(x$path)
     on.exit(unlink("typeset.tex"))
     if (build) {
@@ -88,7 +101,12 @@ to_pdf.chapter <- function(x, build = TRUE, ...) {
         ## Copy any images in the chapter
         files <- list.files(x$path, pattern = "^img_")
         lapply(files, function(filename) {
-            file.copy(filename, paste0("../../build/", filename))
+            if(type == "web") {
+                filename_2 <- reduce_image(filename)
+            } else {
+                filename_2 <- filename
+            }
+            file.copy(filename_2, paste0("../../build/", filename))
             invisible()
         })
     }
