@@ -7,6 +7,7 @@ to_pdf <- function(x, ...) UseMethod("to_pdf")
 
 ##' @export
 to_pdf.report <- function(x, type = c("print", "web"), ...) {
+    type <- match.arg(type)
     ## Nuke previous build
     unlink("build", recursive = TRUE)
     dir.create("build")
@@ -57,6 +58,7 @@ to_pdf.report <- function(x, type = c("print", "web"), ...) {
 
 ##' @export
 to_pdf.chapter <- function(x, build = TRUE, type = c("print", "web"), ...) {
+    type <- match.arg(type)
     wd <- setwd(x$path)
     on.exit(unlink("typeset.tex"))
     if (build) {
