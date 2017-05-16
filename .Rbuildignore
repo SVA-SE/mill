@@ -1,1 +1,8 @@
 ^Makefile$
+vignettes/relax.aux
+vignettes/relax.bbl
+vignettes/relax.blg
+vignettes/relax.log
+vignettes/relax.out
+vignettes/relax.pdf
+vignettes/relax.tex
