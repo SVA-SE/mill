@@ -8,21 +8,15 @@ reduce_image <- function(path) {
     stopifnot(ext %in% c("jpg", "png"))
     reduced <- tempfile(fileext = paste0(".", ext))
     path <- normalizePath(path)
-    if(ext == "jpg") {
-        system2("convert",
-                args = c(shQuote(path),
-                         "-resize 1000x",
-                         "-compress JPEG",
-                         "-quality 50",
-                         reduced),
-                stdout = TRUE, stderr = TRUE)
-    }
-    if(ext == "png"){
-        system2("convert",
-                args = c(shQuote(path),
-                         "-resize 75%",
-                         reduced),
-                stdout = TRUE, stderr = TRUE)
-    }
-    return(reduced)
-    }
+
+    args <- switch(ext,
+                   jpg = c("-resize 1000x", "-compress JPEG", "-quality 50"),
+                   png = "-resize 75%")
+
+    system2("convert",
+            args = c(shQuote(path), args, reduced),
+            stdout = TRUE,
+            stderr = TRUE)
+
+    reduced
+}
