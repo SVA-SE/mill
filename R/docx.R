@@ -241,7 +241,7 @@ asterisk <- function(tex, direction = c("add", "remove")) {
 ##' 'docx'. The chapter 'text.tex' is converted to 'text.docx'. Each
 ##' chapter 'text.docx' is added, but not commited, to the report git
 ##' repository.
-##' @param x The object to convert.
+##' @param x The report object to convert.
 ##' @param repo The git repository to add the 'docx' to.
 ##' @param ... Additional arguments.
 ##' @return invisible NULL.
@@ -253,14 +253,9 @@ to_docx <- function(x, ...) UseMethod("to_docx")
 to_docx.report <- function(x, ...) {
     if (length(list(...)) > 0)
         warning("Additional arguments ignored")
-    to_docx(x$chapters, repo = git2r::repository(x$path))
-}
 
-##' @export
-to_docx.chapters <- function(x, repo = NULL, ...) {
-    if (length(list(...)) > 0)
-        warning("Additional arguments ignored")
-    lapply(x, function(y) to_docx(y, repo))
+    repo <- git2r::repository(x$path)
+    lapply(x$chapters, function(y) to_docx(y, repo = repo))
     invisible()
 }
 
