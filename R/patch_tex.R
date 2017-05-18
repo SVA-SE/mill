@@ -166,18 +166,3 @@ apply_patch.chapter <- function(x) {
 
     invisible(NULL)
 }
-
-##' Build_patch
-##'
-##' Rebuild the patch to the chapter
-##'
-##' @param x A chapter
-##' @export
-generate_patch.chapter <- function(x) {
-    tex <- shQuote(file.path(x$path, "text.tex"))
-    patch <-  shQuote(file.path(x$path, "typeset.patch"))
-    typeset <-  shQuote(file.path(x$path, "typeset.tex"))
-    command <- paste("diff -c --label=text --label=typeset", tex, typeset, ">", patch)
-    system(command)
-    return(patch)
-}
