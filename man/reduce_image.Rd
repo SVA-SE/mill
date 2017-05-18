@@ -4,13 +4,15 @@
 \alias{reduce_image}
 \title{Reduce Images}
 \usage{
-reduce_image(path)
+reduce_image(from, to)
 }
 \arguments{
-\item{path}{The original}
+\item{from}{filename to the original image}
+
+\item{to}{filename to the reduced image}
 }
 \value{
-A path to the reduced image
+invisible NULL
 }
 \description{
 Reduce Images
