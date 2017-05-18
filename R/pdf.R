@@ -6,6 +6,11 @@
 to_pdf <- function(x, ...) UseMethod("to_pdf")
 
 ##' @export
+to_pdf.default <- function(x, ...) {
+    to_pdf(load_report())
+}
+
+##' @export
 to_pdf.report <- function(x, type = c("print", "web"), ...) {
     type <- match.arg(type)
     ## Nuke previous build
