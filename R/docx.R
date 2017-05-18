@@ -96,7 +96,7 @@ import.chapter <- function(x, from) {
 ##' 'tex'. The chapter 'text.docx' is converted to 'text.tex'. Each
 ##' chapter 'text.tex' is added, but not commited, to the report git
 ##' repository.
-##' @param x The object to convert.
+##' @param x The report object to convert.
 ##' @param repo The git repository to add the 'tex' to.
 ##' @param ... Additional arguments.
 ##' @return invisible NULL.
@@ -108,14 +108,9 @@ from_docx <- function(x, ...) UseMethod("from_docx")
 from_docx.report <- function(x, ...) {
     if (length(list(...)) > 0)
         warning("Additional arguments ignored")
-    from_docx(x$chapters, repo = git2r::repository(x$path))
-}
 
-##' @export
-from_docx.chapters <- function(x, repo = NULL, ...) {
-    if (length(list(...)) > 0)
-        warning("Additional arguments ignored")
-    lapply(x, function(y) from_docx(y, repo))
+    repo <- git2r::repository(x$path)
+    lapply(x$chapters, function(y) from_docx(y, repo = repo))
     invisible()
 }
 

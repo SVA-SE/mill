@@ -7,7 +7,7 @@
 from_docx(x, ...)
 }
 \arguments{
-\item{x}{The object to convert.}
+\item{x}{The report object to convert.}
 
 \item{...}{Additional arguments.}
 
