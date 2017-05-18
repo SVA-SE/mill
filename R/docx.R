@@ -287,3 +287,32 @@ to_docx.chapter <- function(x, repo = NULL, ...) {
         git2r::add(repo, f_docx)
     invisible()
 }
+
+##' Roundtrip tex to docx
+##'
+##' @param x The object to convert.
+##' @param repo The git repository to add the 'docx' to.
+##' @param ... Additional arguments.
+##' @return invisible NULL.
+##' @export
+roundtrip <- function(x, ...) UseMethod("roundtrip")
+
+##' @importFrom git2r repository
+##' @export
+roundtrip.report <- function(x, ...) {
+    if (length(list(...)) > 0)
+        warning("Additional arguments ignored")
+    repo <- git2r::repository(x$path)
+    lapply(x$chapters, function(y) roundtrip(y, repo = repo))
+    invisible()
+}
+
+##' @importFrom git2r add
+##' @export
+roundtrip.chapter <- function(x, repo = NULL, ...) {
+    if (length(list(...)) > 0)
+        warning("Additional arguments ignored")
+    to_docx(x, repo = repo)
+    from_docx(x, repo = repo)
+    invisible()
+}
