@@ -324,8 +324,8 @@ roundtrip.chapter <- function(x, repo = NULL, ...) {
     if (length(d@files))
         stop("Working tree is not clean")
 
-    to_docx(x, repo = repo)
-    from_docx(x, repo = repo)
+    to_docx(x, repo = NULL)
+    from_docx(x, repo = NULL)
 
     ## The roundtrip is clean if the tex-file is unchanged
     unstaged <- unlist(git2r::status(repo)$unstaged)
