@@ -307,12 +307,30 @@ roundtrip.report <- function(x, ...) {
     invisible()
 }
 
-##' @importFrom git2r add
+##' @importFrom git2r diff
+##' @importFrom git2r repository
+##' @importFrom git2r reset
+##' @importFrom git2r status
 ##' @export
 roundtrip.chapter <- function(x, repo = NULL, ...) {
     if (length(list(...)) > 0)
         warning("Additional arguments ignored")
+
+    if (is.null(repo))
+        repo <- git2r::repository()
+
+    ## Check if the working tree is clean
+    d <- git2r::diff(repo)
+    if (length(d@files))
+        stop("Working tree is not clean")
+
     to_docx(x, repo = repo)
     from_docx(x, repo = repo)
+
+    ## The roundtrip is clean if the tex-file is unchanged
+    unstaged <- unlist(git2r::status(repo)$unstaged)
+    if (!(file.path("chapters", x$title, "text.tex") %in% unstaged))
+        git2r::reset(git2r::commits(repo, n = 1)[[1]], "hard")
+
     invisible()
 }
