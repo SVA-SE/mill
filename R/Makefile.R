@@ -14,9 +14,13 @@ create_Makefile.report <- function(x, ...) {
     invisible()
 }
 
+
 ##' @export
 create_Makefile.chapter <- function(x, repo, ...) {
-    lines <- c("diff:",
+    lines <- c("pdf:",
+               sprintf("\tcd ../.. && Rscript -e \"library('relax'); r <- load_report(); to_pdf(r[['%s']])\"",
+                       x$title),
+               "diff:",
                "\tdiff -c --label=text --label=typeset text.tex typeset.tex > typeset.patch; [ $$? -eq 1 ]",
                "",
                "patch:",
@@ -24,9 +28,11 @@ create_Makefile.chapter <- function(x, repo, ...) {
                "",
                "roundtrip:",
                sprintf("\tcd ../.. && Rscript -e \"library('relax'); r <- load_report(); roundtrip(r[['%s']])\"",
-                       x$title, x$title),
+                       x$title),
                "",
-               "PHONY: diff, patch, roundtrip",
+               "rpd: roundtrip patch diff",
+               "",
+               "PHONY: pdf diff patch roundtrip rpd",
                "")
 
     writeLines(lines, file.path(x$path, "Makefile"))
