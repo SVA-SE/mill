@@ -17,13 +17,8 @@ export.default <- function(x, to) {
 export.report <- function(x, to) {
     if (missing(to))
         to <- x$report
-    export(x$chapters, to)
-    invisible()
-}
-
-##' @export
-export.chapters <- function(x, to) {
-    lapply(x, function(y) export(y, file.path(to, "chapters")))
+    to <- file.path(to, "chapters")
+    lapply(x$chapters, function(y) export(y, to = to))
     invisible()
 }
 
