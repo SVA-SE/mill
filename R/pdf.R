@@ -24,16 +24,9 @@ to_pdf.report <- function(x, type = c("print", "web"), ...) {
     ## Copy the directories in assets: cover, front-matter and back-matter
     lapply(c("cover", "front-matter", "back-matter"), function(dir) {
         files <- list.files(file.path("../assets", dir), pattern = "[^auto]")
-        ## Leave the picture files
-        pictures <- files[grepl("^img",files)]
-        files <- files[!grepl("^img",files)]
-        lapply(files, function(filename) {
-            file.copy(file.path("../assets", dir, filename), to = filename)
-        })
-
-        lapply(pictures, function(to) {
+        lapply(files, function(to) {
             from <- file.path("../assets", dir, to)
-            if(type == "web") {
+            if(startsWith(to, "img") && type == "web") {
                 reduce_image(from, to)
             } else {
                 file.copy(from, to)
