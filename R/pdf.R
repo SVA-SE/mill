@@ -83,8 +83,8 @@ to_pdf.chapter <- function(x, build = TRUE, type = c("print", "web"), ...) {
         ## Build the filename pdf file.
         luatex(filename)
     } else {
-        file.copy("typeset.tex", paste0("../../build/",
-                                        gsub(" ", "-", tolower(x$title)), ".tex"))
+        file.copy("typeset.tex",
+                  paste0("../../build/", normalize_title(x$title), ".tex"))
 
         ## Copy the figures (.pdf and .tex) and tables (.tex)
         ref <- references(x)

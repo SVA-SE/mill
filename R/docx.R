@@ -129,6 +129,10 @@ from_docx.chapter <- function(x, repo = NULL, ...) {
     invisible()
 }
 
+normalize_title <- function(title) {
+    gsub("[[:space:]]+", "-", tolower(title))
+}
+
 ##' Convert the docx references to tex ref
 ##'
 ##' @param tex The tex character vector
@@ -136,7 +140,7 @@ from_docx.chapter <- function(x, repo = NULL, ...) {
 ##' @return tex character vector
 ##' @keywords internal
 convert_docx_ref_to_ref <- function(tex, title) {
-    title <- gsub("[[:space:]]+", "-", tolower(title))
+    title <- normalize_title(title)
     pattern <- "[{][[][}]([^:]*)[:]([^{]*)[{}[]][}]"
     replacement <- paste0("\\\\ref{\\1:", title, ":\\2}")
     gsub(pattern, replacement, tex)
@@ -160,7 +164,7 @@ convert_ref_to_docx_ref <- function(tex) {
 ##' @return tex character vector
 ##' @keywords internal
 make_labels_chapter_specific <- function(tex, title) {
-    title <- gsub("[[:space:]]+", "-", tolower(title))
+    title <- normalize_title(title)
     pattern <- "[\\]label[{]([^}]*)[}]"
     replacement <- paste0("\\\\label{sec:", title, ":", "\\1}")
     gsub(pattern, replacement, tex)
