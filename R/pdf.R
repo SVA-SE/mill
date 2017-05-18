@@ -30,17 +30,16 @@ to_pdf.report <- function(x, type = c("print", "web"), ...) {
         lapply(files, function(filename) {
             file.copy(file.path("../assets", dir, filename), to = filename)
         })
-        if(type == "web") {
-            lapply(pictures, function(picture) {
-                picture2 <- reduce_image(file.path("../assets", dir, picture))
-                file.copy(picture2, to = picture)
-            })
-        } else {
-            lapply(pictures, function(picture) {
-                file.copy(file.path("../assets", dir, picture), to = picture)
-            })
-        }
+
+        lapply(pictures, function(to) {
+            from <- file.path("../assets", dir, to)
+            if(type == "web") {
+                reduce_image(from, to)
+            } else {
+                file.copy(from, to)
+            }
         })
+    })
 
     ## Copy fonts
     file.copy("../assets/fonts", ".", recursive = TRUE)
@@ -107,14 +106,13 @@ to_pdf.chapter <- function(x, build = TRUE, type = c("print", "web"), ...) {
 
         ## Copy any images in the chapter
         files <- list.files(x$path, pattern = "^img_")
-        lapply(files, function(filename) {
+        lapply(files, function(from) {
+            to <- paste0("../../build/", from)
             if(type == "web") {
-                filename_2 <- reduce_image(filename)
+                reduce_image(from, to)
             } else {
-                filename_2 <- filename
+                file.copy(from, to)
             }
-            file.copy(filename_2, paste0("../../build/", filename))
-            invisible()
         })
     }
 
