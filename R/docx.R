@@ -61,13 +61,8 @@ import.default <- function(x, from) {
 import.report <- function(x, from) {
     if (missing(from))
         from <- x$report
-    import(x$chapters, from)
-    invisible()
-}
-
-##' @export
-import.chapters <- function(x, from) {
-    lapply(x, function(y) import(y, file.path(from, "chapters")))
+    from <- file.path(from, "chapters")
+    lapply(x$chapters, function(y) import(y, from = from))
     invisible()
 }
 
