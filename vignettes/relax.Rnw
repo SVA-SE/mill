@@ -93,6 +93,6 @@ library("relax")
     and all automated checks.
 \end{description}
 
-\bibliography{relax}
+%\bibliography{relax}
 
 \end{document}
