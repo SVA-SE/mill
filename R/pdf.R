@@ -34,9 +34,6 @@ to_pdf.report <- function(x, type = c("print", "web"), ...) {
         })
     })
 
-    ## Copy fonts
-    file.copy("../assets/fonts", ".", recursive = TRUE)
-
     ## We need to build report...
     presnippet <- readLines("../assets/latex/pre-snippet.tex")
     text <- readLines("../assets/latex/report.tex")
@@ -71,7 +68,6 @@ to_pdf.chapter <- function(x, build = TRUE, type = c("print", "web"), ...) {
         ## read in the pieces of the chapter
         a <- assets(x)
         presnippet <- readLines(file.path(a, "latex/pre-snippet.tex"))
-        presnippet <- gsub("fonts/", paste0(a, "/fonts/"), presnippet)
 
         ## Stitch together the chapter
         tex <- c(presnippet,
