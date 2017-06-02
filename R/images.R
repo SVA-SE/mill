@@ -12,11 +12,14 @@ reduce_image <- function(from, to) {
                    png = "-resize 75%",
                    NULL)
 
-    if (is.null(args))
-        stop("Unsupported image format")
+    if (is.null(args)) {
+        ## Just copy file
+        file.copy(from, to)
+        return(invisible(NULL))
+    }
 
     system2("convert",
-            args = c(shQuote(from), args, to),
+            args = c(shQuote(from), args, shQuote(to)),
             stdout = TRUE,
             stderr = TRUE)
 
