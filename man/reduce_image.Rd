@@ -7,9 +7,9 @@
 reduce_image(from, to)
 }
 \arguments{
-\item{from}{filename to the original image}
+\item{from}{filename of the original image}
 
-\item{to}{filename to the reduced image}
+\item{to}{filename of the reduced image}
 }
 \value{
 invisible NULL

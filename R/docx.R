@@ -114,13 +114,13 @@ from_docx.chapter <- function(x, repo = NULL, ...) {
     f_tex <- tempfile(fileext = ".tex")
     on.exit(file.remove(f_tex))
     f_docx <- file.path(x$path, "text.docx")
-    pandoc(paste(shQuote(f_docx), "-o", shQuote(f_tex)))
+    pandoc(paste("--top-level-division=chapter ",
+                 shQuote(f_docx), "-o", shQuote(f_tex)))
 
     ## Tweak incoming tex file
     tex <- readLines(f_tex)
     tex <- convert_docx_ref_to_ref(tex, x$title)
     tex <- make_labels_chapter_specific(tex, x$title)
-    tex <- step_section(tex, "up")
     tex <- asterisk(tex, "add")
     writeLines(tex, file.path(x$path, "text.tex"))
 
@@ -168,39 +168,6 @@ make_labels_chapter_specific <- function(tex, title) {
     pattern <- "[\\]label[{]([^}]*)[}]"
     replacement <- paste0("\\\\label{sec:", title, ":", "\\1}")
     gsub(pattern, replacement, tex)
-}
-
-##' Step up the section levels
-##'
-##' Going 'up':
-##' 1st section -> chapter
-##' 2nd subsection -> section
-##' 3rd subsubsection -> subsection
-##' 4th paragraph -> subsubsection
-##'
-##' Going 'down':
-##' 1st subsubsection -> paragraph
-##' 2nd subsection -> subsubsection
-##' 3rd section -> subsection
-##' 4th chapter -> section
-##'
-##' @param tex The tex character vector
-##' @param direction go 'up' or 'down'
-##' @return tex character vector
-##' @keywords internal
-step_section <- function(tex, direction = c("up", "down")) {
-    direction <- match.arg(direction)
-    patterns <- c("\\\\chapter\\{",
-                  "\\\\section\\{",
-                  "\\\\subsection\\{",
-                  "\\\\subsubsection\\{",
-                  "\\\\paragraph\\{")
-    if (direction == "down")
-        patterns <- rev(patterns)
-    for (i in 1:4) {
-        tex <- gsub(patterns[i + 1], patterns[i], tex)
-    }
-    return(tex)
 }
 
 ##' Add asterisk to sections
@@ -258,7 +225,6 @@ to_docx.chapter <- function(x, repo = NULL, ...) {
 
     ## Clean up changes made in from_docx_chapter()
     tex <- asterisk(tex, "remove")
-    tex <- step_section(tex, "down")
     tex <- convert_ref_to_docx_ref(tex)
     f_tex <- tempfile(fileext = ".tex")
     writeLines(tex, f_tex)
@@ -266,7 +232,8 @@ to_docx.chapter <- function(x, repo = NULL, ...) {
     unlink(f_docx)
 
     ## Convert to docx
-    pandoc(paste(shQuote(f_tex), "-o", shQuote(f_docx)))
+    pandoc(paste("--top-level-division=chapter ",
+                 shQuote(f_tex), "-o", shQuote(f_docx)))
     if (!is.null(repo))
         git2r::add(repo, f_docx)
     invisible()
