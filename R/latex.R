@@ -17,7 +17,7 @@ luatex_cmd <- function() {
 ##'     out) created by LuaTeX are removed.
 ##' @return invisible NULL.
 ##' @keywords internal
-luatex <- function(texname, clean = TRUE) {
+luatex <- function(texname, clean = FALSE) {
     wd <- setwd(dirname(texname))
     on.exit(setwd(wd))
 
