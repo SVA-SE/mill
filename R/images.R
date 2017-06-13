@@ -8,9 +8,15 @@ reduce_image <- function(from, to) {
     from <- normalizePath(from, mustWork = TRUE)
 
     args <- switch(tools::file_ext(from),
-                   jpg = c("-resize 1000x", "-compress JPEG", "-quality 50"),
-                   png = "-resize 75%",
+                   jpg = c("-resize 50%", "-strip", "-interlace Plane", "-gaussian-blur 0.05", "-quality 70%"),
+                   png = c("-resize 300x"),
                    NULL)
+
+    if (tools::file_ext(from) == "png2") {
+        ## Just copy file
+        file.copy(from, paste0(tools::file_path_sans_ext(to), ".png"))
+        return(invisible(NULL))
+    }
 
     if (is.null(args)) {
         ## Just copy file
