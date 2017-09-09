@@ -15,6 +15,7 @@ init_report <- function(path = ".", import = NULL, force = FALSE) {
     init_clean(file.path(report$path, ".git"), force)
     init_clean(file.path(report$path, ".gitignore"), force)
     init_clean(file.path(report$path, "chapters"), force)
+    init_clean(file.path(report$path, "Makefile"), force)
     init_clean(file.path(report$path, "report.org"), force)
 
     repo <- git2r::init(report$path)
@@ -56,6 +57,8 @@ do_init <- function(x, repo, import) UseMethod("do_init")
 ##' @keywords internal
 do_init.report <- function(x, repo, import) {
     do_init(x$chapters, repo, import)
+
+    create_Makefile(x)
 
     git2r::add(repo, file.path(x$path, "report.yml"))
 
