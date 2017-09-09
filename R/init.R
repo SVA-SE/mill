@@ -60,7 +60,7 @@ do_init.report <- function(x, repo, import) {
 
     create_Makefile(x)
 
-    git2r::add(repo, file.path(x$path, "report.yml"))
+    git2r::add(repo, file.path(x$path, "report.xlsx"))
 
     filename <- file.path(x$path, ".gitignore")
     writeLines(".Rproj.user", con = filename)
