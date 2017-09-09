@@ -54,7 +54,7 @@ authors <- function(sheet, title) {
 chapters <- function(sheet, path) {
     stopifnot(is.data.frame(sheet))
     stopifnot("Chapter" %in% colnames(sheet))
-    titles <- sort(unique(trim(unlist(strsplit(sheet$Chapter, ";")))))
+    titles <- sort(unique(trim(unlist(strsplit(sheet$Chapter, ",")))))
     result <- lapply(titles, function(title) {
         structure(list(title = title,
                        path = file.path(path, "chapters", title),
