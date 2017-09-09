@@ -4,7 +4,7 @@
 ##' @return trimmed character string
 ##' @keywords internal
 trim <- function(str) {
-    sub("\\s*$", "", sub("^\\s*", "", str))
+    trimws(gsub("[*]", "", str))
 }
 
 ##' Contributor
