@@ -11,40 +11,27 @@ trim <- function(str) {
 ##'
 ##' Extract one contributor from one row of the project excel sheet.
 ##' @param row the row with the contributor.
+##' @param title the title of the chapter.
 ##' @return a contributor object
 ##' @keywords internal
-contributor <- function(row) {
+contributor <- function(row, title) {
     stopifnot(is.data.frame(row))
-    stopifnot(all(c("Name", "Email", "Organisation") %in%
+    stopifnot(all(c("Name", "Email", "Organisation", "Chapter") %in%
                   colnames(row)))
     stopifnot(nrow(row) == 1)
+
     structure(list(name = trim(row$Name[1]),
                    email = trim(row$Email[1]),
-                   organisation = trim(row$Organisation[1])),
-              .Names = c("name", "email", "organisation"),
+                   organisation = trim(row$Organisation[1]),
+                   contact = length(grep(paste0(title, "*"), row$Chapter[1], fixed = TRUE)) > 0),
               class = "contributor")
-}
-
-##' Contributors
-##'
-##' Extract the contributors from the project excel sheet.
-##' @param sheet a data.frame defining the project.
-##' @return a list with contributors
-##' @keywords internal
-contributors <- function(sheet) {
-    stopifnot(is.data.frame(sheet))
-    result <- lapply(seq_len(nrow(sheet)), function(i) {
-        contributor(sheet[i, ])
-    })
-    class(result) <- "contributors"
-    result
 }
 
 ##' @keywords internal
 authors <- function(sheet, title) {
     stopifnot(is.data.frame(sheet))
     result <- lapply(grep(title, sheet$Chapter), function(i) {
-        contributor(sheet[i, ])
+        contributor(sheet[i, ], title = title)
     })
     class(result) <- "authors"
     result
@@ -79,7 +66,6 @@ load_report <- function(path = ".") {
 
     structure(list(report       = excel_sheets(filename)[1],
                    path         = path,
-                   contributors = contributors(df),
                    chapters     = chapters(df, path)),
               class = "report")
 }
@@ -88,28 +74,31 @@ load_report <- function(path = ".") {
 ##' @export
 summary.report <- function(object, ...) {
     cat("Report: ", object$report, "\n\n", sep = "")
-    print(object$contributors)
-    cat("\n")
     print(object$chapters)
 }
 
 ##' @export
 print.report <- function(x, ...) {
     cat("Report: ", x$report, "\n", sep = "")
-    cat("Contributors: ", length(x$contributors), "\n", sep = "")
+    do.call("rbind", lapply(x, function(y) as.data.frame(y)))
+
+    ## Contributors
+    authors <- lapply(x$chapters, function(chapter) {
+        sapply(chapter$authors, function(author) {
+            author$name
+        })
+    })
+    authors <- unique(unlist(authors))
+    cat("Contributors: ", length(authors), "\n", sep = "")
+
     cat("Chapters: ", length(x$chapters), "\n", sep = "")
 }
 
 ##' @export
-print.contributors <- function(x, ..., indent = "") {
-    cat("Contributors:\n")
-    lapply(x, print, indent = "  ")
-    invisible()
-}
-
-##' @export
 print.contributor <- function(x, ..., indent = "") {
-    cat(indent, x$name, " (", x$organisation, ") <", x$email, ">\n", sep = "")
+    cat(indent,
+        ifelse(x$contact, "*", " "),
+        x$name, " (", x$organisation, ") <", x$email, ">\n", sep = "")
 }
 
 ##' @export
@@ -122,7 +111,6 @@ print.chapters <- function(x, ...) {
 ##' @export
 print.chapter <- function(x, ..., indent = "") {
     cat(indent, x$title, "\n", sep = "")
-    ##print(x$contacts, indent = paste0(indent, "  "))
     print(x$authors, indent = paste0(indent, "  "))
     cat("\n")
 }
@@ -151,17 +139,11 @@ as.data.frame.chapters <- function(x, ...) {
 }
 
 as.data.frame.chapter <- function(x, ...) {
-    cbind(chapter = x$title,
-          rbind(as.data.frame(x$authors), as.data.frame(x$contacts)))
+    cbind(chapter = x$title, as.data.frame(x$authors))
 }
 
 as.data.frame.authors <- function(x) {
     cbind(role = "Author",
-          do.call("rbind", lapply(x, function(y) as.data.frame(y))))
-}
-
-as.data.frame.contacts <- function(x) {
-    cbind(role = "Contact",
           do.call("rbind", lapply(x, function(y) as.data.frame(y))))
 }
 
