@@ -1,7 +1,7 @@
 ##' @keywords internal
-figure_pattern <- function(fileext = c("all", "R", "tex", "xlsx", "pdf")) {
+figure_pattern <- function(fileext = c("all", "R", "tex", "xlsx", "pdf", "jpg")) {
     fileext <- switch(match.arg(fileext),
-                      all  = "(tex)|(R)|(xlsx)|(pdf)$",
+                      all  = "(tex)|(R)|(xlsx)|(pdf)|(jpg)$",
                       R    = "R$",
                       xlsx = "xlsx$",
                       tex  = "tex$",

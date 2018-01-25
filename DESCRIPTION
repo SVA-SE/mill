@@ -1,4 +1,4 @@
-Package: relax
+Package: mill
 Type: Package
 Title: Authoring Reports
 Version: 0.0.12
@@ -6,6 +6,7 @@ Authors@R: c(person("Stefan", "Widgren", role = c("aut", "cre"),
              email = "stefan.widgren@gmail.com"),
              person("Thomas", "Rosendal", role = c("aut")))
 Description: Utilities for authoring reports.
+License: EUPL
 Imports:
     git2r,
     readxl

@@ -10,6 +10,29 @@ create_Makefile <- function(x, ...) UseMethod("create_Makefile")
 ##' @export
 create_Makefile.report <- function(x, ...) {
     repo <- git2r::repository(x$path)
+
+    lines <- c("all:",
+               "\tRscript -e 'relax::to_pdf()'",
+               "",
+               "web:",
+               "\tRscript -e \"relax::to_pdf(relax::load_report(), type = 'web')\"",
+               "",
+               "check:",
+               "\tRscript -e \"relax::check()\"",
+               "",
+               "export:",
+               "\tRscript -e \"relax::export()\"",
+               "",
+               "roundtrip:",
+               "\tRscript -e \"relax::round_trip(relax::load_report())\"",
+               "",
+               ".PHONY: all check export roundtrip web")
+
+    writeLines(lines, file.path(x$path, "Makefile"))
+
+    if (!is.null(repo))
+        git2r::add(repo, file.path(x$path, "Makefile"))
+
     lapply(x$chapters, function(y) create_Makefile(y, repo = repo))
     invisible()
 }

@@ -4,10 +4,12 @@
 \alias{contributor}
 \title{Contributor}
 \usage{
-contributor(row)
+contributor(row, title)
 }
 \arguments{
 \item{row}{the row with the contributor.}
+
+\item{title}{the title of the chapter.}
 }
 \value{
 a contributor object

@@ -14,7 +14,9 @@ init_report <- function(path = ".", import = NULL, force = FALSE) {
 
     init_clean(file.path(report$path, ".git"), force)
     init_clean(file.path(report$path, ".gitignore"), force)
+    init_clean(file.path(report$path, "assets"), force)
     init_clean(file.path(report$path, "chapters"), force)
+    init_clean(file.path(report$path, "Makefile"), force)
     init_clean(file.path(report$path, "report.org"), force)
 
     repo <- git2r::init(report$path)
@@ -57,7 +59,9 @@ do_init <- function(x, repo, import) UseMethod("do_init")
 do_init.report <- function(x, repo, import) {
     do_init(x$chapters, repo, import)
 
-    git2r::add(repo, file.path(x$path, "report.yml"))
+    create_Makefile(x)
+
+    git2r::add(repo, file.path(x$path, "report.xlsx"))
 
     filename <- file.path(x$path, ".gitignore")
     writeLines(".Rproj.user", con = filename)
@@ -70,6 +74,46 @@ do_init.report <- function(x, repo, import) {
     filename <- file.path(x$path, "report.org")
     writeLines(to_orgmode(x), con = filename)
     git2r::add(repo, filename)
+
+    ## Latex snippets
+    dst <- file.path(x$path, "assets", "latex")
+    src <- file.path(import, "assets", "latex")
+    dir.create(dst, recursive = TRUE)
+    files <- list.files(path = src)
+    sapply(files, function(filename) {
+        file.copy(file.path(src, filename), file.path(dst, filename))
+        git2r::add(repo, file.path(dst, filename))
+    })
+
+    ## Cover
+    dst <- file.path(x$path, "assets", "cover")
+    src <- file.path(import, "assets", "cover")
+    dir.create(dst, recursive = TRUE)
+    files <- list.files(path = src)
+    sapply(files, function(filename) {
+        file.copy(file.path(src, filename), file.path(dst, filename))
+        git2r::add(repo, file.path(dst, filename))
+    })
+
+    ## Front-matter
+    dst <- file.path(x$path, "assets", "front-matter")
+    src <- file.path(import, "assets", "front-matter")
+    dir.create(dst, recursive = TRUE)
+    files <- list.files(path = src)
+    sapply(files, function(filename) {
+        file.copy(file.path(src, filename), file.path(dst, filename))
+        git2r::add(repo, file.path(dst, filename))
+    })
+
+    ## Back-matter
+    dst <- file.path(x$path, "assets", "back-matter")
+    src <- file.path(import, "assets", "back-matter")
+    dir.create(dst, recursive = TRUE)
+    files <- list.files(path = src)
+    sapply(files, function(filename) {
+        file.copy(file.path(src, filename), file.path(dst, filename))
+        git2r::add(repo, file.path(dst, filename))
+    })
 
     invisible()
 }
@@ -96,6 +140,10 @@ do_init.chapter <- function(x, repo, import) {
 
     import_text_input(x, repo, import, figure_pattern())
     import_text_input(x, repo, import, "^table-[^.]+[.]tex$")
+    import_text_input(x, repo, import, "^tab_[^.]+[.]tex$")
+    import_text_input(x, repo, import, "^fig_[^.]+[.]tex$")
+    import_text_input(x, repo, import, "^img_[^.]+[.]png2$")
+    import_text_input(x, repo, import, "^typeset[.]patch$")
 
     invisible()
 }

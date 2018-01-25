@@ -4,7 +4,7 @@
 \alias{luatex}
 \title{Run LuaTeX}
 \usage{
-luatex(texname, clean = TRUE)
+luatex(texname, clean = FALSE)
 }
 \arguments{
 \item{texname}{Run LuaTeX on texname.}
