@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/SVA-SE/mill.svg?branch=master)](https://travis-ci.org/SVA-SE/mill)
+[![Build Status](https://travis-ci.org/SVA-SE/mill.svg?maxAge=600&branch=master)](https://travis-ci.org/SVA-SE/mill)
 
 # mill
 
