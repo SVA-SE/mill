@@ -6,3 +6,5 @@ vignettes/relax.log
 vignettes/relax.out
 vignettes/relax.pdf
 vignettes/relax.tex
+^\.travis\.yml$
+^appveyor.yml$
