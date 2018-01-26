@@ -23,7 +23,7 @@ pdf: roxygen
 	cd .. && R CMD Rd2pdf --force $(PKG_NAME)
 
 vignette:
-	cd vignettes && Rscript -e "Sweave('relax'); tools::texi2pdf('relax.tex')"
+	cd vignettes && Rscript -e "Sweave('mill'); tools::texi2pdf('mill.tex')"
 
 # Generate README
 README.md: README.Rmd

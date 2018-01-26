@@ -10,11 +10,11 @@
 
 \Plainauthor{Stefan Widgren, Thomas Rosendal}
 
-\title{\pkg{relax}: An \proglang{R} package for authoring reports}
+\title{\pkg{mill}: An \proglang{R} package for authoring reports}
 
-\Plaintitle{relax: An R package for authoring reports}
+\Plaintitle{mill: An R package for authoring reports}
 
-\Shorttitle{\pkg{relax}: An R package for authoring reports}
+\Shorttitle{\pkg{mill}: An R package for authoring reports}
 
 \Abstract{
 
@@ -48,10 +48,10 @@ options(prompt = "R> ", continue = "+  ", width = 70, useFancyQuotes = FALSE)
 \begin{document}
 
 \SweaveOpts{engine=R,eps=FALSE,height=5,width=10}
-%\VignetteIndexEntry{relax: An R package for authoring reports}
-%\VignetteDepends{relax}
+%\VignetteIndexEntry{mill: An R package for authoring reports}
+%\VignetteDepends{mill}
 %\VignetteKeywords{FIXME}
-%\VignettePackage{relax}
+%\VignettePackage{mill}
 
 %**************************************************************************
 
@@ -59,12 +59,12 @@ options(prompt = "R> ", continue = "+  ", width = 70, useFancyQuotes = FALSE)
 
 \comment{FIXME.}
 
-The \pkg{relax} package is available from GitHub at
-\mbox{\url{https://github.com/stewid/relax}} and is loaded in
+The \pkg{mill} package is available from GitHub at
+\mbox{\url{https://github.com/stewid/mill}} and is loaded in
 \proglang{R} with the following command
 
-<<load-relax>>=
-library("relax")
+<<load-mill>>=
+library("mill")
 @
 
 %**************************************************************************
@@ -93,6 +93,6 @@ library("relax")
     and all automated checks.
 \end{description}
 
-%\bibliography{relax}
+%\bibliography{mill}
 
 \end{document}
