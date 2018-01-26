@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/SVA-SE/mill.svg?branch=master)](https://travis-ci.org/SVA-SE/mill)
+
 # mill
 
 An R package for grinding together docx files to generate a pdf report.
