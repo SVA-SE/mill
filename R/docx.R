@@ -87,7 +87,6 @@ import.chapter <- function(x, from) {
 ##' chapter 'text.tex' is added, but not commited, to the report git
 ##' repository.
 ##' @param x The report object to convert.
-##' @param repo The git repository to add the 'tex' to.
 ##' @param ... Additional arguments.
 ##' @return invisible NULL.
 ##' @export
@@ -99,7 +98,7 @@ from_docx.report <- function(x, ...) {
     if (length(list(...)) > 0)
         warning("Additional arguments ignored")
 
-    repo <- git2r::repository(x$path)
+    repo <- repository(x$path)
     lapply(x$chapters, function(y) from_docx(y, repo = repo))
     invisible()
 }
@@ -125,7 +124,7 @@ from_docx.chapter <- function(x, repo = NULL, ...) {
     writeLines(tex, file.path(x$path, "text.tex"))
 
     if (!is.null(repo))
-        git2r::add(repo, file.path(x$path, "text.tex"))
+        add(repo, file.path(x$path, "text.tex"))
     invisible()
 }
 
@@ -198,7 +197,6 @@ asterisk <- function(tex, direction = c("add", "remove")) {
 ##' chapter 'text.docx' is added, but not commited, to the report git
 ##' repository.
 ##' @param x The report object to convert.
-##' @param repo The git repository to add the 'docx' to.
 ##' @param ... Additional arguments.
 ##' @return invisible NULL.
 ##' @export
@@ -210,7 +208,7 @@ to_docx.report <- function(x, ...) {
     if (length(list(...)) > 0)
         warning("Additional arguments ignored")
 
-    repo <- git2r::repository(x$path)
+    repo <- repository(x$path)
     lapply(x$chapters, function(y) to_docx(y, repo = repo))
     invisible()
 }
@@ -235,14 +233,13 @@ to_docx.chapter <- function(x, repo = NULL, ...) {
     pandoc(paste("--top-level-division=chapter ",
                  shQuote(f_tex), "-o", shQuote(f_docx)))
     if (!is.null(repo))
-        git2r::add(repo, f_docx)
+        add(repo, f_docx)
     invisible()
 }
 
 ##' Roundtrip tex to docx
 ##'
 ##' @param x The object to convert.
-##' @param repo The git repository to add the 'docx' to.
 ##' @param ... Additional arguments.
 ##' @return invisible NULL.
 ##' @export
@@ -253,7 +250,7 @@ roundtrip <- function(x, ...) UseMethod("roundtrip")
 roundtrip.report <- function(x, ...) {
     if (length(list(...)) > 0)
         warning("Additional arguments ignored")
-    repo <- git2r::repository(x$path)
+    repo <- repository(x$path)
     lapply(x$chapters, function(y) roundtrip(y, repo = repo))
     invisible()
 }
@@ -268,10 +265,10 @@ roundtrip.chapter <- function(x, repo = NULL, ...) {
         warning("Additional arguments ignored")
 
     if (is.null(repo))
-        repo <- git2r::repository()
+        repo <- repository()
 
     ## Check if the working tree is clean
-    d <- git2r::diff(repo)
+    d <- diff(repo)
     if (length(d@files))
         stop("Working tree is not clean")
 
@@ -279,9 +276,9 @@ roundtrip.chapter <- function(x, repo = NULL, ...) {
     from_docx(x, repo = NULL)
 
     ## The roundtrip is clean if the tex-file is unchanged
-    unstaged <- unlist(git2r::status(repo)$unstaged)
+    unstaged <- unlist(status(repo)$unstaged)
     if (!(file.path("chapters", x$title, "text.tex") %in% unstaged))
-        git2r::reset(git2r::commits(repo, n = 1)[[1]], "hard")
+        reset(commits(repo, n = 1)[[1]], "hard")
 
     invisible()
 }

@@ -4,10 +4,11 @@
 ##' @return invisible \code{FALSE} if OK, else invisible \code{TRUE}.
 ##' @importFrom utils capture.output
 ##' @importFrom utils packageVersion
+##' @importFrom git2r repository
 ##' @export
 check <- function(path = ".") {
     cat("* using 'relax' version",
-        as.character(utils::packageVersion("relax")), "\n")
+        as.character(packageVersion("relax")), "\n")
 
     if (check_expect_pandoc_is_installed())
         return(invisible(TRUE))
@@ -21,9 +22,9 @@ check <- function(path = ".") {
         return(invisible(TRUE))
     }
     cat(blue("OK\n    "))
-    cat(utils::capture.output(report), sep = "\n    ")
+    cat(capture.output(report), sep = "\n    ")
 
-    repo <- git2r::repository(report$path)
+    repo <- repository(report$path)
     if (check_expect_clean_repository(report, repo))
         return(invisible(TRUE))
 
@@ -44,18 +45,20 @@ check_expect_clean_repository <- function(x, repo)
     UseMethod("check_expect_clean_repository")
 
 ##' @keywords internal
+##' @importFrom git2r diff
+##' @importFrom git2r repository
 check_expect_clean_repository.report <- function(x, repo) {
     cat("* checking that repository is clean ... ")
 
     ## Check if the working tree is clean
-    d <- git2r::diff(repo)
+    d <- diff(repo)
     if (length(d@files)) {
         cat(yellow("ERROR\n"))
         return(TRUE)
     }
 
     cat(blue("OK\n    "))
-    cat(capture.output(git2r::repository()), sep = "\n    ")
+    cat(capture.output(repository()), sep = "\n    ")
     FALSE
 }
 
@@ -109,8 +112,10 @@ check_tex_to_docx_round_trip <- function(x, repo)
     UseMethod("check_tex_to_docx_round_trip")
 
 ##' @keywords internal
+##' @importFrom git2r reset
+##' @importFrom git2r commits
 check_tex_to_docx_round_trip.report <- function(x, repo) {
-    on.exit(git2r::reset(git2r::commits(repo, n = 1)[[1]], "hard"))
+    on.exit(reset(commits(repo, n = 1)[[1]], "hard"))
     cat("* checking 'tex' to 'docx' round trip ... ")
 
     l <- check_tex_to_docx_round_trip(x$chapters, repo)
@@ -137,7 +142,7 @@ check_tex_to_docx_round_trip.chapters <- function(x, repo) {
 check_tex_to_docx_round_trip.chapter <- function(x, repo) {
     to_docx(x)
     from_docx(x)
-    unstaged <- unlist(git2r::status(repo)$unstaged)
+    unstaged <- unlist(status(repo)$unstaged)
     if (file.path("chapters", x$title, "text.tex") %in% unstaged)
         return(file.path("chapters", x$title, "text.tex"))
     NULL

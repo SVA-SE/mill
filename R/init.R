@@ -19,9 +19,9 @@ init_report <- function(path = ".", import = NULL, force = FALSE) {
     init_clean(file.path(report$path, "Makefile"), force)
     init_clean(file.path(report$path, "report.org"), force)
 
-    repo <- git2r::init(report$path)
+    repo <- init(report$path)
     do_init(report, repo, import)
-    git2r::commit(repo, "Initial repository")
+    commit(repo, "Initial repository")
 
     invisible(report)
 }
@@ -56,24 +56,25 @@ init_clean <- function(path, force) {
 do_init <- function(x, repo, import) UseMethod("do_init")
 
 ##' @keywords internal
+##' @importFrom git2r add
 do_init.report <- function(x, repo, import) {
     do_init(x$chapters, repo, import)
 
     create_Makefile(x)
 
-    git2r::add(repo, file.path(x$path, "report.xlsx"))
+    add(repo, file.path(x$path, "report.xlsx"))
 
     filename <- file.path(x$path, ".gitignore")
     writeLines(".Rproj.user", con = filename)
-    git2r::add(repo, filename)
+    add(repo, filename)
 
     filename <- file.path(x$path, "report.Rproj")
     writeLines(Rproj_file(), con = filename)
-    git2r::add(repo, filename)
+    add(repo, filename)
 
     filename <- file.path(x$path, "report.org")
     writeLines(to_orgmode(x), con = filename)
-    git2r::add(repo, filename)
+    add(repo, filename)
 
     ## Latex snippets
     dst <- file.path(x$path, "assets", "latex")
@@ -82,7 +83,7 @@ do_init.report <- function(x, repo, import) {
     files <- list.files(path = src)
     sapply(files, function(filename) {
         file.copy(file.path(src, filename), file.path(dst, filename))
-        git2r::add(repo, file.path(dst, filename))
+        add(repo, file.path(dst, filename))
     })
 
     ## Cover
@@ -92,7 +93,7 @@ do_init.report <- function(x, repo, import) {
     files <- list.files(path = src)
     sapply(files, function(filename) {
         file.copy(file.path(src, filename), file.path(dst, filename))
-        git2r::add(repo, file.path(dst, filename))
+        add(repo, file.path(dst, filename))
     })
 
     ## Front-matter
@@ -102,7 +103,7 @@ do_init.report <- function(x, repo, import) {
     files <- list.files(path = src)
     sapply(files, function(filename) {
         file.copy(file.path(src, filename), file.path(dst, filename))
-        git2r::add(repo, file.path(dst, filename))
+        add(repo, file.path(dst, filename))
     })
 
     ## Back-matter
@@ -112,7 +113,7 @@ do_init.report <- function(x, repo, import) {
     files <- list.files(path = src)
     sapply(files, function(filename) {
         file.copy(file.path(src, filename), file.path(dst, filename))
-        git2r::add(repo, file.path(dst, filename))
+        add(repo, file.path(dst, filename))
     })
 
     invisible()
@@ -125,18 +126,19 @@ do_init.chapters <- function(x, repo, import) {
 }
 
 ##' @keywords internal
+##' @importFrom git2r add
 do_init.chapter <- function(x, repo, import) {
     dir.create(x$path, recursive = TRUE)
 
     filename <- file.path(x$path, ".gitignore")
     writeLines("auto", con = filename)
     writeLines("text.log", con = filename)
-    git2r::add(repo, filename)
+    add(repo, filename)
 
     filename <- file.path(x$path, "text.tex")
     if (!import_from(import, x$path, x$title, "text.tex"))
         writeLines(lorem_ipsum(x$title), con = filename)
-    git2r::add(repo, filename)
+    add(repo, filename)
 
     import_text_input(x, repo, import, figure_pattern())
     import_text_input(x, repo, import, "^table-[^.]+[.]tex$")
@@ -149,6 +151,7 @@ do_init.chapter <- function(x, repo, import) {
 }
 
 ##' @keywords internal
+##' @importFrom git2r add
 import_text_input <- function(x, repo, import, pattern) {
     if (!is.null(import)) {
         files <- list.files(path = file.path(import, "chapters", x$title),
@@ -156,7 +159,7 @@ import_text_input <- function(x, repo, import, pattern) {
         lapply(files, function(filename) {
             file.copy(file.path(import, "chapters", x$title, filename),
                       file.path(x$path, filename))
-            git2r::add(repo, file.path(x$path, filename))
+            add(repo, file.path(x$path, filename))
         })
     }
 }

@@ -10,8 +10,6 @@ roundtrip(x, ...)
 \item{x}{The object to convert.}
 
 \item{...}{Additional arguments.}
-
-\item{repo}{The git repository to add the 'docx' to.}
 }
 \value{
 invisible NULL.

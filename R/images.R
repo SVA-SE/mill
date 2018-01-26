@@ -2,19 +2,21 @@
 ##'
 ##' @param from filename of the original image
 ##' @param to filename of the reduced image
+##' @importFrom tools file_ext
+##' @importFrom tools file_path_sans_ext
 ##' @return invisible NULL
 ##' @export
 reduce_image <- function(from, to) {
     from <- normalizePath(from, mustWork = TRUE)
 
-    args <- switch(tools::file_ext(from),
+    args <- switch(file_ext(from),
                    jpg = c("-resize 50%", "-strip", "-interlace Plane", "-gaussian-blur 0.05", "-quality 70%"),
                    png = c("-resize 300x"),
                    NULL)
 
-    if (tools::file_ext(from) == "png2") {
+    if (file_ext(from) == "png2") {
         ## Just copy file
-        file.copy(from, paste0(tools::file_path_sans_ext(to), ".png"))
+        file.copy(from, paste0(file_path_sans_ext(to), ".png"))
         return(invisible(NULL))
     }
 

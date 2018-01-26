@@ -1,6 +1,7 @@
 ##' Build report
 ##'
 ##' @param x The report object
+##' @param ... Additional parameters
 ##' @return invisible NULL
 ##' @export
 to_pdf <- function(x, ...) UseMethod("to_pdf")

@@ -44,6 +44,7 @@ preview_tables.chapter <- function(x) {
 ##' Preview a table
 ##'
 ##' @param table The path to the table tex file
+##' @importFrom tools file_path_sans_ext
 ##' @export
 preview_table <- function(table) {
     preview <- tempfile(tmpdir = dirname(table), fileext = ".tex")
@@ -74,9 +75,9 @@ preview_table <- function(table) {
     luatex(preview)
 
     ## Copy the pdf preview to 'preview-figure.pdf'
-    from <- paste0(tools::file_path_sans_ext(preview), ".pdf")
+    from <- paste0(file_path_sans_ext(preview), ".pdf")
     to <- file.path(dirname(table),
-                    paste0("preview-", tools::file_path_sans_ext(basename(table)), ".pdf"))
+                    paste0("preview-", file_path_sans_ext(basename(table)), ".pdf"))
     if (file.exists(to))
         file.remove(to)
     file.rename(from, to)

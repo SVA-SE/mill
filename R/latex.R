@@ -15,6 +15,7 @@ luatex_cmd <- function() {
 ##' @param texname Run LuaTeX on texname.
 ##' @param clean logical. If \code{TRUE}, auxiliary files (aux, log,
 ##'     out) created by LuaTeX are removed.
+##' @importFrom tools file_path_sans_ext
 ##' @return invisible NULL.
 ##' @keywords internal
 luatex <- function(texname, clean = FALSE) {
@@ -27,7 +28,7 @@ luatex <- function(texname, clean = FALSE) {
     system(paste(luatex_cmd(), shQuote(texname)))
 
     if (identical(clean, TRUE)) {
-        f <- tools::file_path_sans_ext(texname)
+        f <- file_path_sans_ext(texname)
         file.remove(paste0(f, ".aux"))
         file.remove(paste0(f, ".log"))
         file.remove(paste0(f, ".out"))
@@ -91,11 +92,12 @@ references.chapter <- function(x) {
 ##' Get the chapter tex files
 ##'
 ##' @param x the chapter object
+##' @importFrom methods is
 ##' @keywords internal
 chapter_tex_files <- function(x, type = c("all", "text", "fig", "table")) {
 
     type = match.arg(type)
-    stopifnot(methods::is(x, "chapter"))
+    stopifnot(is(x, "chapter"))
 
     text_files <- NULL
     fig_files  <- NULL

@@ -10,7 +10,13 @@ figure_pattern <- function(fileext = c("all", "R", "tex", "xlsx", "pdf", "jpg"))
     paste0("^figure-[^.]+[.]", fileext)
 }
 
+##' figure_files
+##'
+##' A method to discover the figures in a report or chapter object.
+##'
 ##' @export
+##' @param x The report or chapter object
+##' @param fileext The extension of the files you want to find
 figure_files <- function(x, fileext) UseMethod("figure_files")
 
 ##' @export
@@ -141,6 +147,7 @@ assets.character <- function(x) {
 ##' Preview a figure
 ##'
 ##' @param figure The path to the figure tex file
+##' @importFrom tools file_path_sans_ext
 ##' @export
 preview_figure <- function(figure) {
     preview <- tempfile(tmpdir = dirname(figure), fileext = ".tex")
@@ -166,9 +173,9 @@ preview_figure <- function(figure) {
     luatex(preview)
 
     ## Copy the pdf preview to 'preview-figure.pdf'
-    from <- paste0(tools::file_path_sans_ext(preview), ".pdf")
+    from <- paste0(file_path_sans_ext(preview), ".pdf")
     to <- file.path(dirname(figure),
-                    paste0("preview-", tools::file_path_sans_ext(basename(figure)), ".pdf"))
+                    paste0("preview-", file_path_sans_ext(basename(figure)), ".pdf"))
     if (file.exists(to))
         file.remove(to)
     file.rename(from, to)

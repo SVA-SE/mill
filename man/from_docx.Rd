@@ -10,8 +10,6 @@ from_docx(x, ...)
 \item{x}{The report object to convert.}
 
 \item{...}{Additional arguments.}
-
-\item{repo}{The git repository to add the 'tex' to.}
 }
 \value{
 invisible NULL.

@@ -8,6 +8,8 @@ to_pdf(x, ...)
 }
 \arguments{
 \item{x}{The report object}
+
+\item{...}{Additional parameters}
 }
 \value{
 invisible NULL

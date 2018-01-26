@@ -64,6 +64,7 @@ interactive_replace.chapter <- function(x, pattern, replacement) {
 ##'     first capture with "\\1".
 ##' @param x string
 ##' @return string
+##' @importFrom utils menu
 interactive_replace.character <- function(x, pattern, replacement) {
     ## Check if there is a match
     match <- regexec(pattern, x)[[1]]
@@ -90,8 +91,7 @@ interactive_replace.character <- function(x, pattern, replacement) {
                blue(sub(pattern, replacement, match_text))
                )
         )
-    selection <- utils::menu(c("yes", "no"), title = "")
-
+    selection <- menu(c("yes", "no"), title = "")
     ## If the user answers 'no' return the original text and continue
     if(selection == 2) {
         paste0(chunk,

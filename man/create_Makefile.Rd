@@ -10,8 +10,6 @@ create_Makefile(x, ...)
 \item{x}{The report object}
 
 \item{...}{Additional arguments.}
-
-\item{repo}{The git repository to add the 'Makefile' to.}
 }
 \value{
 invisible NULL
