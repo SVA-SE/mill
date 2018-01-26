@@ -11,10 +11,12 @@
 ##' @export
 ##'
 ##' @examples
+##' \dontrun{
 ##' r <- load_report()
 ##' pattern <- "([[:digit:]]{4, })"
 ##' replacement <- "\\\\numprint{\\1}"
 ##' interactive_replace(r[["Campy"]], pattern, replacement)
+##' }
 interactive_replace <- function(x, pattern, replacement) {
     UseMethod("interactive_replace")
 }
@@ -32,10 +34,12 @@ interactive_replace <- function(x, pattern, replacement) {
 ##' @export
 ##'
 ##' @examples
+##' \dontrun{
 ##' r <- load_report()
 ##' pattern <- "([[:digit:]]{4, })"
 ##' replacement <- "\\\\numprint{\\1}"
 ##' interactive_replace(r[["Campy"]], pattern, replacement)
+##' }
 interactive_replace.chapter <- function(x, pattern, replacement) {
 
     ## Get the text
