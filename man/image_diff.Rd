@@ -4,14 +4,12 @@
 \alias{image_diff}
 \title{image_diff}
 \usage{
-image_diff(reference, new, output = tempfile())
+image_diff(reference, new)
 }
 \arguments{
 \item{reference}{Path to a reference image}
 
 \item{new}{Path to an image to compare to the reference image}
-
-\item{output}{Optional path to the output image}
 }
 \value{
 numeric The percent difference between the two images
@@ -21,9 +19,8 @@ Compare Images
 }
 \details{
 Submit an a reference image and a new image and get back the
-percent difference in all colour channels. Optionally you can also
-save the output comparison image that highlights the differences
-between them.
+percent difference in all colour channels.
 
 Requires imagemagick
+Requires pdftk
 }
