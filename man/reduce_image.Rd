@@ -15,5 +15,5 @@ reduce_image(from, to)
 invisible NULL
 }
 \description{
-Reduce Images
+Reduce the resolution of images. Requires imagemagick.
 }
