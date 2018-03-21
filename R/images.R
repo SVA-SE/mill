@@ -60,7 +60,7 @@ image_diff <- function(reference, new) {
         stopifnot(pdf_np(reference) == 1)
         stopifnot(pdf_np(new) == 1)
     }
-    output <- tempfile(fileext = paste0(".", fileext))
+    output <- tempfile(fileext = paste0(".", fileext1))
     reference <- normalizePath(reference, mustWork = TRUE)
     new <- normalizePath(new, mustWork = TRUE)
     args <- c("-verbose", "-metric MAE")
