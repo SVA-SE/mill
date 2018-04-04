@@ -5,7 +5,7 @@ table_pattern <- function(fileext = c("all", "tex", "pdf")) {
                       tex = "tex$",
                       pdf = "pdf$")
 
-    paste0("^table-[^.]+[.]", fileext)
+    paste0("^tab_[^.]+[.]", fileext)
 }
 
 ##' @keywords internal
@@ -81,4 +81,9 @@ preview_table <- function(table) {
     if (file.exists(to))
         file.remove(to)
     file.rename(from, to)
+    for (ext in c(".log", ".aux", ".out")) {
+        file <- paste0(file_path_sans_ext(preview), ext)
+        if (file.exists(file))
+            file.remove(file)
+    }
 }
