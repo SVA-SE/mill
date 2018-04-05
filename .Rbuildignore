@@ -1,10 +1,10 @@
 ^Makefile$
-vignettes/relax.aux
-vignettes/relax.bbl
-vignettes/relax.blg
-vignettes/relax.log
-vignettes/relax.out
-vignettes/relax.pdf
-vignettes/relax.tex
+vignettes/mill.aux
+vignettes/mill.bbl
+vignettes/mill.blg
+vignettes/mill.log
+vignettes/mill.out
+vignettes/mill.pdf
+vignettes/mill.tex
 ^\.travis\.yml$
 ^appveyor.yml$
