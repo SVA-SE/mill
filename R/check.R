@@ -7,8 +7,8 @@
 ##' @importFrom git2r repository
 ##' @export
 check <- function(path = ".") {
-    cat("* using 'relax' version",
-        as.character(packageVersion("relax")), "\n")
+    cat("* using 'mill' version",
+        as.character(packageVersion("mill")), "\n")
 
     if (check_expect_pandoc_is_installed())
         return(invisible(TRUE))
