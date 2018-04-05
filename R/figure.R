@@ -7,7 +7,7 @@ figure_pattern <- function(fileext = c("all", "R", "tex", "xlsx", "pdf", "jpg"))
                       tex  = "tex$",
                       pdf  = "pdf$")
 
-    paste0("^figure-[^.]+[.]", fileext)
+    paste0("^fig_[^.]+[.]", fileext)
 }
 
 ##' figure_files
