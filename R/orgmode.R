@@ -28,32 +28,26 @@ to_orgmode.chapters <- function(x) {
 
 ##' @keywords internal
 to_orgmode.chapter <- function(x) {
+
+    items <- character(0)
+
     lines <- paste0("** TODO [[file+emacs:chapters/",
                     gsub("[[:space:]]", "%20", x$title),
                     "][", x$title, "]]")
 
-    lines <- c(lines,
-               orgmode_file_items(x$path, x$title, "figure"),
-               orgmode_file_items(x$path, x$title, "table"))
-
-    lines
-}
-
-##' @keywords internal
-orgmode_file_items <- function(path, title, file_type) {
-    items <- character()
-
-    files <- list.files(path = path,
-                        pattern = paste0("^", file_type, "-[^.]+[.]tex$"))
+    files <- c(basename(figure_files(x, "R")),
+               basename(table_files(x, "tex")))
 
     if (length(files)) {
         items <- sapply(files, function(filename) {
             paste0("*** TODO [[file:chapters/",
-                   gsub("[[:space:]]", "%20", title),
+                   gsub("[[:space:]]", "%20", x$title),
                    "/", filename,
-                   "][", sub("[.]tex$", "", filename), "]]")
+                   "][", tools::file_path_sans_ext(filename), "]]")
         }, USE.NAMES = FALSE)
     }
 
-    items
+    lines <- c(lines, items)
+
+    lines
 }
