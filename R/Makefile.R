@@ -41,9 +41,15 @@ create_Makefile.report <- function(x, ...) {
 ##' @importFrom git2r add
 ##' @export
 create_Makefile.chapter <- function(x, repo, ...) {
+    prefix <- "\tcd ../.. && Rscript -e \"library('mill'); r <- load_report();"
+
     lines <- c("pdf:",
-               sprintf("\tcd ../.. && Rscript -e \"library('mill'); r <- load_report(); to_pdf(r[['%s']])\"",
-                       x$title),
+               sprintf("%s to_pdf(r[['%s']])\"", prefix, x$title),
+               "",
+               "import:",
+               sprintf("%s import(r[['%s']], %s); from_docx(r[['%s']])\"",
+                       prefix, x$title, "'Surveillance 2017/chapters'", x$title),
+               "",
                "diff:",
                "\tdiff -c --label=text --label=typeset text.tex typeset.tex > typeset.patch; [ $$? -eq 1 ]",
                "",
@@ -51,16 +57,14 @@ create_Makefile.chapter <- function(x, repo, ...) {
                "\tpatch text.tex -i typeset.patch -o typeset.tex",
                "",
                "roundtrip:",
-               sprintf("\tcd ../.. && Rscript -e \"library('mill'); r <- load_report(); roundtrip(r[['%s']])\"",
-                       x$title),
+               sprintf("%s roundtrip(r[['%s']])\"", prefix, x$title),
                "",
                "table_preview:",
-               sprintf("\tcd ../.. && Rscript -e \"library('mill'); r <- load_report(); preview_tables(r[['%s']])\"",
-                       x$title),
+               sprintf("%s preview_tables(r[['%s']])\"", prefix, x$title),
                "",
                "rpd: roundtrip patch diff",
                "",
-               "PHONY: pdf diff patch roundtrip rpd",
+               "PHONY: pdf import diff patch roundtrip rpd",
                "")
 
     writeLines(lines, file.path(x$path, "Makefile"))
