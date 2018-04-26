@@ -81,3 +81,20 @@ orgmode_parse_author <- function(x) {
                    organisation = o),
               class = "author")
 }
+
+##' @keywords internal
+orgmode_parse_authors <- function(x) {
+    stopifnot(is.character(x),
+              length(x) > 2,
+              identical(grep("^:AUTHORS:", x), 1L))
+
+    a <- list()
+    x <- x[-1]
+    repeat {
+        if (!identical(grep("^AUTHOR:", x[1]), 1L))
+            break
+        a[[length(a)+1]] <- orgmode_parse_author(x[1])
+        x <- x[-1]
+    }
+    a
+}

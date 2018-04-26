@@ -95,6 +95,12 @@ print.report <- function(x, ...) {
 }
 
 ##' @export
+print.author <- function(x, ..., indent = "") {
+    cat(indent,
+        x$name, " [", x$organisation, "] <", x$email, ">\n", sep = "")
+}
+
+##' @export
 print.contributor <- function(x, ..., indent = "") {
     cat(indent,
         ifelse(x$contact, "*", " "),
