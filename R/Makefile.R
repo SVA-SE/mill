@@ -62,6 +62,8 @@ create_Makefile.chapter <- function(x, repo, ...) {
                "table_preview:",
                sprintf("%s preview_tables(r[['%s']])\"", prefix, x$title),
                "",
+               "build_figures:",
+               sprintf("%s build_figures(r[['%s']])\"", prefix, x$title),
                "rpd: roundtrip patch diff",
                "",
                "PHONY: pdf import diff patch roundtrip rpd",
