@@ -17,6 +17,7 @@ to_orgmode.report <- function(x) {
              "REVIEW(r!) EDITOR(e!) | DONE(d@/!)"),
       "#+STARTUP: indent",
       "#+STARTUP: hidestars",
+      "#+STARTUP: logdrawer",
       paste0("#+TITLE: ", x$report))
 }
 
@@ -50,4 +51,33 @@ to_orgmode.chapter <- function(x) {
     lines <- c(lines, items)
 
     lines
+}
+
+##' @keywords internal
+orgmode_parse_author <- function(x) {
+    stopifnot(is.character(x),
+              identical(length(x), 1L),
+              identical(grep("^AUTHOR:", x), 1L))
+
+    ## Extract author name
+    x <- trimws(sub("^AUTHOR:", "", x))
+    x <- unlist(strsplit(x, "[[]"))
+    stopifnot(identical(length(x), 2L))
+    n <- trimws(x[1])
+
+    ## Extract organization
+    x <- trimws(x[2])
+    x <- unlist(strsplit(x, "[]]"))
+    stopifnot(identical(length(x), 2L))
+    o <- trimws(x[1])
+
+    ## Extract email
+    x <- trimws(x[2])
+    stopifnot(identical(grep("^<.+>$", x), 1L))
+    e <- sub("^<", "", sub(">$", "", x))
+
+    structure(list(name = n,
+                   email = e,
+                   organisation = o),
+              class = "author")
 }
