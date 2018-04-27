@@ -131,3 +131,36 @@ orgmode_parse_drawer <- function(x) {
 
     list(result = drawer, remainder = remainder)
 }
+
+##' STARS KEYWORD PRIORITY TITLE TAGS
+##' @noRd
+orgmode_parse_headline <- function(x) {
+    stopifnot(is.character(x),
+              length(x) > 0,
+              identical(grep("^[*]+(\\s|$)", x[1]), 1L))
+
+    ## Extract the level of the headline
+    level <- nchar(regmatches(x[1], regexpr("^[*]+", x[1])))
+
+    ## Extract the headline
+    headline <- trimws(sub("[*]*", "", x[1]))
+    x <- x[-1]
+
+    ## Find end of contents under headline
+    if (any(nchar(regmatches(x, regexpr("^[*]+", x))) <= level)) {
+        ## Extract remainder
+        stop("Not implemented")
+    } else if (length(x) > 0) {
+        contents <- x
+        remainder <- NULL
+    } else {
+        contents <- NULL
+        remainder <- NULL
+    }
+
+    list(result = structure(list(level = level,
+                                 headline = headline,
+                                 contents = contents),
+                            class = "org_headline"),
+         remainder = remainder)
+}
