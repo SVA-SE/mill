@@ -43,12 +43,14 @@ create_Makefile.report <- function(x, ...) {
 create_Makefile.chapter <- function(x, repo, ...) {
     prefix <- "\tcd ../.. && Rscript -e \"library('mill'); r <- load_report();"
 
+    title_regexp <- paste0("^", x$title, "$$")
+
     lines <- c("pdf:",
-               sprintf("%s to_pdf(r[['%s']])\"", prefix, x$title),
+               sprintf("%s to_pdf(r[['%s']])\"", prefix, title_regexp),
                "",
                "import:",
                sprintf("%s import(r[['%s']], %s); from_docx(r[['%s']])\"",
-                       prefix, x$title, "'Surveillance 2017/chapters'", x$title),
+                       prefix, title_regexp, "'Surveillance 2017/chapters'", title_regexp),
                "",
                "diff:",
                "\tdiff -c --label=text --label=typeset text.tex typeset.tex > typeset.patch; [ $$? -eq 1 ]",
@@ -57,13 +59,13 @@ create_Makefile.chapter <- function(x, repo, ...) {
                "\tpatch text.tex -i typeset.patch -o typeset.tex",
                "",
                "roundtrip:",
-               sprintf("%s roundtrip(r[['%s']])\"", prefix, x$title),
+               sprintf("%s roundtrip(r[['%s']])\"", prefix, title_regexp),
                "",
                "table_preview:",
-               sprintf("%s preview_tables(r[['%s']])\"", prefix, x$title),
+               sprintf("%s preview_tables(r[['%s']])\"", prefix, title_regexp),
                "",
                "build_figures:",
-               sprintf("%s build_figures(r[['%s']])\"", prefix, x$title),
+               sprintf("%s build_figures(r[['%s']])\"", prefix, title_regexp),
                "rpd: roundtrip patch diff",
                "",
                "PHONY: pdf import diff patch roundtrip rpd",
