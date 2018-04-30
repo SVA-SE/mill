@@ -1,30 +1,26 @@
-##' Export files
+##' Export files to workspace
 ##'
-##' @param x The object to export.
-##' @param to The destination of the export. If the argument is
-##'     missing, the docx files are exported to a folder named from
-##'     the report title.
+##' Authors make contributions to chapters in the workspace.
+##' @param x The object to export. The docx files are exported to
+##'     workspace/chapters/title.
 ##' @return invisible NULL.
 ##' @export
-export <- function(x, to) UseMethod("export")
+export <- function(x) UseMethod("export")
 
 ##' @export
-export.default <- function(x, to) {
+export.default <- function(x) {
     export(load_report())
 }
 
 ##' @export
-export.report <- function(x, to) {
-    if (missing(to))
-        to <- x$report
-    to <- file.path(to, "chapters")
-    lapply(x$chapters, function(y) export(y, to = to))
+export.report <- function(x) {
+    lapply(x$chapters, function(y) export(y))
     invisible()
 }
 
 ##' @export
-export.chapter <- function(x, to) {
-    to <- file.path(to, x$title)
+export.chapter <- function(x) {
+    to <- file.path("workspace", "chapters", x$title)
     if (!dir.exists(to))
         dir.create(to, recursive = TRUE)
 
