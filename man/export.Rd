@@ -2,20 +2,17 @@
 % Please edit documentation in R/docx.R
 \name{export}
 \alias{export}
-\title{Export files}
+\title{Export files to workspace}
 \usage{
-export(x, to)
+export(x)
 }
 \arguments{
-\item{x}{The object to export.}
-
-\item{to}{The destination of the export. If the argument is
-missing, the docx files are exported to a folder named from
-the report title.}
+\item{x}{The object to export. The docx files are exported to
+workspace/chapters/title.}
 }
 \value{
 invisible NULL.
 }
 \description{
-Export files
+Authors make contributions to chapters in the workspace.
 }
