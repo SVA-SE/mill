@@ -116,6 +116,7 @@ from_docx.chapter <- function(x, repo = NULL, ...) {
     tex <- readLines(f_tex)
     tex <- convert_docx_ref_to_ref(tex, x$title)
     tex <- make_labels_chapter_specific(tex, x$title)
+    tex <- make_hypertargets_chapter_specific(tex, x$title)
     tex <- asterisk(tex, "add")
     writeLines(tex, file.path(x$path, "text.tex"))
 
@@ -149,6 +150,19 @@ convert_docx_ref_to_ref <- function(tex, title) {
 convert_ref_to_docx_ref <- function(tex) {
     pattern <- "\\\\ref[{]([^:]*)[:][^:]*[:]([^}]*)[}]"
     replacement <- "[\\1:\\2]"
+    gsub(pattern, replacement, tex)
+}
+
+##' Make tex hypertargets chapter specific in the report
+##'
+##' @param tex The tex character vector
+##' @param title The chapter title
+##' @return tex character vector
+##' @keywords internal
+make_hypertargets_chapter_specific <- function(tex, title) {
+    title <- normalize_title(title)
+    pattern <- "[\\]hypertarget[{]([^}]*)[}]"
+    replacement <- paste0("\\\\hypertarget{sec:", title, ":", "\\1}")
     gsub(pattern, replacement, tex)
 }
 
