@@ -8,7 +8,7 @@ Authors@R: c(person("Stefan", "Widgren", role = c("aut", "cre"),
 Description: Utilities for authoring reports.
 License: EUPL
 Depends:
-    R(>= 3.1)
+    R(>= 3.2)
 Imports:
     git2r,
     readxl,
