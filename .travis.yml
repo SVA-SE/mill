@@ -9,9 +9,6 @@ os:
   - linux
   - osx
 
-r_packages:
-  - covr
-
 r:
   - 3.2
   - oldrel
@@ -24,10 +21,6 @@ matrix:
     r: 3.2
   - os: osx
     r: devel
-
-# Only report coverage for the release version on linux
-after_success:
-  - if [ "$TRAVIS_OS_NAME" == "linux" ] && [ "$TRAVIS_R_VERSION_STRING" == "release" ]; then Rscript -e 'library(covr); coveralls()'; fi
 
 notifications:
   email:
