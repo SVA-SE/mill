@@ -95,3 +95,22 @@ result_expected <- structure(list(
     .Names = c("result", "remainder"))
 result_observed <- mill:::org_headline(c("* Chapter 1", "* Chapter 2"))
 stopifnot(identical(result_observed, result_expected))
+
+##########################
+### Parse org document ###
+##########################
+
+result_expected <- structure(
+    list(contents = list(structure(list(level = 1L,
+                                        headline = "Chapter 1",
+                                        contents = NULL),
+                                   .Names = c("level", "headline", "contents"),
+                                   class = "org_headline"),
+                         structure(list(level = 1L,
+                                        headline = "Chapter 2",
+                                        contents = NULL),
+                                   .Names = c("level", "headline", "contents"),
+                                   class = "org_headline"))),
+    .Names = "contents", class = "org_doc")
+result_observed <- mill:::org_doc(c("* Chapter 1", "* Chapter 2"))
+stopifnot(identical(result_observed, result_expected))

@@ -168,3 +168,21 @@ org_headline <- function(x) {
                             class = "org_headline"),
          remainder = remainder)
 }
+
+##' @noRd
+org_doc <- function(x) {
+    stopifnot(is.character(x), length(x) > 0)
+
+    contents <- list()
+
+    repeat {
+        org <- org_headline(x)
+        contents[[length(contents) + 1]] <- org$result
+
+        x <- org$remainder
+        if (is.null(x))
+            break
+    }
+
+    structure(list(contents = contents), class = "org_doc")
+}
