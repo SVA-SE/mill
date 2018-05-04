@@ -31,13 +31,18 @@ result_expected <- structure(list(
                   ":END:")),
     .Names = c("result", "remainder"))
 
-result_observed <- mill:::orgmode_parse_drawer(rep(lines, 2))
+result_observed <- mill:::org_drawer(rep(lines, 2))
 
 stopifnot(identical(result_observed, result_expected))
 
-## Parse headline
-tools::assertError(mill:::orgmode_parse_headline(1))
-tools::assertError(mill:::orgmode_parse_headline(character(0)))
+######################
+### Parse headline ###
+######################
+
+tools::assertError(mill:::org_headline(1))
+tools::assertError(mill:::org_headline(character(0)))
+
+##
 
 result_expected <- structure(list(
     result = structure(list(level = 1L, headline = "", contents = NULL),
@@ -45,15 +50,17 @@ result_expected <- structure(list(
                        class = "org_headline"),
     remainder = NULL),
     .Names = c("result", "remainder"))
-result_observed <- mill:::orgmode_parse_headline("*")
+result_observed <- mill:::org_headline("*")
 stopifnot(identical(result_observed, result_expected))
+
+##
 
 result_expected <- structure(list(
     result = structure(list(level = 2L, headline = "DONE", contents = NULL),
                        .Names = c("level", "headline", "contents"),
                        class = "org_headline"),
     remainder = NULL), .Names = c("result", "remainder"))
-result_observed <- mill:::orgmode_parse_headline("** DONE")
+result_observed <- mill:::org_headline("** DONE")
 stopifnot(identical(result_observed, result_expected))
 
 result_expected <- structure(list(
@@ -61,8 +68,10 @@ result_expected <- structure(list(
                        .Names = c("level", "headline", "contents"),
                        class = "org_headline"),
     remainder = NULL), .Names = c("result", "remainder"))
-result_observed <- mill:::orgmode_parse_headline("*** Some e-mail")
+result_observed <- mill:::org_headline("*** Some e-mail")
 stopifnot(identical(result_observed, result_expected))
+
+##
 
 result_expected <- structure(list(
     result = structure(list(level = 4L,
@@ -71,8 +80,10 @@ result_expected <- structure(list(
                        .Names = c("level", "headline", "contents"),
                        class = "org_headline"),
     remainder = NULL), .Names = c("result", "remainder"))
-result_observed <- mill:::orgmode_parse_headline("**** TODO [#A] COMMENT Title :tag:a2%:")
+result_observed <- mill:::org_headline("**** TODO [#A] COMMENT Title :tag:a2%:")
 stopifnot(identical(result_observed, result_expected))
+
+##
 
 result_expected <- structure(list(
     result = structure(list(level = 1L,
@@ -82,5 +93,5 @@ result_expected <- structure(list(
                        class = "org_headline"),
     remainder = "* Chapter 2"),
     .Names = c("result", "remainder"))
-result_observed <- mill:::orgmode_parse_headline(c("* Chapter 1", "* Chapter 2"))
+result_observed <- mill:::org_headline(c("* Chapter 1", "* Chapter 2"))
 stopifnot(identical(result_observed, result_expected))

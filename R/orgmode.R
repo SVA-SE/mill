@@ -100,7 +100,7 @@ orgmode_parse_authors <- function(x) {
 }
 
 ##' @keywords internal
-orgmode_parse_drawer <- function(x) {
+org_drawer <- function(x) {
     stopifnot(is.character(x),
               length(x) > 1,
               identical(grep("^:[^:]+:$", x[1]), 1L))
@@ -134,7 +134,7 @@ orgmode_parse_drawer <- function(x) {
 
 ##' STARS KEYWORD PRIORITY TITLE TAGS
 ##' @noRd
-orgmode_parse_headline <- function(x) {
+org_headline <- function(x) {
     stopifnot(is.character(x),
               length(x) > 0,
               identical(grep("^[*]+(\\s|$)", x[1]), 1L))
