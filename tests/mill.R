@@ -73,3 +73,14 @@ result_expected <- structure(list(
     remainder = NULL), .Names = c("result", "remainder"))
 result_observed <- mill:::orgmode_parse_headline("**** TODO [#A] COMMENT Title :tag:a2%:")
 stopifnot(identical(result_observed, result_expected))
+
+result_expected <- structure(list(
+    result = structure(list(level = 1L,
+                            headline = "Chapter 1",
+                            contents = NULL),
+                       .Names = c("level", "headline", "contents"),
+                       class = "org_headline"),
+    remainder = "* Chapter 2"),
+    .Names = c("result", "remainder"))
+result_observed <- mill:::orgmode_parse_headline(c("* Chapter 1", "* Chapter 2"))
+stopifnot(identical(result_observed, result_expected))
