@@ -101,9 +101,8 @@ orgmode_parse_authors <- function(x) {
 
 ##' @keywords internal
 org_drawer <- function(x) {
-    stopifnot(is.character(x),
-              length(x) > 1,
-              identical(grep("^:[^:]+:$", x[1]), 1L))
+    if (!identical(grep("^:[^:]+:$", x[1]), 1L))
+        return(NULL)
 
     ## Extract name of drawer
     name <- sub("^:", "", sub(":$", "", x[1]))
@@ -117,10 +116,11 @@ org_drawer <- function(x) {
     if (end > 2) {
         contents <- x[seq(from = 2, to = end - 1, by = 1)]
     } else {
-        contents <- character(0)
+        contents <- NULL
     }
 
-    drawer <- structure(list(name = name, contents = contents), class = "org_drawer")
+    drawer <- structure(list(name = name, contents = contents),
+                        class = "org_drawer")
 
     ## Extract remainder
     if (end < length(x)) {

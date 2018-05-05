@@ -15,19 +15,19 @@ mill:::orgmode_parse_authors(lines)
 
 ## Parse drawer
 lines <- c(":AUTHORS:",
-           "AUTHOR: Alice [Org A] <alice@example.org>",
-           "AUTHOR: Bob [Org B] <bob@example.org>",
+           "- Alice (Org A) <alice@example.org>",
+           "- Bob (Org B) <bob@example.org>",
            ":END:")
 
 result_expected <- structure(list(
     result = structure(list(name = "AUTHORS",
-                            contents = c("AUTHOR: Alice [Org A] <alice@example.org>",
-                                         "AUTHOR: Bob [Org B] <bob@example.org>")),
+                            contents = c("- Alice (Org A) <alice@example.org>",
+                                         "- Bob (Org B) <bob@example.org>")),
                        .Names = c("name", "contents"),
                        class = "org_drawer"),
     remainder = c(":AUTHORS:",
-                  "AUTHOR: Alice [Org A] <alice@example.org>",
-                  "AUTHOR: Bob [Org B] <bob@example.org>",
+                  "- Alice (Org A) <alice@example.org>",
+                  "- Bob (Org B) <bob@example.org>",
                   ":END:")),
     .Names = c("result", "remainder"))
 
