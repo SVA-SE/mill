@@ -135,9 +135,8 @@ org_drawer <- function(x) {
 ##' STARS KEYWORD PRIORITY TITLE TAGS
 ##' @noRd
 org_headline <- function(x) {
-    stopifnot(is.character(x),
-              length(x) > 0,
-              identical(grep("^[*]+(\\s|$)", x[1]), 1L))
+    if (!identical(grep("^[*]+(\\s|$)", x[1]), 1L))
+        return(NULL)
 
     ## Extract the level of the headline
     level <- nchar(regmatches(x[1], regexpr("^[*]+", x[1])))

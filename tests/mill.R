@@ -39,8 +39,8 @@ stopifnot(identical(result_observed, result_expected))
 ### Parse headline ###
 ######################
 
-tools::assertError(mill:::org_headline(1))
-tools::assertError(mill:::org_headline(character(0)))
+stopifnot(is.null(mill:::org_headline(1)))
+stopifnot(is.null(mill:::org_headline(character(0))))
 
 ##
 
