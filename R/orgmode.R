@@ -176,8 +176,12 @@ org_doc <- function(x) {
     contents <- list()
 
     repeat {
-        org <- org_headline(x)
-        contents[[length(contents) + 1]] <- org$result
+        if (identical(grep("^[*]+(\\s|$)", x[1]), 1L)) {
+            org <- org_headline(x)
+            contents[[length(contents) + 1]] <- org$result
+        } else {
+            stop("Not implemented")
+        }
 
         x <- org$remainder
         if (is.null(x))
