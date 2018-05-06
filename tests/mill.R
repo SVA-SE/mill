@@ -1,19 +1,17 @@
 library("mill")
 
-tools::assertError(mill:::orgmode_parse_author(1))
-tools::assertError(mill:::orgmode_parse_author(c("A", "B")))
-mill:::orgmode_parse_author("AUTHOR: Alice [Org A] <alice@example.org>")
+####################
+### Parse drawer ###
+####################
 
-tools::assertError(orgmode_parse_authors(1))
-tools::assertError(orgmode_parse_authors(c("A", "B")))
-tools::assertError(orgmode_parse_authors(c("A", "B", "C")))
-lines <- c(":AUTHORS:",
-           "AUTHOR: Alice [Org A] <alice@example.org>",
-           "AUTHOR: Bob [Org B] <bob@example.org>",
-           ":END:")
-mill:::orgmode_parse_authors(lines)
+stopifnot(is.null(mill:::org_drawer(1)))
+stopifnot(is.null(mill:::org_drawer(character(0))))
+stopifnot(is.null(mill:::org_drawer(":LOGBOOK :")))
+stopifnot(is.null(mill:::org_drawer(":LOGBOOK:")))
+stopifnot(is.null(mill:::org_drawer(c(":LOGBOOK:", "content"))))
 
-## Parse drawer
+##
+
 lines <- c(":AUTHORS:",
            "- Alice (Org A) <alice@example.org>",
            "- Bob (Org B) <bob@example.org>",
