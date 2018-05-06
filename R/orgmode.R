@@ -99,7 +99,27 @@ orgmode_parse_authors <- function(x) {
     a
 }
 
-##' @keywords internal
+##' @noRd
+org_list <- function(x) {
+    if (!identical(grep("^-", x[1]), 1L))
+        return(NULL)
+
+    items <- list()
+    repeat {
+        if (!identical(grep("^-", x[1]), 1L))
+            break
+        items[[length(items) + 1]] <- structure(list(item = x[1]),
+                                                class = "org_item")
+        x <- x[-1]
+        if (identical(length(x), 0L))
+            x <- NULL
+    }
+
+    list(result = structure(list(items= items), class = "org_list"),
+         remainder = x)
+}
+
+##' @noRd
 org_drawer <- function(x) {
     if (!identical(grep("^:[^\\s:]+:$", x[1]), 1L))
         return(NULL)
@@ -110,25 +130,25 @@ org_drawer <- function(x) {
         return(NULL)
     end <- min(end)
 
-    ## Extract name of drawer
-    name <- sub("^:", "", sub(":$", "", x[1]))
-
-    ## Extract content of drawer
-    if (end > 2) {
-        contents <- x[seq(from = 2, to = end - 1, by = 1)]
-    } else {
-        contents <- NULL
-    }
-
-    drawer <- structure(list(name = name, contents = contents),
-                        class = "org_drawer")
-
     ## Extract remainder
     if (end < length(x)) {
         remainder <- x[seq(from = end + 1, to = length(x), by = 1)]
     } else {
         remainder <- NULL
     }
+
+    ## Extract name of drawer
+    name <- sub("^:", "", sub(":$", "", x[1]))
+
+    ## Extract content of drawer
+    if (end > 2) {
+        x <- x[seq(from = 2, to = end - 1, by = 1)]
+    } else {
+        x <- NULL
+    }
+
+    drawer <- structure(list(name = name, contents = x),
+                        class = "org_drawer")
 
     list(result = drawer, remainder = remainder)
 }

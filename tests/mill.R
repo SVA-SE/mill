@@ -1,5 +1,25 @@
 library("mill")
 
+##################
+### Parse list ###
+##################
+
+result_expected <- structure(
+    list(result = structure(
+             list(items = list(structure(
+                      list(item = "- Alice (Org A) <alice@example.org>"),
+                      .Names = "item", class = "org_item"),
+                      structure(list(item = "- Bob (Org B) <bob@example.org>"),
+                                .Names = "item", class = "org_item"))),
+             .Names = "items", class = "org_list"),
+         remainder = NULL),
+    .Names = c("result", "remainder"))
+
+result_observed <- mill:::org_list(c("- Alice (Org A) <alice@example.org>",
+                                     "- Bob (Org B) <bob@example.org>"))
+
+stopifnot(identical(result_observed, result_expected))
+
 ####################
 ### Parse drawer ###
 ####################
