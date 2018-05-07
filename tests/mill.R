@@ -37,17 +37,15 @@ lines <- c(":AUTHORS:",
            "- Bob (Org B) <bob@example.org>",
            ":END:")
 
-result_expected <- structure(list(
-    result = structure(list(name = "AUTHORS",
-                            contents = c("- Alice (Org A) <alice@example.org>",
-                                         "- Bob (Org B) <bob@example.org>")),
-                       .Names = c("name", "contents"),
-                       class = "org_drawer"),
-    remainder = c(":AUTHORS:",
-                  "- Alice (Org A) <alice@example.org>",
-                  "- Bob (Org B) <bob@example.org>",
-                  ":END:")),
-    .Names = c("result", "remainder"))
+result_expected <- structure(list(result = structure(list(name = "AUTHORS",
+  contents = list(structure(list(items = list(structure(list(
+  item = "- Alice (Org A) <alice@example.org>"), .Names = "item", class = "org_item"),
+  structure(list(item = "- Bob (Org B) <bob@example.org>"), .Names = "item",
+            class = "org_item"))), .Names = "items", class = "org_list"))),
+  .Names = c("name", "contents"), class = "org_drawer"),
+  remainder = c(":AUTHORS:", "- Alice (Org A) <alice@example.org>",
+                "- Bob (Org B) <bob@example.org>", ":END:")),
+  .Names = c("result", "remainder"))
 
 result_observed <- mill:::org_drawer(rep(lines, 2))
 

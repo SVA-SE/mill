@@ -101,7 +101,23 @@ org_drawer <- function(x) {
         x <- NULL
     }
 
-    drawer <- structure(list(name = name, contents = x),
+    ## Parse content of drawer
+    contents <- list()
+    if (!is.null(x)) {
+        repeat {
+            org <- org_list(x)
+
+            if (is.null(org))
+                stop("Not implemented")
+
+            contents[[length(contents) + 1]] <- org$result
+            x <- org$remainder
+            if (is.null(x))
+                break
+        }
+    }
+
+    drawer <- structure(list(name = name, contents = contents),
                         class = "org_drawer")
 
     list(result = drawer, remainder = remainder)
