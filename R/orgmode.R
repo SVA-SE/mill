@@ -173,9 +173,29 @@ org_headline <- function(x) {
         x <- NULL
     }
 
+    ## Parse content of headline
+    if (!is.null(x)) {
+        section <- list()
+
+        repeat {
+            org <- org_headline(x)
+            if (is.null(org))
+                org <- org_drawer(x)
+            if (is.null(org))
+                stop(x[1], "\nNot implemented")
+
+            section[[length(section) + 1]] <- org$result
+            x <- org$remainder
+            if (is.null(x))
+                break
+        }
+    } else {
+        section <- NULL
+    }
+
     list(result = structure(list(level = level,
                                  headline = headline,
-                                 contents = x),
+                                 section = section),
                             class = "org_headline"),
          remainder = remainder)
 }
