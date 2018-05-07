@@ -53,52 +53,6 @@ to_orgmode.chapter <- function(x) {
     lines
 }
 
-##' @keywords internal
-orgmode_parse_author <- function(x) {
-    stopifnot(is.character(x),
-              identical(length(x), 1L),
-              identical(grep("^AUTHOR:", x), 1L))
-
-    ## Extract author name
-    x <- trimws(sub("^AUTHOR:", "", x))
-    x <- unlist(strsplit(x, "[[]"))
-    stopifnot(identical(length(x), 2L))
-    n <- trimws(x[1])
-
-    ## Extract organization
-    x <- trimws(x[2])
-    x <- unlist(strsplit(x, "[]]"))
-    stopifnot(identical(length(x), 2L))
-    o <- trimws(x[1])
-
-    ## Extract email
-    x <- trimws(x[2])
-    stopifnot(identical(grep("^<.+>$", x), 1L))
-    e <- sub("^<", "", sub(">$", "", x))
-
-    structure(list(name = n,
-                   email = e,
-                   organisation = o),
-              class = "author")
-}
-
-##' @keywords internal
-orgmode_parse_authors <- function(x) {
-    stopifnot(is.character(x),
-              length(x) > 2,
-              identical(grep("^:AUTHORS:", x), 1L))
-
-    a <- list()
-    x <- x[-1]
-    repeat {
-        if (!identical(grep("^AUTHOR:", x[1]), 1L))
-            break
-        a[[length(a)+1]] <- orgmode_parse_author(x[1])
-        x <- x[-1]
-    }
-    a
-}
-
 ##' @noRd
 org_list <- function(x) {
     if (!identical(grep("^-", x[1]), 1L))
