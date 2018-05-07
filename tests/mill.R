@@ -51,6 +51,30 @@ result_observed <- mill:::org_drawer(rep(lines, 2))
 
 stopifnot(identical(result_observed, result_expected))
 
+##
+
+lines <- c(":AUTHORS:",
+           "- Alice (Org A) <alice@example.org>",
+           "CLOCK: [2018-04-24 Tue 13:42]--[2018-04-24 Tue 13:43] =>  0:01",
+           "- Bob (Org B) <bob@example.org>",
+           ":END:")
+
+result_expected <- structure(list(result = structure(list(name = "AUTHORS",
+  contents = list(structure(list(items = list(structure(list(
+  item = "- Alice (Org A) <alice@example.org>"), .Names = "item", class = "org_item"))),
+  .Names = "items", class = "org_list"),
+  structure(list(clock = "[2018-04-24 Tue 13:42]--[2018-04-24 Tue 13:43] =>  0:01",
+                 class = "org_clock"), .Names = c("clock", "class")),
+  structure(list(items = list(structure(list(item = "- Bob (Org B) <bob@example.org>"),
+  .Names = "item", class = "org_item"))), .Names = "items", class = "org_list"))),
+  .Names = c("name", "contents"), class = "org_drawer"), remainder = c(":AUTHORS:",
+  "- Alice (Org A) <alice@example.org>", "CLOCK: [2018-04-24 Tue 13:42]--[2018-04-24 Tue 13:43] =>  0:01",
+  "- Bob (Org B) <bob@example.org>", ":END:")), .Names = c("result", "remainder"))
+
+result_observed <- mill:::org_drawer(rep(lines, 2))
+
+stopifnot(identical(result_observed, result_expected))
+
 ######################
 ### Parse headline ###
 ######################

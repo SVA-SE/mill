@@ -54,6 +54,24 @@ to_orgmode.chapter <- function(x) {
 }
 
 ##' @noRd
+org_clock <- function(x) {
+    if (!identical(grep("^CLOCK:", x[1]), 1L))
+        return(NULL)
+
+    clock <- structure(list(clock = trimws(sub("^CLOCK:", "", x[1])),
+                            class = "org_clock"))
+
+    ## Extract remainder
+    if (length(x) > 1) {
+        x <- x[-1]
+    } else {
+        x = NULL
+    }
+
+    list(result = clock, remainder = x)
+}
+
+##' @noRd
 org_list <- function(x) {
     if (!identical(grep("^-", x[1]), 1L))
         return(NULL)
@@ -106,7 +124,8 @@ org_drawer <- function(x) {
     if (!is.null(x)) {
         repeat {
             org <- org_list(x)
-
+            if (is.null(org))
+                org <- org_clock(x)
             if (is.null(org))
                 stop("Not implemented")
 
