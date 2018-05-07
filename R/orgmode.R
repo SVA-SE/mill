@@ -157,23 +157,25 @@ org_headline <- function(x) {
 
     ## Find end of contents under headline i.e. search for lines that
     ## start new headlines at the same or a lower level.
-    contents <- NULL
     remainder <- NULL
     i <- grep("^[*]+(\\s|$)", x)
     i <- i[which(nchar(regmatches(x[i], regexpr("^[*]+", x[i]))) <= level)]
     if (length(i)) {
         ## Extract remainder.
         i <- min(i)
-        if (i > 1)
-            contents <- x[seq(from = 1, to = i - 1, by = 1)]
         remainder <- x[seq(from = i, to = length(x), by = 1)]
-    } else if (length(x) > 0) {
-        contents <- x
+        if (i > 1) {
+            x <- x[seq(from = 1, to = i - 1, by = 1)]
+        } else {
+            x <- NULL
+        }
+    } else if (identical(length(x), 0L)) {
+        x <- NULL
     }
 
     list(result = structure(list(level = level,
                                  headline = headline,
-                                 contents = contents),
+                                 contents = x),
                             class = "org_headline"),
          remainder = remainder)
 }
