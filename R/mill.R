@@ -56,18 +56,13 @@ chapters <- function(sheet, path) {
 ##' Load configuration for the report
 ##'
 ##' @param path The path to the root folder of the project.
-##' @importFrom readxl read_excel
-##' @importFrom readxl excel_sheets
 ##' @export
 load_report <- function(path = ".") {
     path <- normalizePath(path, mustWork = TRUE)
-    filename <- file.path(path, "report.xlsx")
-    df <- read_excel(filename)
-
-    structure(list(report       = excel_sheets(filename)[1],
-                   path         = path,
-                   chapters     = chapters(df, path)),
-              class = "report")
+    filename <- file.path(path, "README.org")
+    org <- org_doc(filename)
+    class(org) <- c("report", class(org))
+    org
 }
 
 ##' @method summary report
