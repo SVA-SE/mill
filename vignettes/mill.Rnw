@@ -84,17 +84,18 @@ library("mill")
     updating - it means we are waiting for input.
   \item [SUBMITTED] The author(s) notified that the chapter is updated
     - we need to import and convert the chapter from docx to tex.
-  \item [Converted] We have imported the chapter from docx to \LaTex -
-    we need to typeset the chapter. This includes first running 'make
-    patch' the modify 'typeset.tex' with new typesetting and
-    potentially with the contents of typeset.reject. When theis is
-    done save typeset.tex and run 'make diff' Then run 'make pdf'
-    inspect the pdf and commit 'typeset.patch' but not the pdf.
-  \item [TYPESET] The chapter has been typeset in \LaTeX and a
+  \item [CONVERTED] We have imported the chapter from docx to \LaTeX\ -
+    we need to typeset the chapter. This includes first running
+    \code{make patch} the modify 'typeset.tex' with new typesetting
+    and potentially with the contents of 'typeset.reject'. When this
+    is done save 'typeset.tex' and run \code{make diff} Then run
+    \code{make pdf} inspect the pdf and commit 'typeset.patch' but not
+    the pdf.
+  \item [TYPESET] The chapter has been typeset in \LaTeX\ and a
     chapter\_name.pdf of the chapter has been produced. It can be sent
     to the author for feedback.
-  \item [PROOF] The chapter\_name.pdf has been sent to the author for
-    review. We are waiting for feedback from the author.
+  \item [PROOF] The 'chapter\_name.pdf' has been sent to the author
+    for review. We are waiting for feedback from the author.
   \item [DONE] The chapter has passed the typesetter, author, editor
     and all automated checks.
 \end{description}
