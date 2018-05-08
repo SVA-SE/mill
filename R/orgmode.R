@@ -54,6 +54,25 @@ to_orgmode.chapter <- function(x) {
 }
 
 ##' @noRd
+org_paragraph <- function(x) {
+    if (length(x) < 1)
+        return(NULL)
+
+    paragraph <- x[1]
+
+    ## Extract remainder
+    if (length(x) > 1) {
+        remainder <- x[-1]
+    } else {
+        remainder <- NULL
+    }
+
+    list(result = structure(list(paragraph = paragraph),
+                            class = "org_paragraph"),
+         remainder = remainder)
+}
+
+##' @noRd
 org_keyword <- function(x) {
     if (!identical(grep("^#[+][^\\s:]+:", x[1]), 1L))
         return(NULL)
@@ -187,7 +206,7 @@ org_drawer <- function(x) {
             if (is.null(org))
                 org <- org_clock(x)
             if (is.null(org))
-                stop("Not implemented")
+                org <- org_paragraph(x)
 
             contents[[length(contents) + 1]] <- org$result
             x <- org$remainder
@@ -246,7 +265,7 @@ org_headline <- function(x) {
             if(is.null(org))
                 org <- org_keyword(x)
             if (is.null(org))
-                stop(x[1], "\nNot implemented")
+                org <- org_paragraph(x)
 
             section[[length(section) + 1]] <- org$result
             x <- org$remainder
