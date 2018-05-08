@@ -54,6 +54,27 @@ to_orgmode.chapter <- function(x) {
 }
 
 ##' @noRd
+org_keyword <- function(x) {
+    if (!identical(grep("^#[+][^\\s:]+:", x[1]), 1L))
+        return(NULL)
+
+    ## Extract key and value
+    key <- sub("^#[+]", "", regmatches(x[1], regexpr("#[+][^:]+", x[1])))
+    value <- trimws(substr(x[1], nchar(key) + 4, nchar(x[1])))
+
+    ## Extract remainder
+    if (length(x) > 1) {
+        remainder <- x[-1]
+    } else {
+        remainder <- NULL
+    }
+
+    list(result = structure(list(key = key, value = value),
+                            class = "org_keyword"),
+         remainder = remainder)
+}
+
+##' @noRd
 org_dynamic_block <- function(x) {
     if (!identical(grep("^#[+]BEGIN:\\s[^\\s]+", x[1]), 1L))
         return(NULL)
@@ -222,6 +243,8 @@ org_headline <- function(x) {
                 org <- org_drawer(x)
             if(is.null(org))
                 org <- org_dynamic_block(x)
+            if(is.null(org))
+                org <- org_keyword(x)
             if (is.null(org))
                 stop(x[1], "\nNot implemented")
 
@@ -248,13 +271,11 @@ org_doc <- function(x) {
     contents <- list()
 
     repeat {
-        if (identical(grep("^[*]+(\\s|$)", x[1]), 1L)) {
-            org <- org_headline(x)
-            contents[[length(contents) + 1]] <- org$result
-        } else {
-            stop("Not implemented")
-        }
+        org <- org_headline(x)
+        if (is.null(org))
+            stop(x[1], "\nNot implemented")
 
+        contents[[length(contents) + 1]] <- org$result
         x <- org$remainder
         if (is.null(x))
             break

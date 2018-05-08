@@ -206,3 +206,18 @@ result_expected <- structure(list(
 result_observed <- mill:::org_dynamic_block(lines)
 
 stopifnot(identical(result_observed, result_expected))
+
+#######################
+### Parse a keyword ###
+#######################
+
+result_expected <- structure(list(result = structure(list(key = "STARTUP",
+                                                          value = "logdrawer"),
+                                                     .Names = c("key", "value"),
+                                                     class = "org_keyword"),
+                                  remainder = NULL),
+                             .Names = c("result", "remainder"))
+
+result_observed <- mill:::org_keyword("#+STARTUP: logdrawer")
+
+stopifnot(identical(result_observed, result_expected))
