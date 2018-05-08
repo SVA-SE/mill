@@ -54,6 +54,45 @@ to_orgmode.chapter <- function(x) {
 }
 
 ##' @noRd
+org_dynamic_block <- function(x) {
+    if (!identical(grep("^#[+]BEGIN:\\s[^\\s]+", x[1]), 1L))
+        return(NULL)
+
+    ## Find end of dynamic block
+    end <- grep("^#[+]END:$", x)
+    if (identical(length(end), 0L))
+        return(NULL)
+    end <- min(end)
+
+    ## Extract remainder
+    if (end < length(x)) {
+        remainder <- x[seq(from = end + 1, to = length(x), by = 1)]
+    } else {
+        remainder <- NULL
+    }
+
+    ## Extract name and parameters of the dynamic block.
+    parameters <- trimws(sub("^#[+]BEGIN:", "", x[1]))
+    name <- regmatches(parameters, regexpr("^[^[:space:]]+", parameters))
+    parameters <- trimws(substr(parameters, nchar(name) + 1, nchar(parameters)))
+    if (identical(nchar(parameters), 0L))
+        parameters <- NULL
+
+    ## Extract content of the dynaminc block
+    if (end > 2) {
+        x <- x[seq(from = 2, to = end - 1, by = 1)]
+    } else {
+        x <- NULL
+    }
+
+    list(result = structure(list(name = name,
+                                 parameters = parameters,
+                                 contents = x),
+                            class = "org_dynamic_block"),
+         remainder = remainder)
+}
+
+##' @noRd
 org_clock <- function(x) {
     if (!identical(grep("^CLOCK:", x[1]), 1L))
         return(NULL)
@@ -181,6 +220,8 @@ org_headline <- function(x) {
             org <- org_headline(x)
             if (is.null(org))
                 org <- org_drawer(x)
+            if(is.null(org))
+                org <- org_dynamic_block(x)
             if (is.null(org))
                 stop(x[1], "\nNot implemented")
 

@@ -154,3 +154,55 @@ result_expected <- structure(
     .Names = "contents", class = "org_doc")
 result_observed <- mill:::org_doc(c("* Chapter 1", "* Chapter 2"))
 stopifnot(identical(result_observed, result_expected))
+
+#############################
+### Parse a dynamic block ###
+#############################
+
+lines <- c("#+BEGIN: clocktable :maxlevel 2 :scope file",
+           "#+CAPTION: Clock summary at [2015-12-20 Sun 21:28]",
+           "| Headline     | Time   |",
+           "|--------------+--------|",
+           "| *Total time* | *0:00* |",
+           "#+END:")
+
+result_expected <- structure(list(
+    result = structure(
+        list(name = "clocktable",
+             parameters = ":maxlevel 2 :scope file",
+             contents = c("#+CAPTION: Clock summary at [2015-12-20 Sun 21:28]",
+                          "| Headline     | Time   |",
+                          "|--------------+--------|",
+                          "| *Total time* | *0:00* |")),
+        .Names = c("name", "parameters", "contents"),
+        class = "org_dynamic_block"),
+    remainder = NULL), .Names = c("result", "remainder"))
+
+result_observed <- mill:::org_dynamic_block(lines)
+
+stopifnot(identical(result_observed, result_expected))
+
+##
+
+lines <- c("#+BEGIN: clocktable",
+           "#+CAPTION: Clock summary at [2015-12-20 Sun 21:28]",
+           "| Headline     | Time   |",
+           "|--------------+--------|",
+           "| *Total time* | *0:00* |",
+           "#+END:")
+
+result_expected <- structure(list(
+    result = structure(
+        list(name = "clocktable",
+             parameters = NULL,
+             contents = c("#+CAPTION: Clock summary at [2015-12-20 Sun 21:28]",
+                          "| Headline     | Time   |",
+                          "|--------------+--------|",
+                          "| *Total time* | *0:00* |")),
+        .Names = c("name", "parameters", "contents"),
+        class = "org_dynamic_block"),
+    remainder = NULL), .Names = c("result", "remainder"))
+
+result_observed <- mill:::org_dynamic_block(lines)
+
+stopifnot(identical(result_observed, result_expected))
