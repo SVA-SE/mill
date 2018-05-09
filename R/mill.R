@@ -1,32 +1,3 @@
-##' Trim whitespace
-##'
-##' @param str character string to trim
-##' @return trimmed character string
-##' @keywords internal
-trim <- function(str) {
-    trimws(gsub("[*]", "", str))
-}
-
-##' Contributor
-##'
-##' Extract one contributor from one row of the project excel sheet.
-##' @param row the row with the contributor.
-##' @param title the title of the chapter.
-##' @return a contributor object
-##' @keywords internal
-contributor <- function(row, title) {
-    stopifnot(is.data.frame(row))
-    stopifnot(all(c("Name", "Email", "Organisation", "Chapter") %in%
-                  colnames(row)))
-    stopifnot(nrow(row) == 1)
-
-    structure(list(name = trim(row$Name[1]),
-                   email = trim(row$Email[1]),
-                   organisation = trim(row$Organisation[1]),
-                   contact = length(grep(paste0(title, "*"), row$Chapter[1], fixed = TRUE)) > 0),
-              class = "contributor")
-}
-
 ##' @keywords internal
 authors <- function(x) {
     stopifnot(inherits(x, "chapter"))
