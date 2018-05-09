@@ -84,28 +84,35 @@ library("mill")
     updating - it means we are waiting for input.
   \item [SUBMITTED] The author(s) notified that the chapter is updated
     - we need to import and convert the chapter from docx to tex.
-  \item [TYPESET] The chapter has been typeset in \LaTeX and a
+  \item [CONVERTED] We have imported the chapter from docx to \LaTeX\ -
+    we need to typeset the chapter. This includes first running
+    \code{make patch} the modify 'typeset.tex' with new typesetting
+    and potentially with the contents of 'typeset.reject'. When this
+    is done save 'typeset.tex' and run \code{make diff} Then run
+    \code{make pdf} inspect the pdf and commit 'typeset.patch' but not
+    the pdf.
+  \item [TYPESET] The chapter has been typeset in \LaTeX\ and a
     chapter\_name.pdf of the chapter has been produced. It can be sent
     to the author for feedback.
   \item [PROOF] The chapter\_name.pdf has been sent to the author for
-  review. We are waiting for feedback from the author.
+    review. We are waiting for feedback from the author.
   \item [AUTHOR-FEEDBACK] We have received feedback from the author on
-  the proof that needs to be addressed.
+    the proof that needs to be addressed.
   \item [REVIEW] The chapter is with the editor.
   \item [EDITOR] The chapter has been reviewed by the editor and sent
-  back to the author in docx format. We will wait for the author to
-  tell us they are done
+    back to the author in docx format. We will wait for the author to
+    tell us they are done
   \item [EDITOR-FEEDBACK-SUBMITTED] The author has completed the
-  feedback from the editor. The word doc on onecloud now contains the
-  latest information therefore, we need to run the convert process
-  again to update the .tex file in the chapter directory.
+    feedback from the editor. The word doc on onecloud now contains the
+    latest information therefore, we need to run the convert process
+    again to update the .tex file in the chapter directory.
   \item [POST-EDITOR-CONVERTED] The chapter has been converted from
-  EDITOR-FEEDBACK-SUBMITTED. We now need to typeset the chapter and
-  move it to DONE state when the typesetter is happy.
+    EDITOR-FEEDBACK-SUBMITTED. We now need to typeset the chapter and
+    move it to DONE state when the typesetter is happy.
   \item [DONE] The chapter has passed the typesetter, author, editor
     and all automated checks.
 \end{description}
 
 %\bibliography{mill}
 
-\end{document}
+ \end{document}
