@@ -56,8 +56,46 @@ chapters <- function(x) {
 load_report <- function(path = ".") {
     path <- normalizePath(path, mustWork = TRUE)
     filename <- file.path(path, "README.org")
-    org <- org_doc(filename)
+    org <- org_doc(readLines(filename))
     class(org) <- c("report", class(org))
+
+    ii <- length(org$contents)
+    for (i in seq_len(ii)) {
+        if (inherits(org$contents[[i]], "org_headline")) {
+            if (identical(grep("Chapters", org$contents[[i]]$headline), 1L)) {
+                cl <- c("chapters", "org_headline")
+                class(org$contents[[i]]) <- cl
+
+                jj <- length(org$contents[[i]]$section)
+                for (j in seq_len(jj)) {
+                    stopifnot(inherits(org$contents[[i]]$section[[j]],
+                                       "org_headline"))
+                    cl <- c("chapter", "org_headline")
+                    class(org$contents[[i]]$section[[j]]) <- cl
+
+                    kk <- length(org$contents[[i]]$section[[j]]$section)
+                    for (k in seq_len(kk)) {
+                        d <- org$contents[[i]]$section[[j]]$section[[k]]
+                        if (inherits(d, "org_drawer") && d$name == "AUTHORS") {
+                            cl <- c("authors", "org_drawer")
+                            class(org$contents[[i]]$section[[j]]$section[[k]]) <- cl
+
+                            break;
+                        }
+
+                        if (identical(k, kk))
+                            stop("Unable to find 'Authors'")
+                    }
+                }
+
+                break
+            }
+        }
+
+        if (identical(i, ii))
+            stop("Unable to find 'Chapters'")
+    }
+
     org
 }
 
@@ -65,7 +103,7 @@ load_report <- function(path = ".") {
 ##' @export
 summary.report <- function(object, ...) {
     cat("Report: ", object$report, "\n\n", sep = "")
-    print(object$chapters)
+    print(chapters(object))
 }
 
 ##' @export
@@ -73,16 +111,16 @@ print.report <- function(x, ...) {
     cat("Report: ", x$report, "\n", sep = "")
     do.call("rbind", lapply(x, function(y) as.data.frame(y)))
 
-    ## Contributors
+    ## Authors
     authors <- lapply(x$chapters, function(chapter) {
         sapply(chapter$authors, function(author) {
             author$name
         })
     })
     authors <- unique(unlist(authors))
-    cat("Contributors: ", length(authors), "\n", sep = "")
+    cat("Authors: ", length(authors), "\n", sep = "")
 
-    cat("Chapters: ", length(x$chapters), "\n", sep = "")
+    cat("Chapters: ", length(chapters(x)$section), "\n", sep = "")
 }
 
 ##' @export
@@ -92,37 +130,39 @@ print.author <- function(x, ..., indent = "") {
 }
 
 ##' @export
-print.contributor <- function(x, ..., indent = "") {
-    cat(indent,
-        ifelse(x$contact, "*", " "),
-        x$name, " (", x$organisation, ") <", x$email, ">\n", sep = "")
-}
-
-##' @export
 print.chapters <- function(x, ...) {
     cat("Chapters:\n")
-    lapply(x, print, indent = "  ")
+    lapply(x$section, print, indent = "  ")
     invisible()
+}
+
+##' @noRd
+chapter_state <- function(x) {
+    stopifnot(inherits(x, "chapter"))
+    m <- regexpr("[^[:space:]]+", x$headline)
+    m <- regmatches(x$headline, m)
+    trimws(m)
+}
+
+##' @noRd
+chapter_title <- function(x) {
+    stopifnot(inherits(x, "chapter"))
+    m <- regexpr("[^[]+[]]{2}$", x$headline)
+    m <- regmatches(x$headline, m)
+    trimws(sub("[]]{2}$", "", m))
 }
 
 ##' @export
 print.chapter <- function(x, ..., indent = "") {
-    cat(indent, x$title, "\n", sep = "")
-    print(x$authors, indent = paste0(indent, "  "))
-    cat("\n")
-}
-
-##' @export
-print.contacts <- function(x, ..., indent = "") {
-    cat(indent, "Contacts:\n", sep = "")
-    lapply(x, print, indent = paste0(indent, "  "))
-    invisible()
+    cat(indent, chapter_state(x), " ", chapter_title(x), "\n", sep = "")
+    ## print(x$authors, indent = paste0(indent, "  "))
+    ## cat("\n")
 }
 
 ##' @export
 print.authors <- function(x, ..., indent = "") {
     cat(indent, "Authors:\n", sep = "")
-    lapply(x, print, indent = paste0(indent, "  "))
+    lapply(x$items, print, indent = paste0(indent, "  "))
     invisible()
 }
 
