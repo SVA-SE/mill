@@ -18,10 +18,10 @@ check <- function(path = ".") {
     cat("* loading report ... ")
     report <- tryCatch(load_report(path), error = function(e) NULL)
     if (is.null(report)) {
-        cat(yellow("ERROR\n"))
+        cat("ERROR\n")
         return(invisible(TRUE))
     }
-    cat(blue("OK\n    "))
+    cat("OK\n    ")
     cat(capture.output(report), sep = "\n    ")
 
     repo <- repository(report$path)
@@ -53,11 +53,11 @@ check_expect_clean_repository.report <- function(x, repo) {
     ## Check if the working tree is clean
     d <- diff(repo)
     if (length(d@files)) {
-        cat(yellow("ERROR\n"))
+        cat("ERROR\n")
         return(TRUE)
     }
 
-    cat(blue("OK\n    "))
+    cat("OK\n    ")
     cat(capture.output(repository()), sep = "\n    ")
     FALSE
 }
@@ -75,11 +75,11 @@ check_expect_pandoc_is_installed <- function() {
                        error = function(e) character(0))
     ver <- grep("^pandoc[[:space:]]+[.0-9]*", output)
     if (!length(ver)) {
-        cat(yellow("ERROR\n"))
+        cat("ERROR\n")
         return(TRUE)
     }
 
-    cat(blue("OK\n   "), output[ver], "\n")
+    cat("OK\n   ", output[ver], "\n")
     FALSE
 }
 
@@ -95,11 +95,11 @@ check_expect_patch_is_installed <- function() {
                        error = function(e) character(0))
     ver <- grep("^GNU patch[[:space:]]+[.0-9]*", output)
     if (!length(ver)) {
-        cat(yellow("ERROR\n"))
+        cat("ERROR\n")
         return(TRUE)
     }
 
-    cat(blue("OK\n   "), output[ver], "\n")
+    cat("OK\n   ", output[ver], "\n")
     FALSE
 }
 
@@ -121,12 +121,12 @@ check_tex_to_docx_round_trip.report <- function(x, repo) {
     l <- check_tex_to_docx_round_trip(x$chapters, repo)
     l <- l[!sapply(l, is.null)]
     if (length(l)) {
-        cat(yellow("ERROR\n"))
+        cat("ERROR\n")
         lapply(l, function(filename) cat("   ", filename, "\n"))
         return(TRUE)
     }
 
-    cat(blue("OK\n"))
+    cat("OK\n")
     FALSE
 }
 
@@ -163,12 +163,12 @@ check_apply_typeset_patch.report <- function(x) {
     l <- check_apply_typeset_patch(x$chapters)
     l <- l[!sapply(l, is.null)]
     if (length(l)) {
-        cat(yellow("ERROR\n"))
+        cat("ERROR\n")
         lapply(l, function(filename) cat("   ", filename, "\n"))
         return(TRUE)
     }
 
-    cat(blue("OK\n"))
+    cat("OK\n")
     FALSE
 }
 
@@ -210,12 +210,12 @@ check_reference_format.report <- function(x) {
 
     d <- setdiff(ref$tex, c(ref_fig, ref_tab))
     if (length(d)) {
-        cat(yellow("ERROR\n    "))
+        cat("ERROR\n    ")
         cat(d, sep = "\n    ")
         return(TRUE)
     }
 
-    cat(blue("OK\n"))
+    cat("OK\n")
     FALSE
 }
 
@@ -233,12 +233,12 @@ check_missing_figure_reference_files.report <- function(x) {
 
     ref <- check_missing_figure_reference_files(x$chapters)
     if (length(ref)) {
-        cat(yellow("ERROR\n    "))
+        cat("ERROR\n    ")
         cat(sub(x$path, ".", ref), sep = "\n    ")
         return(TRUE)
     }
 
-    cat(blue("OK\n"))
+    cat("OK\n")
     FALSE
 }
 
@@ -280,12 +280,12 @@ check_missing_table_reference_files.report <- function(x) {
 
     ref <- check_missing_table_reference_files(x$chapters)
     if (length(ref)) {
-        cat("yellow(ERROR\n    )")
+        cat("ERROR\n    ")
         cat(sub(x$path, ".", ref), sep = "\n    ")
         return(TRUE)
     }
 
-    cat(blue("OK\n"))
+    cat("OK\n")
     FALSE
 }
 
