@@ -1,12 +1,36 @@
-##' @keywords internal
-authors <- function(x) {
-    stopifnot(inherits(x, "chapter"))
+##' @export
+authors <- function(x, ...) {
+    UseMethod("authors")
+}
+
+##' @export
+authors.report <- function(x, ...) {
+    authors(chapters(x), ...)
+}
+
+##' @export
+authors.chapters <- function(x, ...) {
+    sort(unique(unlist(sapply(x$section, authors, ...))))
+}
+
+##' @export
+authors.chapter <- function(x, ...) {
     for (i in seq_len(length(x$section))) {
         if (inherits(x$section[[i]], "authors"))
-            return(x$section[[i]])
+            return(authors(x$section[[i]], ...))
     }
 
     stop("Unable to find 'Authors'")
+}
+
+##' @export
+authors.authors <- function(x, ...) {
+    sapply(x$contents[[1]]$items, authors, ...)
+}
+
+##' @export
+authors.author <- function(x, ...) {
+    as.character(x$item)
 }
 
 ##' @noRd
@@ -51,6 +75,12 @@ load_report <- function(path = ".") {
                             cl <- c("authors", "org_drawer")
                             class(org$contents[[i]]$section[[j]]$section[[k]]) <- cl
 
+                            ll <- length(org$contents[[i]]$section[[j]]$section[[k]]$contents[[1]]$items)
+                            for (l in seq_len(ll)) {
+                                cl <- c("author", "org_item")
+                                class(org$contents[[i]]$section[[j]]$section[[k]]$contents[[1]]$items[[l]]) <- cl
+                            }
+
                             break;
                         }
 
@@ -73,24 +103,14 @@ load_report <- function(path = ".") {
 ##' @method summary report
 ##' @export
 summary.report <- function(object, ...) {
-    cat("Report: ", object$report, "\n\n", sep = "")
+    cat("Report: ", report_title(object), "\n\n", sep = "")
     print(chapters(object))
 }
 
 ##' @export
 print.report <- function(x, ...) {
-    cat("Report: ", x$report, "\n", sep = "")
-    do.call("rbind", lapply(x, function(y) as.data.frame(y)))
-
-    ## Authors
-    authors <- lapply(x$chapters, function(chapter) {
-        sapply(chapter$authors, function(author) {
-            author$name
-        })
-    })
-    authors <- unique(unlist(authors))
-    cat("Authors: ", length(authors), "\n", sep = "")
-
+    cat("Report: ", report_title(x), "\n", sep = "")
+    cat("Authors: ", length(authors(x)), "\n", sep = "")
     cat("Chapters: ", length(chapters(x)$section), "\n", sep = "")
 }
 
@@ -105,6 +125,12 @@ print.chapters <- function(x, ...) {
     cat("Chapters:\n")
     lapply(x$section, print, indent = "  ")
     invisible()
+}
+
+##' @noRd
+report_title <- function(x) {
+    stopifnot(inherits(x, "report"))
+    "FIXME"
 }
 
 ##' @noRd
@@ -126,8 +152,8 @@ chapter_title <- function(x) {
 ##' @export
 print.chapter <- function(x, ..., indent = "") {
     cat(indent, chapter_state(x), " ", chapter_title(x), "\n", sep = "")
-    ## print(x$authors, indent = paste0(indent, "  "))
-    ## cat("\n")
+    print(authors(x), indent = paste0(indent, "  "))
+    cat("\n")
 }
 
 ##' @export
@@ -138,25 +164,8 @@ print.authors <- function(x, ..., indent = "") {
 }
 
 ##' @export
-as.data.frame.report <- function(x, ...) {
-    as.data.frame(x$chapters)
-}
-
-as.data.frame.chapters <- function(x, ...) {
-    do.call("rbind", lapply(x, function(y) as.data.frame(y)))
-}
-
-as.data.frame.chapter <- function(x, ...) {
-    cbind(chapter = x$title, as.data.frame(x$authors))
-}
-
-as.data.frame.authors <- function(x) {
-    cbind(role = "Author",
-          do.call("rbind", lapply(x, function(y) as.data.frame(y))))
-}
-
-as.data.frame.contributor <- function(x) {
-    data.frame(name = x$name, email = x$email, organisation = x$organisation)
+print.author <- function(x, ..., indent = "") {
+    cat(indent, x$item, "\n", sep = "")
 }
 
 ##' @export
