@@ -28,29 +28,25 @@ contributor <- function(row, title) {
 }
 
 ##' @keywords internal
-authors <- function(sheet, title) {
-    stopifnot(is.data.frame(sheet))
-    result <- lapply(grep(title, sheet$Chapter), function(i) {
-        contributor(sheet[i, ], title = title)
-    })
-    class(result) <- "authors"
-    result
+authors <- function(x) {
+    stopifnot(inherits(x, "chapter"))
+    for (i in seq_len(length(x$section))) {
+        if (inherits(x$section[[i]], "authors"))
+            return(x$section[[i]])
+    }
+
+    stop("Unable to find 'Authors'")
 }
 
-##' @keywords internal
-chapters <- function(sheet, path) {
-    stopifnot(is.data.frame(sheet))
-    stopifnot("Chapter" %in% colnames(sheet))
-    titles <- sort(unique(trim(unlist(strsplit(sheet$Chapter, ",")))))
-    result <- lapply(titles, function(title) {
-        structure(list(title = title,
-                       path = file.path(path, "chapters", title),
-                       authors = authors(sheet, title)),
-                  .Names = c("title", "path", "authors"),
-                  class = "chapter")
-    })
-    class(result) <- "chapters"
-    result
+##' @noRd
+chapters <- function(x) {
+    stopifnot(inherits(x, "report"))
+    for (i in seq_len(length(x$contents))) {
+        if (inherits(x$contents[[i]], "chapters"))
+            return(x$contents[[i]])
+    }
+
+    stop("Unable to find 'Chapters'")
 }
 
 ##' Load configuration for the report
