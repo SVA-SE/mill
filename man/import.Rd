@@ -2,20 +2,16 @@
 % Please edit documentation in R/docx.R
 \name{import}
 \alias{import}
-\title{Import files}
+\title{Import chapter}
 \usage{
-import(x, from)
+import(chapter = NULL)
 }
 \arguments{
-\item{x}{The object to import.}
-
-\item{from}{The source of the import. If the argument is missing,
-the docx files are imported from a folder named from the
-report title.}
+\item{chapter}{name of the chapter to import.}
 }
 \value{
 invisible NULL.
 }
 \description{
-Import files
+Import chapter
 }
