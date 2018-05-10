@@ -38,20 +38,41 @@ export.chapter <- function(x) {
     invisible()
 }
 
-##' Import chapter
+##' Import files
 ##'
-##' @param chapter name of the chapter to import.
+##' @param x The object to import.
+##' @param from The source of the import. If the argument is missing,
+##'     the docx files are imported from a folder named from the
+##'     report title.
 ##' @return invisible NULL.
 ##' @export
-import <- function(chapter = NULL) {
-    x <- load_report()[[chapter]]
-    from <- file.path("workspace", "chapters", chapter_title(x))
+import <- function(x, from) UseMethod("import")
+
+##' @export
+import.default <- function(x, from) {
+    import(load_report())
+}
+
+##' @export
+import.report <- function(x, from) {
+    if (missing(from))
+        stop("'from' is missing")
+    from <- file.path(from, "chapters")
+    lapply(x$chapters, function(y) import(y, from = from))
+    invisible()
+}
+
+##' @export
+import.chapter <- function(x, from) {
+    if (missing(from))
+        stop("'from' is missing")
+    from <- file.path(from, chapter_title(x))
     if (!dir.exists(from))
         stop("Invalid directory")
 
     ## Import title.docx to text.docx
     from <- paste0(file.path(from, chapter_title(x)), ".docx")
-    to <- file.path("chapters", chapter_title(x), "text.docx")
+    to <- file.path(x$path, "text.docx")
     file.copy(from, to, overwrite = TRUE)
 
     invisible()
