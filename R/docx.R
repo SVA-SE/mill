@@ -55,24 +55,19 @@ import.default <- function(x, from) {
 
 ##' @export
 import.report <- function(x, from) {
-    if (missing(from))
-        stop("'from' is missing")
-    from <- file.path(from, "chapters")
-    lapply(x$chapters, function(y) import(y, from = from))
+    lapply(chapters(x)$section, function(y) import(y))
     invisible()
 }
 
 ##' @export
 import.chapter <- function(x, from) {
-    if (missing(from))
-        stop("'from' is missing")
-    from <- file.path(from, chapter_title(x))
+    from <- file.path("workspace", "chapters", chapter_title(x))
     if (!dir.exists(from))
         stop("Invalid directory")
 
     ## Import title.docx to text.docx
     from <- paste0(file.path(from, chapter_title(x)), ".docx")
-    to <- file.path(x$path, "text.docx")
+    to <- file.path("chapters", chapter_title(x), "text.docx")
     file.copy(from, to, overwrite = TRUE)
 
     invisible()
