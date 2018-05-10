@@ -91,8 +91,8 @@ from_docx.report <- function(x, ...) {
     if (length(list(...)) > 0)
         warning("Additional arguments ignored")
 
-    repo <- repository(x$path)
-    lapply(x$chapters, function(y) from_docx(y, repo = repo))
+    repo <- repository()
+    lapply(chapters(x)$section, function(y) from_docx(y, repo = repo))
     invisible()
 }
 
@@ -105,20 +105,20 @@ from_docx.chapter <- function(x, repo = NULL, ...) {
     ## Convert the docx to a temporary tex file.
     f_tex <- tempfile(fileext = ".tex")
     on.exit(file.remove(f_tex))
-    f_docx <- file.path(x$path, "text.docx")
+    f_docx <- file.path("chapters", chapter_title(x), "text.docx")
     pandoc(paste("--top-level-division=chapter ",
                  shQuote(f_docx), "-o", shQuote(f_tex)))
 
     ## Tweak incoming tex file
     tex <- readLines(f_tex)
-    tex <- convert_docx_ref_to_ref(tex, x$title)
-    tex <- make_labels_chapter_specific(tex, x$title)
-    tex <- make_hypertargets_chapter_specific(tex, x$title)
+    tex <- convert_docx_ref_to_ref(tex, chapter_title(x))
+    tex <- make_labels_chapter_specific(tex, chapter_title(x))
+    tex <- make_hypertargets_chapter_specific(tex, chapter_title(x))
     tex <- asterisk(tex, "add")
-    writeLines(tex, file.path(x$path, "text.tex"))
+    writeLines(tex, file.path("chapters", chapter_title(x), "text.tex"))
 
     if (!is.null(repo))
-        add(repo, file.path(x$path, "text.tex"))
+        add(repo, file.path("chapters", chapter_title(x), "text.tex"))
     invisible()
 }
 
