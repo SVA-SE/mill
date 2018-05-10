@@ -25,12 +25,9 @@ authors.chapter <- function(x, ...) {
 
 ##' @export
 authors.authors <- function(x, ...) {
-    sapply(x$contents[[1]]$items, authors, ...)
-}
-
-##' @export
-authors.author <- function(x, ...) {
-    as.character(x$item)
+    unlist(lapply(x$contents[[1]]$items, function(y) {
+        y$item
+    }))
 }
 
 ##' @noRd
@@ -103,27 +100,37 @@ load_report <- function(path = ".") {
 ##' @method summary report
 ##' @export
 summary.report <- function(object, ...) {
-    cat("Report: ", report_title(object), "\n\n", sep = "")
-    print(chapters(object))
+    print(object, ..., main_only = FALSE)
 }
 
 ##' @export
 print.report <- function(x, ...) {
     cat("Report: ", report_title(x), "\n", sep = "")
+    cat("Progress: [FIXME%]\n")
     cat("Authors: ", length(authors(x)), "\n", sep = "")
-    cat("Chapters: ", length(chapters(x)$section), "\n", sep = "")
-}
-
-##' @export
-print.author <- function(x, ..., indent = "") {
-    cat(indent,
-        x$name, " [", x$organisation, "] <", x$email, ">\n", sep = "")
+    print(chapters(x), ...)
 }
 
 ##' @export
 print.chapters <- function(x, ...) {
-    cat("Chapters:\n")
-    lapply(x$section, print, indent = "  ")
+    cat("Chapters: ", length(x$section), "\n", sep = "")
+    lapply(x$section, function(y) {print(y, ..., indent = "  ")})
+    invisible()
+}
+
+##' @export
+print.chapter <- function(x, ..., indent = "", main_only = TRUE) {
+    cat(indent, chapter_state(x), " ", chapter_title(x), "\n", sep = "")
+    indent <- paste0(indent, "  ")
+    x <- authors(x)
+    if (isTRUE(main_only)) {
+        i <- 1
+    } else {
+        i <- seq_len(length(x))
+    }
+    lapply(x[i], function(y) {
+        cat(indent, y, "\n", sep = "")
+    })
     invisible()
 }
 
@@ -150,35 +157,20 @@ chapter_title <- function(x) {
 }
 
 ##' @export
-print.chapter <- function(x, ..., indent = "") {
-    cat(indent, chapter_state(x), " ", chapter_title(x), "\n", sep = "")
-    print(authors(x), indent = paste0(indent, "  "))
-    cat("\n")
-}
-
-##' @export
-print.authors <- function(x, ..., indent = "") {
-    cat(indent, "Authors:\n", sep = "")
-    lapply(x$items, print, indent = paste0(indent, "  "))
-    invisible()
-}
-
-##' @export
-print.author <- function(x, ..., indent = "") {
-    cat(indent, x$item, "\n", sep = "")
-}
-
-##' @export
 `[.report` <- function(x, i) {
-    if (is.character(i))
-        i <- grep(i, sapply(x$chapters, "[", "title"), ignore.case = TRUE)
-    x$chapters[i]
+    if (is.character(i)) {
+        i <- grep(i, sapply(chapters(x)$section, chapter_title),
+                  ignore.case = TRUE)
+    }
+    chapters(x)$section[i]
 }
 
 ##' @export
 `[[.report` <- function(x, i) {
-    if (is.character(i))
-        i <- grep(i, sapply(x$chapters, "[", "title"), ignore.case = TRUE)
+    if (is.character(i)) {
+        i <- grep(i, sapply(chapters(x)$section, chapter_title),
+                  ignore.case = TRUE)
+    }
     stopifnot(identical(length(i), 1L))
-    x$chapters[[i]]
+    chapters(x)$section[[i]]
 }
