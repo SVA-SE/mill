@@ -11,7 +11,7 @@ apply_patch <- function(x) {
 ##' @export
 ##' @param x A report object
 apply_patch.report <- function(x) {
-    lapply(x$chapters, function(y) apply_patch(y))
+    lapply(chapters(x)$section, function(y) apply_patch(y))
     invisible()
 }
 
@@ -23,8 +23,6 @@ apply_patch.report <- function(x) {
 ##' @return invisible(NULL)
 ##' @export
 apply_patch.chapter <- function(x) {
-    owd <- setwd(x$path)
-    on.exit(setwd(owd))
     output <- tryCatch(system2("patch",
                                args = c("text.tex", "-i", "typeset.patch",
                                         "-o", "typeset.tex"),
