@@ -106,7 +106,7 @@ summary.report <- function(object, ...) {
 ##' @export
 print.report <- function(x, ...) {
     cat("Report: ", report_title(x), "\n", sep = "")
-    cat("Progress: [FIXME%]\n")
+    cat("Progress: [", report_progress(x), "%]\n", sep = "")
     cat("Authors: ", length(authors(x)), "\n", sep = "")
     print(chapters(x), ...)
 }
@@ -135,9 +135,49 @@ print.chapter <- function(x, ..., indent = "", main_only = TRUE) {
 }
 
 ##' @noRd
-report_title <- function(x) {
+report_keyword <- function(x, key) {
     stopifnot(inherits(x, "report"))
-    "FIXME"
+
+    ii <- length(x$contents)
+    for (i in seq_len(ii)) {
+        if (inherits(x$contents[[i]], "org_headline")) {
+            if (identical(grep("Org-mode configuration", x$contents[[i]]$headline), 1L)) {
+                jj <- length(x$contents[[i]]$section)
+                for (j in seq_len(jj)) {
+                    if (inherits(x$contents[[i]]$section[[j]], "org_keyword")) {
+                        if (identical(x$contents[[i]]$section[[j]]$key, key)) {
+                            return(x$contents[[i]]$section[[j]]$value)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    stop("Unable to find keyword: ", key)
+}
+
+##' @noRd
+report_title <- function(x) {
+    report_keyword(x, "TITLE")
+}
+
+##' @noRd
+report_progress <- function(x) {
+    ## Determine valid todo states for a chapter
+    todos <- report_keyword(x, "TODO")
+    todos <- gsub("[(][^)]*[)]", "", todos)
+    todos <- gsub("[|]", "", todos)
+    todos <- trimws(unlist(strsplit(todos, " ")))
+    todos <- todos[nchar(todos) > 0]
+
+    completed <- sum(sapply(chapters(x)$section, function(y) {
+        s <- chapter_state(y)
+        stopifnot(s %in% todos)
+        match(s, todos)
+    }))
+
+    as.integer(100 * completed / (length(todos) * length(chapters(x)$section)))
 }
 
 ##' @noRd
