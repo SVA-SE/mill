@@ -28,10 +28,10 @@ apply_patch.chapter <- function(x) {
                                         "-o", "typeset.tex"),
                                stdout = TRUE, stderr = TRUE),
                        warning = function(w) w)
+
     if (!identical(output,
                    "patching file typeset.tex (read from text.tex)")) {
-        cat(output, "\n")
-        stop(paste("Unable to apply patch: ", x$title))
+        stop(paste("Unable to apply patch: ", chapter_title(x)))
     }
 
     invisible(NULL)

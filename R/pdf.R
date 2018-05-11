@@ -17,10 +17,11 @@ to_pdf.report <- function(x, type = c("print", "web"), ...) {
     ## Nuke previous build
     unlink("build", recursive = TRUE)
     dir.create("build")
-    wd <- setwd(file.path(x$path, "build"))
-    on.exit(setwd(wd))
 
-    lapply(x$chapters, function(y) to_pdf(y, build = FALSE, type = type, ...))
+    lapply(chapters(x)$section, function(y) to_pdf(y, build = FALSE, type = type, ...))
+
+    wd <- setwd("build")
+    on.exit(setwd(wd))
 
     ## Copy the directories in assets: cover, front-matter and back-matter
     lapply(c("cover", "front-matter", "back-matter"), function(dir) {
@@ -54,10 +55,10 @@ to_pdf.report <- function(x, type = c("print", "web"), ...) {
 ##' @export
 to_pdf.chapter <- function(x, build = TRUE, type = c("print", "web"), ...) {
     type <- match.arg(type)
-    wd <- setwd(x$path)
-    on.exit(unlink("typeset.tex"))
+    wd <- setwd(file.path("chapters", chapter_title(x)))
+    on.exit(unlink("typeset.tex"), add = TRUE)
     if (build) {
-        filename <- paste0(x$title, ".tex")
+        filename <- paste0(chapter_title(x), ".tex")
         on.exit(unlink(filename), add = TRUE)
     }
     on.exit(setwd(wd), add = TRUE)
@@ -67,8 +68,7 @@ to_pdf.chapter <- function(x, build = TRUE, type = c("print", "web"), ...) {
 
     if (build) {
         ## read in the pieces of the chapter
-        a <- assets(x)
-        presnippet <- readLines(file.path(a, "latex/pre-snippet.tex"))
+        presnippet <- readLines("../../assets/latex/pre-snippet.tex")
 
         ## Stitch together the chapter
         tex <- c(presnippet,
@@ -95,7 +95,7 @@ to_pdf.chapter <- function(x, build = TRUE, type = c("print", "web"), ...) {
         })
 
         ## Copy any images in the chapter
-        files <- list.files(x$path, pattern = "^img_")
+        files <- list.files(pattern = "^img_")
         lapply(files, function(from) {
             to <- paste0("../../build/", from)
             if(type == "web") {

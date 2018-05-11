@@ -12,9 +12,7 @@ table_pattern <- function(fileext = c("all", "tex", "pdf")) {
 table_files <- function(x, fileext) UseMethod("table_files")
 
 table_files.chapter <- function(x, fileext = "all") {
-    list.files(path = x$path,
-               pattern = table_pattern(fileext),
-               full.names = TRUE)
+    list.files(pattern = table_pattern(fileext), full.names = TRUE)
 }
 
 ##' Preview tables

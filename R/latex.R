@@ -46,12 +46,12 @@ references <- function(x) UseMethod("references")
 
 ##' @export
 references.report <- function(x) {
-    references(x$chapters)
+    references(chapters(x))
 }
 
 ##' @export
 references.chapters <- function(x) {
-    do.call("rbind", lapply(x, function(y) references(y)))
+    do.call("rbind", lapply(x$section, function(y) references(y)))
 }
 
 ##' @export
@@ -67,7 +67,7 @@ references.chapter <- function(x) {
         }))
 
         if (length(m)) {
-            filename = file.path("chapters", x$title, basename(filename))
+            filename = file.path("chapters", chapter_title(x), basename(filename))
             tex <- m
             cmd <- sub("[\\]([^{]+)[{][^}]*[}]", "\\1", tex)
             marker <- sub("[\\][^{]+[{]([^}]*)[}]", "\\1", tex)
@@ -95,16 +95,15 @@ references.chapter <- function(x) {
 ##' @importFrom methods is
 ##' @keywords internal
 chapter_tex_files <- function(x, type = c("all", "text", "fig", "table")) {
-
     type = match.arg(type)
-    stopifnot(is(x, "chapter"))
+    stopifnot(inherits(x, "chapter"))
 
     text_files <- NULL
     fig_files  <- NULL
     tab_files  <- NULL
 
     if (type %in% c("all", "text"))
-        text_files <- file.path(x$path, "text.tex")
+        text_files <- "text.tex"
     if (type %in% c("all", "fig"))
         fig_files <- figure_files(x, "tex")
     if (type %in% c("all", "table"))

@@ -21,26 +21,17 @@ figure_files <- function(x, fileext) UseMethod("figure_files")
 
 ##' @export
 figure_files.report <- function(x, fileext = "all") {
-    figure_files(x$chapters, fileext)
+    figure_files(chapters(x), fileext)
 }
 
 ##' @export
 figure_files.chapters <- function(x, fileext = "all") {
-    unlist(lapply(x, function(y) figure_files(y, fileext)))
+    unlist(lapply(x$section, function(y) figure_files(y, fileext)))
 }
 
 ##' @export
 figure_files.chapter <- function(x, fileext = "all") {
-    list.files(path = x$path,
-               pattern = figure_pattern(fileext),
-               full.names = TRUE)
-}
-
-##' @export
-figure_files.chapter <- function(x, fileext = "all") {
-    list.files(path = x$path,
-               pattern = figure_pattern(fileext),
-               full.names = TRUE)
+    list.files(pattern = figure_pattern(fileext), full.names = TRUE)
 }
 
 ##' @keywords internal
@@ -118,30 +109,6 @@ preview_figures.chapters <- function(x) {
 preview_figures.chapter <- function(x) {
     lapply(figure_files(x, "tex"), preview_figure)
     invisible()
-}
-
-##' Get Assets
-##'
-##' Determine the assets directory given a report, chapter or chapter
-##' file in the report project.
-##' @param x The report object, chapter object or filename.
-##' @return character string with path to assets.
-##' @export
-assets <- function(x) UseMethod("assets")
-
-##' @export
-assets.report <- function(x) {
-    file.path(x$path, "assets")
-}
-
-##' @export
-assets.chapter <- function(x) {
-    file.path(dirname(dirname(x$path)), "assets")
-}
-
-##' @keywords internal
-assets.character <- function(x) {
-    file.path(dirname(dirname(dirname(x))), "assets")
 }
 
 ##' Preview a figure
