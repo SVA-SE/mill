@@ -215,8 +215,8 @@ to_docx.report <- function(x, ...) {
     if (length(list(...)) > 0)
         warning("Additional arguments ignored")
 
-    repo <- repository(x$path)
-    lapply(x$chapters, function(y) to_docx(y, repo = repo))
+    repo <- repository()
+    lapply(chapters(x)$section, function(y) to_docx(y, repo = repo))
     invisible()
 }
 
@@ -225,7 +225,7 @@ to_docx.report <- function(x, ...) {
 to_docx.chapter <- function(x, repo = NULL, ...) {
     if (length(list(...)) > 0)
         warning("Additional arguments ignored")
-    f_tex <- file.path(x$path, "text.tex")
+    f_tex <- file.path("chapters", chapter_title(x), "text.tex")
     tex <- readLines(f_tex)
 
     ## Clean up changes made in from_docx_chapter()
@@ -233,7 +233,7 @@ to_docx.chapter <- function(x, repo = NULL, ...) {
     tex <- convert_ref_to_docx_ref(tex)
     f_tex <- tempfile(fileext = ".tex")
     writeLines(tex, f_tex)
-    f_docx <- file.path(x$path, "text.docx")
+    f_docx <- file.path("chapters", chapter_title(x), "text.docx")
     unlink(f_docx)
 
     ## Convert to docx
@@ -257,8 +257,8 @@ roundtrip <- function(x, ...) UseMethod("roundtrip")
 roundtrip.report <- function(x, ...) {
     if (length(list(...)) > 0)
         warning("Additional arguments ignored")
-    repo <- repository(x$path)
-    lapply(x$chapters, function(y) roundtrip(y, repo = repo))
+    repo <- repository()
+    lapply(chapters(x)$section, function(y) roundtrip(y, repo = repo))
     invisible()
 }
 
@@ -284,7 +284,7 @@ roundtrip.chapter <- function(x, repo = NULL, ...) {
 
     ## The roundtrip is clean if the tex-file is unchanged
     unstaged <- unlist(status(repo)$unstaged)
-    if (!(file.path("chapters", x$title, "text.tex") %in% unstaged))
+    if (!(file.path("chapters", chapter_title(x), "text.tex") %in% unstaged))
         reset(commits(repo, n = 1)[[1]], "hard")
 
     invisible()
