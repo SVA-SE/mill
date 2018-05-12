@@ -51,7 +51,12 @@ references.report <- function(x) {
 
 ##' @export
 references.chapters <- function(x) {
-    do.call("rbind", lapply(x$section, function(y) references(y)))
+    do.call("rbind", lapply(x$section, function(y) {
+        wd <- setwd(file.path("chapters", chapter_title(y)))
+        ref <- references(y)
+        setwd(wd)
+        ref
+    }))
 }
 
 ##' @export

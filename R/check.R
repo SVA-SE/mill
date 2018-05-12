@@ -1,12 +1,11 @@
 ##' Check report
 ##'
-##' @param path The path to the report.
 ##' @return invisible \code{FALSE} if OK, else invisible \code{TRUE}.
 ##' @importFrom utils capture.output
 ##' @importFrom utils packageVersion
 ##' @importFrom git2r repository
 ##' @export
-check <- function(path = ".") {
+check <- function() {
     cat("* using 'mill' version",
         as.character(packageVersion("mill")), "\n")
 
@@ -16,7 +15,7 @@ check <- function(path = ".") {
         return(invisible(TRUE))
 
     cat("* loading report ... ")
-    report <- tryCatch(load_report(path), error = function(e) NULL)
+    report <- tryCatch(load_report(), error = function(e) NULL)
     if (is.null(report)) {
         cat("ERROR\n")
         return(invisible(TRUE))
@@ -24,11 +23,10 @@ check <- function(path = ".") {
     cat("OK\n    ")
     cat(capture.output(report), sep = "\n    ")
 
-    repo <- repository(report$path)
-    if (check_expect_clean_repository(report, repo))
+    if (check_expect_clean_repository(report))
         return(invisible(TRUE))
 
-    result <- check_tex_to_docx_round_trip(report, repo)
+    result <- check_tex_to_docx_round_trip(report)
     result <- c(result, check_apply_typeset_patch(report))
     result <- c(result, check_reference_format(report))
     result <- c(result, check_missing_figure_reference_files(report))
@@ -41,17 +39,17 @@ check <- function(path = ".") {
 ##'
 ##' To protect against overwriting un-committed changes.
 ##' @keywords internal
-check_expect_clean_repository <- function(x, repo)
+check_expect_clean_repository <- function(x)
     UseMethod("check_expect_clean_repository")
 
 ##' @keywords internal
 ##' @importFrom git2r diff
 ##' @importFrom git2r repository
-check_expect_clean_repository.report <- function(x, repo) {
+check_expect_clean_repository.report <- function(x) {
     cat("* checking that repository is clean ... ")
 
     ## Check if the working tree is clean
-    d <- diff(repo)
+    d <- diff(repository())
     if (length(d@files)) {
         cat("ERROR\n")
         return(TRUE)
@@ -108,17 +106,17 @@ check_expect_patch_is_installed <- function() {
 ##' Checking that converting to 'docx' from 'tex' and converting back
 ##' to 'tex' doesn't generate changes.
 ##' @keywords internal
-check_tex_to_docx_round_trip <- function(x, repo)
+check_tex_to_docx_round_trip <- function(x)
     UseMethod("check_tex_to_docx_round_trip")
 
 ##' @keywords internal
 ##' @importFrom git2r reset
 ##' @importFrom git2r commits
-check_tex_to_docx_round_trip.report <- function(x, repo) {
-    on.exit(reset(commits(repo, n = 1)[[1]], "hard"))
+check_tex_to_docx_round_trip.report <- function(x) {
+    on.exit(reset(commits(repository(), n = 1)[[1]], "hard"))
     cat("* checking 'tex' to 'docx' round trip ... ")
 
-    l <- check_tex_to_docx_round_trip(x$chapters, repo)
+    l <- check_tex_to_docx_round_trip(chapters(x))
     l <- l[!sapply(l, is.null)]
     if (length(l)) {
         cat("ERROR\n")
@@ -131,20 +129,20 @@ check_tex_to_docx_round_trip.report <- function(x, repo) {
 }
 
 ##' @keywords internal
-check_tex_to_docx_round_trip.chapters <- function(x, repo) {
-    sapply(x, function(y) check_tex_to_docx_round_trip(y, repo))
+check_tex_to_docx_round_trip.chapters <- function(x) {
+    sapply(x$section, function(y) check_tex_to_docx_round_trip(y))
 }
 
 ##' @keywords internal
 ##' @importFrom git2r commits
 ##' @importFrom git2r reset
 ##' @importFrom git2r status
-check_tex_to_docx_round_trip.chapter <- function(x, repo) {
+check_tex_to_docx_round_trip.chapter <- function(x) {
     to_docx(x)
     from_docx(x)
-    unstaged <- unlist(status(repo)$unstaged)
-    if (file.path("chapters", x$title, "text.tex") %in% unstaged)
-        return(file.path("chapters", x$title, "text.tex"))
+    unstaged <- unlist(status(repository())$unstaged)
+    if (file.path("chapters", chapter_title(x), "text.tex") %in% unstaged)
+        return(file.path("chapters", chapter_title(x), "text.tex"))
     NULL
 }
 
@@ -160,7 +158,7 @@ check_apply_typeset_patch <- function(x)
 check_apply_typeset_patch.report <- function(x) {
     cat("* checking apply typeset patch ... ")
 
-    l <- check_apply_typeset_patch(x$chapters)
+    l <- check_apply_typeset_patch(chapters(x))
     l <- l[!sapply(l, is.null)]
     if (length(l)) {
         cat("ERROR\n")
@@ -174,12 +172,12 @@ check_apply_typeset_patch.report <- function(x) {
 
 ##' @keywords internal
 check_apply_typeset_patch.chapters <- function(x) {
-    sapply(x, function(y) check_apply_typeset_patch(y))
+    sapply(x$section, function(y) check_apply_typeset_patch(y))
 }
 
 ##' @keywords internal
 check_apply_typeset_patch.chapter <- function(x) {
-    owd <- setwd(x$path)
+    owd <- setwd(file.path("chapters", chapter_title(x)))
     on.exit(setwd(owd))
     output <- tryCatch(system2("patch",
                                args = c("text.tex", "-i", "typeset.patch",
@@ -189,7 +187,7 @@ check_apply_typeset_patch.chapter <- function(x) {
     if (identical(output,
                   "patching file typeset.tex (read from text.tex)"))
         return(NULL)
-    return(file.path("chapters", x$title, "typeset.patch"))
+    return(file.path("chapters", chapter_title(x), "typeset.patch"))
 }
 
 ##' Check reference format
@@ -231,10 +229,10 @@ check_missing_figure_reference_files <- function(x)
 check_missing_figure_reference_files.report <- function(x) {
     cat("* checking missing figure reference files ... ")
 
-    ref <- check_missing_figure_reference_files(x$chapters)
+    ref <- check_missing_figure_reference_files(chapters(x))
     if (length(ref)) {
         cat("ERROR\n    ")
-        cat(sub(x$path, ".", ref), sep = "\n    ")
+        cat(ref, sep = "\n    ")
         return(TRUE)
     }
 
@@ -243,7 +241,12 @@ check_missing_figure_reference_files.report <- function(x) {
 }
 
 check_missing_figure_reference_files.chapters <- function(x) {
-    unlist(lapply(x, function(y) check_missing_figure_reference_files(y)))
+    unlist(lapply(x$section, function(y) {
+        wd <- setwd(file.path("chapters", chapter_title(y)))
+        ref <- check_missing_figure_reference_files(y)
+        setwd(wd)
+        ref
+    }))
 }
 
 check_missing_figure_reference_files.chapter <- function(x) {
@@ -255,13 +258,14 @@ check_missing_figure_reference_files.chapter <- function(x) {
     if (nrow(ref)) {
         id <- sapply(strsplit(ref$marker, ":"), "[", 3)
         filename <- paste0("fig_", normalize_title(x$title), "_", id, ".tex")
-        ref_fig_files <- file.path(x$path, filename)
+        ref_fig_files <- file.path("chapters", chapter_title(x), filename)
     } else {
         ref_fig_files <- character(0)
     }
 
     ## Observed tex files
-    fig_files <- list.files(path = x$path, pattern = "tex$", full.names = TRUE)
+    fig_files <- list.files(path = file.path("chapters", chapter_title(x)),
+                            pattern = "tex$", full.names = TRUE)
 
     setdiff(ref_fig_files, fig_files)
 }
@@ -278,10 +282,10 @@ check_missing_table_reference_files <- function(x)
 check_missing_table_reference_files.report <- function(x) {
     cat("* checking missing table reference files ... ")
 
-    ref <- check_missing_table_reference_files(x$chapters)
+    ref <- check_missing_table_reference_files(chapters(x))
     if (length(ref)) {
         cat("ERROR\n    ")
-        cat(sub(x$path, ".", ref), sep = "\n    ")
+        cat(ref, sep = "\n    ")
         return(TRUE)
     }
 
@@ -290,7 +294,12 @@ check_missing_table_reference_files.report <- function(x) {
 }
 
 check_missing_table_reference_files.chapters <- function(x) {
-    unlist(lapply(x, function(y) check_missing_table_reference_files(y)))
+    unlist(lapply(x$section, function(y) {
+        wd <- setwd(file.path("chapters", chapter_title(y)))
+        ref <- check_missing_table_reference_files(y)
+        setwd(wd)
+        ref
+    }))
 }
 
 check_missing_table_reference_files.chapter <- function(x) {
@@ -302,13 +311,14 @@ check_missing_table_reference_files.chapter <- function(x) {
     if (nrow(ref)) {
         id <- sapply(strsplit(ref$marker, ":"), "[", 3)
         filename <- paste0("tab_", normalize_title(x$title), "_", id, ".tex")
-        ref_tab_files <- file.path(x$path, filename)
+        ref_tab_files <- file.path("chapters", chapter_title(x), filename)
     } else {
         ref_tab_files <- character(0)
     }
 
     ## Observed tex files
-    tab_files <- list.files(path = x$path, pattern = "tex$", full.names = TRUE)
+    tab_files <- list.files(path = file.path("chapters", chapter_title(x)),
+                            pattern = "tex$", full.names = TRUE)
 
     setdiff(ref_tab_files, tab_files)
 }

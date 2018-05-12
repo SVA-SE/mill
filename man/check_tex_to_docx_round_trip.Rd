@@ -4,7 +4,7 @@
 \alias{check_tex_to_docx_round_trip}
 \title{Check conversion between 'tex' and 'docx'}
 \usage{
-check_tex_to_docx_round_trip(x, repo)
+check_tex_to_docx_round_trip(x)
 }
 \description{
 Checking that converting to 'docx' from 'tex' and converting back
