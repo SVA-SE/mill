@@ -196,6 +196,12 @@ chapter_title <- function(x) {
     trimws(sub("[]]{2}$", "", m))
 }
 
+##' @noRd
+chapter_path <- function(x) {
+    stopifnot(inherits(x, "chapter"))
+    file.path("chapters", chapter_title(x))
+}
+
 ##' @export
 `[.report` <- function(x, i) {
     if (is.character(i)) {

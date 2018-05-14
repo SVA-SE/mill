@@ -67,7 +67,7 @@ import.chapter <- function(x, from) {
 
     ## Import title.docx to text.docx
     from <- paste0(file.path(from, chapter_title(x)), ".docx")
-    to <- file.path("chapters", chapter_title(x), "text.docx")
+    to <- file.path(chapter_path(x), "text.docx")
     file.copy(from, to, overwrite = TRUE)
 
     invisible()
@@ -105,7 +105,7 @@ from_docx.chapter <- function(x, repo = NULL, ...) {
     ## Convert the docx to a temporary tex file.
     f_tex <- tempfile(fileext = ".tex")
     on.exit(file.remove(f_tex))
-    f_docx <- file.path("chapters", chapter_title(x), "text.docx")
+    f_docx <- file.path(chapter_path(x), "text.docx")
     pandoc(paste("--top-level-division=chapter ",
                  shQuote(f_docx), "-o", shQuote(f_tex)))
 
@@ -115,10 +115,10 @@ from_docx.chapter <- function(x, repo = NULL, ...) {
     tex <- make_labels_chapter_specific(tex, chapter_title(x))
     tex <- make_hypertargets_chapter_specific(tex, chapter_title(x))
     tex <- asterisk(tex, "add")
-    writeLines(tex, file.path("chapters", chapter_title(x), "text.tex"))
+    writeLines(tex, file.path(chapter_path(x), "text.tex"))
 
     if (!is.null(repo))
-        add(repo, file.path("chapters", chapter_title(x), "text.tex"))
+        add(repo, file.path(chapter_path(x), "text.tex"))
     invisible()
 }
 
@@ -225,7 +225,7 @@ to_docx.report <- function(x, ...) {
 to_docx.chapter <- function(x, repo = NULL, ...) {
     if (length(list(...)) > 0)
         warning("Additional arguments ignored")
-    f_tex <- file.path("chapters", chapter_title(x), "text.tex")
+    f_tex <- file.path(chapter_path(x), "text.tex")
     tex <- readLines(f_tex)
 
     ## Clean up changes made in from_docx_chapter()
@@ -233,7 +233,7 @@ to_docx.chapter <- function(x, repo = NULL, ...) {
     tex <- convert_ref_to_docx_ref(tex)
     f_tex <- tempfile(fileext = ".tex")
     writeLines(tex, f_tex)
-    f_docx <- file.path("chapters", chapter_title(x), "text.docx")
+    f_docx <- file.path(chapter_path(x), "text.docx")
     unlink(f_docx)
 
     ## Convert to docx
@@ -284,7 +284,7 @@ roundtrip.chapter <- function(x, repo = NULL, ...) {
 
     ## The roundtrip is clean if the tex-file is unchanged
     unstaged <- unlist(status(repo)$unstaged)
-    if (!(file.path("chapters", chapter_title(x), "text.tex") %in% unstaged))
+    if (!(file.path(chapter_path(x), "text.tex") %in% unstaged))
         reset(commits(repo, n = 1)[[1]], "hard")
 
     invisible()

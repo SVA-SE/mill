@@ -52,7 +52,7 @@ references.report <- function(x) {
 ##' @export
 references.chapters <- function(x) {
     do.call("rbind", lapply(x$section, function(y) {
-        wd <- setwd(file.path("chapters", chapter_title(y)))
+        wd <- setwd(chapter_path(y))
         ref <- references(y)
         setwd(wd)
         ref
@@ -72,7 +72,7 @@ references.chapter <- function(x) {
         }))
 
         if (length(m)) {
-            filename = file.path("chapters", chapter_title(x), basename(filename))
+            filename = file.path(chapter_path(x), basename(filename))
             tex <- m
             cmd <- sub("[\\]([^{]+)[{][^}]*[}]", "\\1", tex)
             marker <- sub("[\\][^{]+[{]([^}]*)[}]", "\\1", tex)

@@ -141,8 +141,8 @@ check_tex_to_docx_round_trip.chapter <- function(x) {
     to_docx(x)
     from_docx(x)
     unstaged <- unlist(status(repository())$unstaged)
-    if (file.path("chapters", chapter_title(x), "text.tex") %in% unstaged)
-        return(file.path("chapters", chapter_title(x), "text.tex"))
+    if (file.path(chapter_path(x), "text.tex") %in% unstaged)
+        return(file.path(chapter_path(x), "text.tex"))
     NULL
 }
 
@@ -177,7 +177,7 @@ check_apply_typeset_patch.chapters <- function(x) {
 
 ##' @keywords internal
 check_apply_typeset_patch.chapter <- function(x) {
-    owd <- setwd(file.path("chapters", chapter_title(x)))
+    owd <- setwd(chapter_path(x))
     on.exit(setwd(owd))
     output <- tryCatch(system2("patch",
                                args = c("text.tex", "-i", "typeset.patch",
@@ -187,7 +187,7 @@ check_apply_typeset_patch.chapter <- function(x) {
     if (identical(output,
                   "patching file typeset.tex (read from text.tex)"))
         return(NULL)
-    return(file.path("chapters", chapter_title(x), "typeset.patch"))
+    return(file.path(chapter_path(x), "typeset.patch"))
 }
 
 ##' Check reference format
@@ -242,7 +242,7 @@ check_missing_figure_reference_files.report <- function(x) {
 
 check_missing_figure_reference_files.chapters <- function(x) {
     unlist(lapply(x$section, function(y) {
-        wd <- setwd(file.path("chapters", chapter_title(y)))
+        wd <- setwd(chapter_path(y))
         ref <- check_missing_figure_reference_files(y)
         setwd(wd)
         ref
@@ -258,13 +258,13 @@ check_missing_figure_reference_files.chapter <- function(x) {
     if (nrow(ref)) {
         id <- sapply(strsplit(ref$marker, ":"), "[", 3)
         filename <- paste0("fig_", normalize_title(x$title), "_", id, ".tex")
-        ref_fig_files <- file.path("chapters", chapter_title(x), filename)
+        ref_fig_files <- file.path(chapter_path(x), filename)
     } else {
         ref_fig_files <- character(0)
     }
 
     ## Observed tex files
-    fig_files <- list.files(path = file.path("chapters", chapter_title(x)),
+    fig_files <- list.files(path = chapter_path(x),
                             pattern = "tex$", full.names = TRUE)
 
     setdiff(ref_fig_files, fig_files)
@@ -295,7 +295,7 @@ check_missing_table_reference_files.report <- function(x) {
 
 check_missing_table_reference_files.chapters <- function(x) {
     unlist(lapply(x$section, function(y) {
-        wd <- setwd(file.path("chapters", chapter_title(y)))
+        wd <- setwd(chapter_path(y))
         ref <- check_missing_table_reference_files(y)
         setwd(wd)
         ref
@@ -311,13 +311,13 @@ check_missing_table_reference_files.chapter <- function(x) {
     if (nrow(ref)) {
         id <- sapply(strsplit(ref$marker, ":"), "[", 3)
         filename <- paste0("tab_", normalize_title(x$title), "_", id, ".tex")
-        ref_tab_files <- file.path("chapters", chapter_title(x), filename)
+        ref_tab_files <- file.path(chapter_path(x), filename)
     } else {
         ref_tab_files <- character(0)
     }
 
     ## Observed tex files
-    tab_files <- list.files(path = file.path("chapters", chapter_title(x)),
+    tab_files <- list.files(path = chapter_path(x),
                             pattern = "tex$", full.names = TRUE)
 
     setdiff(ref_tab_files, tab_files)
