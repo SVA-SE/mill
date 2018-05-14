@@ -38,37 +38,36 @@ export.chapter <- function(x) {
     invisible()
 }
 
-##' Import files
+##' Check if current working directory is in a chapter
+##' @noRd
+in_chapter <- function() {
+    if (!file.exists("README.org")) {
+        if (identical(basename(dirname(getwd())), "chapters"))
+            return(file.exists("../../README.org"))
+    }
+    FALSE
+}
+
+##' Import chapter docx file from workspace
 ##'
-##' @param x The object to import.
-##' @param from The source of the import. If the argument is missing,
-##'     the docx files are imported from a folder named from the
-##'     report title.
 ##' @return invisible NULL.
 ##' @export
-import <- function(x, from) UseMethod("import")
+import <- function(...) {
+    if (in_chapter()) {
+        chapter <- basename(getwd())
+        from <- paste0("../../workspace/chapters/", chapter)
+        if (!dir.exists(from))
+            stop("Invalid directory")
 
-##' @export
-import.default <- function(x, from) {
-    import(load_report())
-}
-
-##' @export
-import.report <- function(x, from) {
-    lapply(chapters(x)$section, function(y) import(y))
-    invisible()
-}
-
-##' @export
-import.chapter <- function(x, from) {
-    from <- file.path("workspace", "chapters", chapter_title(x))
-    if (!dir.exists(from))
-        stop("Invalid directory")
-
-    ## Import title.docx to text.docx
-    from <- paste0(file.path(from, chapter_title(x)), ".docx")
-    to <- file.path(chapter_path(x), "text.docx")
-    file.copy(from, to, overwrite = TRUE)
+        ## Import title.docx to text.docx
+        from <- paste0(from, "/", chapter, ".docx")
+        to <- "text.docx"
+        file.copy(from, to, overwrite = TRUE)
+    } else {
+        ## FIXME: 'in_report' If the current working directory is the
+        ## root folder, import all chapters.
+        stop("Not implemented")
+    }
 
     invisible()
 }
