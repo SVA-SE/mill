@@ -69,10 +69,12 @@ import <- function() {
         from <- paste0(from, "/", chapter, ".docx")
         to <- "text.docx"
         file.copy(from, to, overwrite = TRUE)
-    } else {
-        ## FIXME: 'in_report' If the current working directory is the
-        ## root folder, import all chapters.
-        stop("Not implemented")
+    } else if (in_report()) {
+        lapply(list.files("chapters"), function(chapter) {
+            wd <- setwd(paste0("chapters/", chapter))
+            import()
+            setwd(wd)
+        })
     }
 
     invisible()
