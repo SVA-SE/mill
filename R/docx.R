@@ -48,11 +48,17 @@ in_chapter <- function() {
     FALSE
 }
 
+##' Check if current working directory is in a report
+##' @noRd
+in_report <- function() {
+    file.exists("README.org")
+}
+
 ##' Import chapter docx file from workspace
 ##'
 ##' @return invisible NULL.
 ##' @export
-import <- function(...) {
+import <- function() {
     if (in_chapter()) {
         chapter <- basename(getwd())
         from <- paste0("../../workspace/chapters/", chapter)
