@@ -4,12 +4,7 @@
 \alias{create_Makefile}
 \title{Create a Makefile in each chapter of the report}
 \usage{
-create_Makefile(x, ...)
-}
-\arguments{
-\item{x}{The report object}
-
-\item{...}{Additional arguments.}
+create_Makefile()
 }
 \value{
 invisible NULL
