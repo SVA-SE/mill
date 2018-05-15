@@ -4,10 +4,7 @@
 \alias{build_figures}
 \title{Build figures}
 \usage{
-build_figures(x)
-}
-\arguments{
-\item{x}{The report object or chapter object}
+build_figures()
 }
 \value{
 invisible NULL

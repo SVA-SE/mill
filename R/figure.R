@@ -44,36 +44,23 @@ preview_files.chapter <- function(x, items = "all") {
 
 ##' Build figures
 ##'
-##' @param x The report object or chapter object
 ##' @return invisible NULL
 ##' @export
-build_figures <- function(x) UseMethod("build_figures")
+build_figures <- function() {
+    if (in_chapter()) {
+        lapply(figure_files("R"), function(figure) {
+            source(figure, local = TRUE, chdir = TRUE)
+        })
+    } else if (in_report()) {
+        lapply(list.files("chapters"), function(chapter) {
+            wd <- setwd(paste0("chapters/", chapter))
+            build_figures()
+            setwd(wd)
+        })
+    }
 
-##' @export
-build_figures.report <- function(x) {
-    build_figures(x$chapters)
+    invisible(NULL)
 }
-
-##' @export
-build_figures.chapters <- function(x) {
-    lapply(x, function(y) build_figures(y))
-    invisible()
-}
-
-##' @export
-build_figures.chapter <- function(x) {
-    lapply(figure_files(x, "R"), build_figure)
-    invisible()
-}
-
-##' Build a figure
-##'
-##' @param figure The path to the figure R script
-##' @export
-build_figure <- function(figure) {
-    source(figure, local = TRUE, chdir = TRUE)
-}
-
 
 ##' Preview figures
 ##'
