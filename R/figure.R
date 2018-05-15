@@ -1,7 +1,7 @@
 ##' @keywords internal
 figure_pattern <- function(fileext = c("all", "R", "tex", "xlsx", "pdf", "jpg")) {
     fileext <- switch(match.arg(fileext),
-                      all  = "(tex)|(R)|(xlsx)|(pdf)|(jpg)$",
+                      all  = "((tex)|(R)|(xlsx)|(pdf)|(jpg))$",
                       R    = "R$",
                       xlsx = "xlsx$",
                       tex  = "tex$",
@@ -10,28 +10,16 @@ figure_pattern <- function(fileext = c("all", "R", "tex", "xlsx", "pdf", "jpg"))
     paste0("^fig_[^.]+[.]", fileext)
 }
 
-##' figure_files
+##' List figure files
 ##'
-##' A method to discover the figures in a report or chapter object.
+##' A method to discover the figures in a report or a chapter.
 ##'
 ##' @export
-##' @param x The report or chapter object
 ##' @param fileext The extension of the files you want to find
-figure_files <- function(x, fileext) UseMethod("figure_files")
-
-##' @export
-figure_files.report <- function(x, fileext = "all") {
-    figure_files(chapters(x), fileext)
-}
-
-##' @export
-figure_files.chapters <- function(x, fileext = "all") {
-    unlist(lapply(x$section, function(y) figure_files(y, fileext)))
-}
-
-##' @export
-figure_files.chapter <- function(x, fileext = "all") {
-    list.files(pattern = figure_pattern(fileext), full.names = TRUE)
+figure_files <- function(fileext = "all") {
+    if (in_chapter())
+        return(list.files(pattern = figure_pattern(fileext)))
+    stop("Not implemented")
 }
 
 ##' @keywords internal

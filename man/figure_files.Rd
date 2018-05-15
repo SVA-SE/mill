@@ -2,13 +2,11 @@
 % Please edit documentation in R/figure.R
 \name{figure_files}
 \alias{figure_files}
-\title{figure_files}
+\title{List figure files}
 \usage{
-figure_files(x, fileext)
+figure_files(x, fileext = "all")
 }
 \arguments{
-\item{x}{The report or chapter object}
-
 \item{fileext}{The extension of the files you want to find}
 }
 \description{
