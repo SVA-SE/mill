@@ -4,7 +4,7 @@
 \alias{import}
 \title{Import chapter docx file from workspace}
 \usage{
-import(...)
+import()
 }
 \value{
 invisible NULL.

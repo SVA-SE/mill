@@ -1,42 +1,36 @@
-##' @keywords internal
+##' @noRd
 table_pattern <- function(fileext = c("all", "tex", "pdf")) {
     fileext <- switch(match.arg(fileext),
-                      all = "(tex)|(pdf)$",
+                      all = "((tex)|(pdf))$",
                       tex = "tex$",
                       pdf = "pdf$")
 
     paste0("^tab_[^.]+[.]", fileext)
 }
 
-##' @keywords internal
-table_files <- function(x, fileext) UseMethod("table_files")
-
-table_files.chapter <- function(x, fileext = "all") {
-    list.files(pattern = table_pattern(fileext), full.names = TRUE)
+##' @noRd
+table_files <- function(fileext = "all") {
+    if (in_chapter())
+        return(list.files(pattern = table_pattern(fileext)))
+    stop("Not implemented")
 }
 
 ##' Preview tables
 ##'
-##' @param x The report object or chapter object
 ##' @return invisible NULL
 ##' @export
-preview_tables <- function(x) UseMethod("preview_tables")
+preview_tables <- function() {
+    if (in_chapter()) {
+        lapply(table_files("tex"), preview_table)
+    } else if (in_report()) {
+        lapply(list.files("chapters"), function(chapter) {
+            wd <- setwd(paste0("chapters/", chapter))
+            preview_tables()
+            setwd(wd)
+        })
+    }
 
-##' @export
-preview_tables.report <- function(x) {
-    preview_tables(x$chapters)
-}
-
-##' @export
-preview_tables.chapters <- function(x) {
-    lapply(x, function(y) preview_tables(y))
-    invisible()
-}
-
-##' @export
-preview_tables.chapter <- function(x) {
-    lapply(table_files(x, "tex"), preview_table)
-    invisible()
+    invisible(NULL)
 }
 
 ##' Preview a table
@@ -49,10 +43,8 @@ preview_table <- function(table) {
     on.exit(unlink(preview))
 
     ## Read in the pieces of the table
-    a <- assets(table)
     text <- readLines(table)
-    presnippet <- readLines(file.path(a, "latex/pre-snippet.tex"))
-    presnippet <- gsub("assets/", paste0(a, "/"), presnippet)
+    presnippet <- readLines("../../assets/latex/pre-snippet.tex")
 
     ## Create a tex file with the context to create a preview.
     tex <- c(presnippet,
@@ -84,4 +76,6 @@ preview_table <- function(table) {
         if (file.exists(file))
             file.remove(file)
     }
+
+    invisible(NULL)
 }
