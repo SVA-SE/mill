@@ -22,7 +22,7 @@ create_Makefile <- function() {
                    "\tRscript -e \"mill::roundtrip()\"",
                    "",
                    "table_preview:",
-                   "\tRscript -e \"preview_tables()\"",
+                   "\tRscript -e \"mill::preview_tables()\"",
                    "",
                    "build_figures:",
                    "\tRscript -e \"mill::build_figures()\"",
