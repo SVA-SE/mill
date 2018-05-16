@@ -4,12 +4,10 @@
 \alias{to_pdf}
 \title{Build report}
 \usage{
-to_pdf(x, ...)
+to_pdf(type = c("print", "web"))
 }
 \arguments{
-\item{x}{The report object}
-
-\item{...}{Additional parameters}
+\item{type}{The report type to create}
 }
 \value{
 invisible NULL

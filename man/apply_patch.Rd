@@ -2,13 +2,13 @@
 % Please edit documentation in R/patch_tex.R
 \name{apply_patch}
 \alias{apply_patch}
-\title{Apply_patch}
+\title{Apply patch}
 \usage{
-apply_patch(x)
+apply_patch()
 }
-\arguments{
-\item{x}{A chapter}
+\value{
+invisible(NULL)
 }
 \description{
-Apply_patch
+Apply patch
 }
