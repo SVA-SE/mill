@@ -23,14 +23,14 @@ check <- function() {
     cat("OK\n    ")
     cat(capture.output(report), sep = "\n    ")
 
-    if (check_expect_clean_repository(report))
+    if (check_expect_clean_repository())
         return(invisible(TRUE))
 
-    result <- check_tex_to_docx_round_trip(report)
-    result <- c(result, check_apply_typeset_patch(report))
-    result <- c(result, check_reference_format(report))
-    result <- c(result, check_missing_figure_reference_files(report))
-    result <- c(result, check_missing_table_reference_files(report))
+    result <- check_tex_to_docx_round_trip()
+    result <- c(result, check_apply_typeset_patch())
+    result <- c(result, check_reference_format())
+    result <- c(result, check_missing_figure_reference_files())
+    result <- c(result, check_missing_table_reference_files())
 
     invisible(any(result))
 }
@@ -101,18 +101,25 @@ check_expect_patch_is_installed <- function() {
 ##'
 ##' Checking that converting to 'docx' from 'tex' and converting back
 ##' to 'tex' doesn't generate changes.
-##' @keywords internal
-check_tex_to_docx_round_trip <- function(x)
-    UseMethod("check_tex_to_docx_round_trip")
-
-##' @keywords internal
-##' @importFrom git2r reset
 ##' @importFrom git2r commits
-check_tex_to_docx_round_trip.report <- function(x) {
+##' @importFrom git2r reset
+##' @importFrom git2r status
+##' @noRd
+check_tex_to_docx_round_trip <- function() {
     on.exit(reset(commits(repository(), n = 1)[[1]], "hard"))
     cat("* checking 'tex' to 'docx' round trip ... ")
 
-    l <- check_tex_to_docx_round_trip(chapters(x))
+    l <- sapply(list.files("chapters"), function(chapter) {
+        wd <- setwd(paste0("chapters/", chapter))
+        to_docx()
+        from_docx()
+        setwd(wd)
+        unstaged <- unlist(status(repository())$unstaged)
+        if (file.path("chapters", chapter, "text.tex") %in% unstaged)
+            return(file.path("chapters", chapter, "text.tex"))
+        NULL
+    })
+
     l <- l[!sapply(l, is.null)]
     if (length(l)) {
         cat("ERROR\n")
@@ -122,24 +129,6 @@ check_tex_to_docx_round_trip.report <- function(x) {
 
     cat("OK\n")
     FALSE
-}
-
-##' @keywords internal
-check_tex_to_docx_round_trip.chapters <- function(x) {
-    sapply(x$section, function(y) check_tex_to_docx_round_trip(y))
-}
-
-##' @keywords internal
-##' @importFrom git2r commits
-##' @importFrom git2r reset
-##' @importFrom git2r status
-check_tex_to_docx_round_trip.chapter <- function(x) {
-    to_docx(x)
-    from_docx(x)
-    unstaged <- unlist(status(repository())$unstaged)
-    if (file.path(chapter_path(x), "text.tex") %in% unstaged)
-        return(file.path(chapter_path(x), "text.tex"))
-    NULL
 }
 
 ##' Check apply patch 'typeset.patch' to 'text.tex'
@@ -147,14 +136,22 @@ check_tex_to_docx_round_trip.chapter <- function(x) {
 ##' Checking that applying patches doesn't generate warnings or
 ##' errors.
 ##' @keywords internal
-check_apply_typeset_patch <- function(x)
-    UseMethod("check_apply_typeset_patch")
-
-##' @keywords internal
-check_apply_typeset_patch.report <- function(x) {
+check_apply_typeset_patch <- function() {
     cat("* checking apply typeset patch ... ")
 
-    l <- check_apply_typeset_patch(chapters(x))
+    l <- sapply(list.files("chapters"), function(chapter) {
+        wd <- setwd(paste0("chapters/", chapter))
+        output <- tryCatch(system2("patch",
+                                   args = c("text.tex", "-i", "typeset.patch",
+                                            "-o", "typeset.tex"),
+                                   stdout = TRUE, stderr = TRUE),
+                           warning = function(w) w)
+        setwd(wd)
+        if (identical(output, "patching file typeset.tex (read from text.tex)"))
+            return(NULL)
+        paste0(chapter, "/typeset.patch")
+    })
+
     l <- l[!sapply(l, is.null)]
     if (length(l)) {
         cat("ERROR\n")
@@ -166,37 +163,13 @@ check_apply_typeset_patch.report <- function(x) {
     FALSE
 }
 
-##' @keywords internal
-check_apply_typeset_patch.chapters <- function(x) {
-    sapply(x$section, function(y) check_apply_typeset_patch(y))
-}
-
-##' @keywords internal
-check_apply_typeset_patch.chapter <- function(x) {
-    owd <- setwd(chapter_path(x))
-    on.exit(setwd(owd))
-    output <- tryCatch(system2("patch",
-                               args = c("text.tex", "-i", "typeset.patch",
-                                        "-o", "typeset.tex"),
-                               stdout = TRUE, stderr = TRUE),
-                       warning = function(w) w)
-    if (identical(output,
-                  "patching file typeset.tex (read from text.tex)"))
-        return(NULL)
-    return(file.path(chapter_path(x), "typeset.patch"))
-}
-
 ##' Check reference format
 ##'
-##' @param x the report or chapter object.
-##' @keywords internal
-check_reference_format <- function(x)
-    UseMethod("check_reference_format")
-
-check_reference_format.report <- function(x) {
+##' @noRd
+check_reference_format <- function(x) {
     cat("* checking reference format ... ")
 
-    ref <- references(x)
+    ref <- references()
     ref <- ref[ref$cmd == "ref", ]
     ref_all <- ref$tex
     ref_fig <- ref$tex[ref$reftype == "fig"]
