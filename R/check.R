@@ -38,14 +38,10 @@ check <- function() {
 ##' Check that repository is clean
 ##'
 ##' To protect against overwriting un-committed changes.
-##' @keywords internal
-check_expect_clean_repository <- function(x)
-    UseMethod("check_expect_clean_repository")
-
-##' @keywords internal
 ##' @importFrom git2r diff
 ##' @importFrom git2r repository
-check_expect_clean_repository.report <- function(x) {
+##' @keywords internal
+check_expect_clean_repository <- function() {
     cat("* checking that repository is clean ... ")
 
     ## Check if the working tree is clean

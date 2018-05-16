@@ -4,7 +4,7 @@
 \alias{check_expect_clean_repository}
 \title{Check that repository is clean}
 \usage{
-check_expect_clean_repository(x)
+check_expect_clean_repository()
 }
 \description{
 To protect against overwriting un-committed changes.
