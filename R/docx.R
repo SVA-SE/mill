@@ -199,44 +199,34 @@ asterisk <- function(tex, direction = c("add", "remove")) {
 ##' 'docx'. The chapter 'text.tex' is converted to 'text.docx'. Each
 ##' chapter 'text.docx' is added, but not commited, to the report git
 ##' repository.
-##' @param x The report object to convert.
-##' @param ... Additional arguments.
+##' @param repo the report git repository.
 ##' @return invisible NULL.
 ##' @export
-to_docx <- function(x, ...) UseMethod("to_docx")
+to_docx <- function(repo = NULL) {
+    if (in_chapter()) {
+        ## Clean up changes made in from_docx_chapter()
+        tex <- readLines("text.tex")
+        tex <- asterisk(tex, "remove")
+        tex <- convert_ref_to_docx_ref(tex)
+        f_tex <- tempfile(fileext = ".tex")
+        writeLines(tex, f_tex)
+        f_docx <- "text.docx"
+        unlink(f_docx)
 
-##' @importFrom git2r repository
-##' @export
-to_docx.report <- function(x, ...) {
-    if (length(list(...)) > 0)
-        warning("Additional arguments ignored")
+        ## Convert to docx
+        pandoc(paste("--top-level-division=chapter ",
+                     shQuote(f_tex), "-o", shQuote(f_docx)))
+        if (!is.null(repo))
+            add(repo, paste0("chapters/", basename(getwd()), "/text.docx"))
+    } else if (in_report()) {
+        repo <- repository()
+        lapply(list.files("chapters"), function(chapter) {
+            wd <- setwd(paste0("chapters/", chapter))
+            to_docx(repo = repo)
+            setwd(wd)
+        })
+    }
 
-    repo <- repository()
-    lapply(chapters(x)$section, function(y) to_docx(y, repo = repo))
-    invisible()
-}
-
-##' @importFrom git2r add
-##' @export
-to_docx.chapter <- function(x, repo = NULL, ...) {
-    if (length(list(...)) > 0)
-        warning("Additional arguments ignored")
-    f_tex <- file.path(chapter_path(x), "text.tex")
-    tex <- readLines(f_tex)
-
-    ## Clean up changes made in from_docx_chapter()
-    tex <- asterisk(tex, "remove")
-    tex <- convert_ref_to_docx_ref(tex)
-    f_tex <- tempfile(fileext = ".tex")
-    writeLines(tex, f_tex)
-    f_docx <- file.path(chapter_path(x), "text.docx")
-    unlink(f_docx)
-
-    ## Convert to docx
-    pandoc(paste("--top-level-division=chapter ",
-                 shQuote(f_tex), "-o", shQuote(f_docx)))
-    if (!is.null(repo))
-        add(repo, f_docx)
     invisible()
 }
 
