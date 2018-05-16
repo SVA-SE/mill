@@ -81,11 +81,12 @@ import <- function() {
 ##' 'tex'. The chapter 'text.docx' is converted to 'text.tex'. Each
 ##' chapter 'text.tex' is added, but not commited, to the report git
 ##' repository.
+##' @param repo the report git repository.
 ##' @return invisible NULL.
 ##' @importFrom git2r add
 ##' @importFrom git2r repository
 ##' @export
-from_docx <- function() {
+from_docx <- function(repo = NULL) {
     if (in_chapter()) {
         chapter <- basename(getwd())
 
@@ -103,11 +104,13 @@ from_docx <- function() {
         tex <- make_hypertargets_chapter_specific(tex, chapter)
         tex <- asterisk(tex, "add")
         writeLines(tex, "text.tex")
-        add(repository("../.."), paste0("chapters/", chapter, "/text.tex"))
+        if (!is.null(repo))
+            add(repo, paste0("chapters/", chapter, "/text.tex"))
     } else if (in_report()) {
+        repo <- repository()
         lapply(list.files("chapters"), function(chapter) {
             wd <- setwd(paste0("chapters/", chapter))
-            from_docx()
+            from_docx(repo = repo)
             setwd(wd)
         })
     }
