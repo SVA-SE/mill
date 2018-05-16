@@ -83,7 +83,7 @@ preview_figures.chapters <- function(x) {
 
 ##' @export
 preview_figures.chapter <- function(x) {
-    lapply(figure_files(x, "tex"), preview_figure)
+    lapply(figure_files("tex"), preview_figure)
     invisible()
 }
 
