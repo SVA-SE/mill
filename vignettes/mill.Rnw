@@ -94,8 +94,21 @@ library("mill")
   \item [TYPESET] The chapter has been typeset in \LaTeX\ and a
     chapter\_name.pdf of the chapter has been produced. It can be sent
     to the author for feedback.
-  \item [PROOF] The 'chapter\_name.pdf' has been sent to the author
-    for review. We are waiting for feedback from the author.
+  \item [PROOF] The chapter\_name.pdf has been sent to the author for
+    review. We are waiting for feedback from the author.
+  \item [AUTHOR-FEEDBACK] We have received feedback from the author on
+    the proof that needs to be addressed.
+  \item [REVIEW] The chapter is with the editor.
+  \item [EDITOR] The chapter has been reviewed by the editor and sent
+    back to the author in docx format. We will wait for the author to
+    tell us they are done
+  \item [EDITOR-FEEDBACK-SUBMITTED] The author has completed the
+    feedback from the editor. The word doc on onecloud now contains the
+    latest information therefore, we need to run the convert process
+    again to update the .tex file in the chapter directory.
+  \item [POST-EDITOR-CONVERTED] The chapter has been converted from
+    EDITOR-FEEDBACK-SUBMITTED. We now need to typeset the chapter and
+    move it to DONE state when the typesetter is happy.
   \item [DONE] The chapter has passed the typesetter, author, editor
     and all automated checks.
 \end{description}

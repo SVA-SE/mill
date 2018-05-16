@@ -88,10 +88,10 @@ to_pdf_chapter <- function(build = TRUE, type = c("print", "web")) {
         file.copy("typeset.tex",
                   paste0("../../build/", normalize_title(chapter), ".tex"))
 
-        ## Copy the figures (.pdf and .tex) and tables (.tex)
+        ## Copy the figures (.pdf, .png and .tex) and tables (.tex)
         ref <- references()
         lapply(ref[ref$reftype == "fig", "marker"], function(marker) {
-            marker <- paste0(gsub(":", "_", marker), c(".pdf", ".tex"))
+            marker <- paste0(gsub(":", "_", marker), c(".pdf", ".tex", ".png"))
             file.copy(marker, paste0("../../build/", marker))
         })
         lapply(ref[ref$reftype == "tab", "marker"], function(marker) {
