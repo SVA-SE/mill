@@ -232,46 +232,34 @@ to_docx <- function(repo = NULL) {
 
 ##' Roundtrip tex to docx
 ##'
-##' @param x The object to convert.
-##' @param ... Additional arguments.
 ##' @return invisible NULL.
-##' @export
-roundtrip <- function(x, ...) UseMethod("roundtrip")
-
-##' @importFrom git2r repository
-##' @export
-roundtrip.report <- function(x, ...) {
-    if (length(list(...)) > 0)
-        warning("Additional arguments ignored")
-    repo <- repository()
-    lapply(chapters(x)$section, function(y) roundtrip(y, repo = repo))
-    invisible()
-}
-
 ##' @importFrom git2r diff
 ##' @importFrom git2r repository
 ##' @importFrom git2r reset
 ##' @importFrom git2r status
 ##' @export
-roundtrip.chapter <- function(x, repo = NULL, ...) {
-    if (length(list(...)) > 0)
-        warning("Additional arguments ignored")
+roundtrip <- function() {
+    if (in_chapter()) {
+        ## Check if the working tree is clean
+        repo <- repository("../..")
+        d <- diff(repo)
+        if (length(d@files))
+            stop("Working tree is not clean")
 
-    if (is.null(repo))
-        repo <- repository()
+        to_docx(repo = NULL)
+        from_docx(repo = NULL)
 
-    ## Check if the working tree is clean
-    d <- diff(repo)
-    if (length(d@files))
-        stop("Working tree is not clean")
-
-    to_docx(x, repo = NULL)
-    from_docx(x, repo = NULL)
-
-    ## The roundtrip is clean if the tex-file is unchanged
-    unstaged <- unlist(status(repo)$unstaged)
-    if (!(file.path(chapter_path(x), "text.tex") %in% unstaged))
-        reset(commits(repo, n = 1)[[1]], "hard")
+        ## The roundtrip is clean if the tex-file is unchanged
+        unstaged <- unlist(status(repo)$unstaged)
+        if (!(paste0("chapters/", basename(getwd()), "/text.tex") %in% unstaged))
+            reset(commits(repo, n = 1)[[1]], "hard")
+    } else if (in_report()) {
+        lapply(list.files("chapters"), function(chapter) {
+            wd <- setwd(paste0("chapters/", chapter))
+            roundtrip()
+            setwd(wd)
+        })
+    }
 
     invisible()
 }
