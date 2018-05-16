@@ -1,77 +1,76 @@
 ##' Export files to workspace
 ##'
-##' Authors make contributions to chapters in the workspace.
-##' @param x The object to export. The docx files are exported to
-##'     workspace/chapters/title.
+##' Authors make contributions to chapters in the workspace. The docx
+##' files are exported to workspace/chapters/title.
 ##' @return invisible NULL.
 ##' @export
-export <- function(x) UseMethod("export")
+export <- function() {
+    if (in_chapter()) {
+        chapter <- basename(getwd())
 
-##' @export
-export.default <- function(x) {
-    export(load_report())
-}
+        to <- paste0("../../workspace/chapters/", chapter)
+        if (!dir.exists(to))
+            dir.create(to, recursive = TRUE)
 
-##' @export
-export.report <- function(x) {
-    lapply(x$chapters, function(y) export(y))
-    invisible()
-}
+        ## Export text.docx to renamed title.docx
+        from <- "text.docx"
+        if (!file.exists(from))
+            to_docx()
+        file.copy(from, paste0(to, "/", chapter, ".docx"), overwrite = TRUE)
 
-##' @export
-export.chapter <- function(x) {
-    to <- file.path("workspace", "chapters", x$title)
-    if (!dir.exists(to))
-        dir.create(to, recursive = TRUE)
-
-    ## Export text.docx to renamed title.docx
-    from <- file.path(x$path, "text.docx")
-    if (!file.exists(from))
-        to_docx(x)
-    file.copy(from, paste0(file.path(to, x$title), ".docx"), overwrite = TRUE)
-
-    ## Export data and preview files
-    lapply(c(figure_files(x, "xlsx"), preview_files(x)), function(from) {
-        file.copy(from, file.path(to, basename(from)), overwrite = TRUE)
-    })
+        ## Export data and preview files
+        lapply(c(figure_files("xlsx"), preview_files()), function(from) {
+            file.copy(from, file.path(to, basename(from)), overwrite = TRUE)
+        })
+    } else if (in_report()) {
+        lapply(list.files("chapters"), function(chapter) {
+            wd <- setwd(paste0("chapters/", chapter))
+            export()
+            setwd(wd)
+        })
+    }
 
     invisible()
 }
 
-##' Import files
+##' Check if current working directory is in a chapter
+##' @noRd
+in_chapter <- function() {
+    if (!file.exists("README.org")) {
+        if (identical(basename(dirname(getwd())), "chapters"))
+            return(file.exists("../../README.org"))
+    }
+    FALSE
+}
+
+##' Check if current working directory is in a report
+##' @noRd
+in_report <- function() {
+    file.exists("README.org")
+}
+
+##' Import chapter docx file from workspace
 ##'
-##' @param x The object to import.
-##' @param from The source of the import. If the argument is missing,
-##'     the docx files are imported from a folder named from the
-##'     report title.
 ##' @return invisible NULL.
 ##' @export
-import <- function(x, from) UseMethod("import")
+import <- function() {
+    if (in_chapter()) {
+        chapter <- basename(getwd())
+        from <- paste0("../../workspace/chapters/", chapter)
+        if (!dir.exists(from))
+            stop("Invalid directory")
 
-##' @export
-import.default <- function(x, from) {
-    import(load_report())
-}
-
-##' @export
-import.report <- function(x, from) {
-    if (missing(from))
-        from <- x$report
-    from <- file.path(from, "chapters")
-    lapply(x$chapters, function(y) import(y, from = from))
-    invisible()
-}
-
-##' @export
-import.chapter <- function(x, from) {
-    from <- file.path(from, x$title)
-    if (!dir.exists(from))
-        stop("Invalid directory")
-
-    ## Import title.docx to text.docx
-    from <- paste0(file.path(from, x$title), ".docx")
-    to <- file.path(x$path, "text.docx")
-    file.copy(from, to, overwrite = TRUE)
+        ## Import title.docx to text.docx
+        from <- paste0(from, "/", chapter, ".docx")
+        to <- "text.docx"
+        file.copy(from, to, overwrite = TRUE)
+    } else if (in_report()) {
+        lapply(list.files("chapters"), function(chapter) {
+            wd <- setwd(paste0("chapters/", chapter))
+            import()
+            setwd(wd)
+        })
+    }
 
     invisible()
 }
@@ -82,46 +81,40 @@ import.chapter <- function(x, from) {
 ##' 'tex'. The chapter 'text.docx' is converted to 'text.tex'. Each
 ##' chapter 'text.tex' is added, but not commited, to the report git
 ##' repository.
-##' @param x The report object to convert.
-##' @param ... Additional arguments.
+##' @param repo the report git repository.
 ##' @return invisible NULL.
-##' @export
-from_docx <- function(x, ...) UseMethod("from_docx")
-
+##' @importFrom git2r add
 ##' @importFrom git2r repository
 ##' @export
-from_docx.report <- function(x, ...) {
-    if (length(list(...)) > 0)
-        warning("Additional arguments ignored")
+from_docx <- function(repo = NULL) {
+    if (in_chapter()) {
+        chapter <- basename(getwd())
 
-    repo <- repository(x$path)
-    lapply(x$chapters, function(y) from_docx(y, repo = repo))
-    invisible()
-}
+        ## Convert the docx to a temporary tex file.
+        f_tex <- tempfile(fileext = ".tex")
+        f_docx <- "text.docx"
+        pandoc(paste("--top-level-division=chapter ",
+                     shQuote(f_docx), "-o", shQuote(f_tex)))
 
-##' @importFrom git2r add
-##' @export
-from_docx.chapter <- function(x, repo = NULL, ...) {
-    if (length(list(...)) > 0)
-        warning("Additional arguments ignored")
+        ## Tweak incoming tex file
+        tex <- readLines(f_tex)
+        file.remove(f_tex)
+        tex <- convert_docx_ref_to_ref(tex, chapter)
+        tex <- make_labels_chapter_specific(tex, chapter)
+        tex <- make_hypertargets_chapter_specific(tex, chapter)
+        tex <- asterisk(tex, "add")
+        writeLines(tex, "text.tex")
+        if (!is.null(repo))
+            add(repo, paste0("chapters/", chapter, "/text.tex"))
+    } else if (in_report()) {
+        repo <- repository()
+        lapply(list.files("chapters"), function(chapter) {
+            wd <- setwd(paste0("chapters/", chapter))
+            from_docx(repo = repo)
+            setwd(wd)
+        })
+    }
 
-    ## Convert the docx to a temporary tex file.
-    f_tex <- tempfile(fileext = ".tex")
-    on.exit(file.remove(f_tex))
-    f_docx <- file.path(x$path, "text.docx")
-    pandoc(paste("--top-level-division=chapter ",
-                 shQuote(f_docx), "-o", shQuote(f_tex)))
-
-    ## Tweak incoming tex file
-    tex <- readLines(f_tex)
-    tex <- convert_docx_ref_to_ref(tex, x$title)
-    tex <- make_labels_chapter_specific(tex, x$title)
-    tex <- make_hypertargets_chapter_specific(tex, x$title)
-    tex <- asterisk(tex, "add")
-    writeLines(tex, file.path(x$path, "text.tex"))
-
-    if (!is.null(repo))
-        add(repo, file.path(x$path, "text.tex"))
     invisible()
 }
 
@@ -206,89 +199,67 @@ asterisk <- function(tex, direction = c("add", "remove")) {
 ##' 'docx'. The chapter 'text.tex' is converted to 'text.docx'. Each
 ##' chapter 'text.docx' is added, but not commited, to the report git
 ##' repository.
-##' @param x The report object to convert.
-##' @param ... Additional arguments.
+##' @param repo the report git repository.
 ##' @return invisible NULL.
 ##' @export
-to_docx <- function(x, ...) UseMethod("to_docx")
+to_docx <- function(repo = NULL) {
+    if (in_chapter()) {
+        ## Clean up changes made in from_docx_chapter()
+        tex <- readLines("text.tex")
+        tex <- asterisk(tex, "remove")
+        tex <- convert_ref_to_docx_ref(tex)
+        f_tex <- tempfile(fileext = ".tex")
+        writeLines(tex, f_tex)
+        f_docx <- "text.docx"
+        unlink(f_docx)
 
-##' @importFrom git2r repository
-##' @export
-to_docx.report <- function(x, ...) {
-    if (length(list(...)) > 0)
-        warning("Additional arguments ignored")
+        ## Convert to docx
+        pandoc(paste("--top-level-division=chapter ",
+                     shQuote(f_tex), "-o", shQuote(f_docx)))
+        if (!is.null(repo))
+            add(repo, paste0("chapters/", basename(getwd()), "/text.docx"))
+    } else if (in_report()) {
+        repo <- repository()
+        lapply(list.files("chapters"), function(chapter) {
+            wd <- setwd(paste0("chapters/", chapter))
+            to_docx(repo = repo)
+            setwd(wd)
+        })
+    }
 
-    repo <- repository(x$path)
-    lapply(x$chapters, function(y) to_docx(y, repo = repo))
-    invisible()
-}
-
-##' @importFrom git2r add
-##' @export
-to_docx.chapter <- function(x, repo = NULL, ...) {
-    if (length(list(...)) > 0)
-        warning("Additional arguments ignored")
-    f_tex <- file.path(x$path, "text.tex")
-    tex <- readLines(f_tex)
-
-    ## Clean up changes made in from_docx_chapter()
-    tex <- asterisk(tex, "remove")
-    tex <- convert_ref_to_docx_ref(tex)
-    f_tex <- tempfile(fileext = ".tex")
-    writeLines(tex, f_tex)
-    f_docx <- file.path(x$path, "text.docx")
-    unlink(f_docx)
-
-    ## Convert to docx
-    pandoc(paste("--top-level-division=chapter ",
-                 shQuote(f_tex), "-o", shQuote(f_docx)))
-    if (!is.null(repo))
-        add(repo, f_docx)
     invisible()
 }
 
 ##' Roundtrip tex to docx
 ##'
-##' @param x The object to convert.
-##' @param ... Additional arguments.
 ##' @return invisible NULL.
-##' @export
-roundtrip <- function(x, ...) UseMethod("roundtrip")
-
-##' @importFrom git2r repository
-##' @export
-roundtrip.report <- function(x, ...) {
-    if (length(list(...)) > 0)
-        warning("Additional arguments ignored")
-    repo <- repository(x$path)
-    lapply(x$chapters, function(y) roundtrip(y, repo = repo))
-    invisible()
-}
-
 ##' @importFrom git2r diff
 ##' @importFrom git2r repository
 ##' @importFrom git2r reset
 ##' @importFrom git2r status
 ##' @export
-roundtrip.chapter <- function(x, repo = NULL, ...) {
-    if (length(list(...)) > 0)
-        warning("Additional arguments ignored")
+roundtrip <- function() {
+    if (in_chapter()) {
+        ## Check if the working tree is clean
+        repo <- repository("../..")
+        d <- diff(repo)
+        if (length(d@files))
+            stop("Working tree is not clean")
 
-    if (is.null(repo))
-        repo <- repository()
+        to_docx(repo = NULL)
+        from_docx(repo = NULL)
 
-    ## Check if the working tree is clean
-    d <- diff(repo)
-    if (length(d@files))
-        stop("Working tree is not clean")
-
-    to_docx(x, repo = NULL)
-    from_docx(x, repo = NULL)
-
-    ## The roundtrip is clean if the tex-file is unchanged
-    unstaged <- unlist(status(repo)$unstaged)
-    if (!(file.path("chapters", x$title, "text.tex") %in% unstaged))
-        reset(commits(repo, n = 1)[[1]], "hard")
+        ## The roundtrip is clean if the tex-file is unchanged
+        unstaged <- unlist(status(repo)$unstaged)
+        if (!(paste0("chapters/", basename(getwd()), "/text.tex") %in% unstaged))
+            reset(commits(repo, n = 1)[[1]], "hard")
+    } else if (in_report()) {
+        lapply(list.files("chapters"), function(chapter) {
+            wd <- setwd(paste0("chapters/", chapter))
+            roundtrip()
+            setwd(wd)
+        })
+    }
 
     invisible()
 }

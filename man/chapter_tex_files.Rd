@@ -4,10 +4,7 @@
 \alias{chapter_tex_files}
 \title{Get the chapter tex files}
 \usage{
-chapter_tex_files(x, type = c("all", "text", "fig", "table"))
-}
-\arguments{
-\item{x}{the chapter object}
+chapter_tex_files(type = c("all", "text", "fig", "table"))
 }
 \description{
 Get the chapter tex files

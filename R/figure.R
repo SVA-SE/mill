@@ -1,46 +1,26 @@
 ##' @keywords internal
 figure_pattern <- function(fileext = c("all", "R", "tex", "xlsx", "pdf", "jpg")) {
     fileext <- switch(match.arg(fileext),
-                      all  = "(tex)|(R)|(xlsx)|(pdf)|(jpg)|(png)$",
+                      all  = "((tex)|(R)|(xlsx)|(pdf)|(jpg)|(png))$",
                       R    = "R$",
                       xlsx = "xlsx$",
                       tex  = "tex$",
+                      png  = "png$",
                       pdf  = "pdf$")
 
     paste0("^fig_[^.]+[.]", fileext)
 }
 
-##' figure_files
+##' List figure files
 ##'
-##' A method to discover the figures in a report or chapter object.
+##' A method to discover the figures in a report or a chapter.
 ##'
 ##' @export
-##' @param x The report or chapter object
 ##' @param fileext The extension of the files you want to find
-figure_files <- function(x, fileext) UseMethod("figure_files")
-
-##' @export
-figure_files.report <- function(x, fileext = "all") {
-    figure_files(x$chapters, fileext)
-}
-
-##' @export
-figure_files.chapters <- function(x, fileext = "all") {
-    unlist(lapply(x, function(y) figure_files(y, fileext)))
-}
-
-##' @export
-figure_files.chapter <- function(x, fileext = "all") {
-    list.files(path = x$path,
-               pattern = figure_pattern(fileext),
-               full.names = TRUE)
-}
-
-##' @export
-figure_files.chapter <- function(x, fileext = "all") {
-    list.files(path = x$path,
-               pattern = figure_pattern(fileext),
-               full.names = TRUE)
+figure_files <- function(fileext = "all") {
+    if (in_chapter())
+        return(list.files(pattern = figure_pattern(fileext)))
+    stop("Not implemented")
 }
 
 ##' @keywords internal
@@ -65,36 +45,23 @@ preview_files.chapter <- function(x, items = "all") {
 
 ##' Build figures
 ##'
-##' @param x The report object or chapter object
 ##' @return invisible NULL
 ##' @export
-build_figures <- function(x) UseMethod("build_figures")
+build_figures <- function() {
+    if (in_chapter()) {
+        lapply(figure_files("R"), function(figure) {
+            source(figure, local = TRUE, chdir = TRUE)
+        })
+    } else if (in_report()) {
+        lapply(list.files("chapters"), function(chapter) {
+            wd <- setwd(paste0("chapters/", chapter))
+            build_figures()
+            setwd(wd)
+        })
+    }
 
-##' @export
-build_figures.report <- function(x) {
-    build_figures(x$chapters)
+    invisible(NULL)
 }
-
-##' @export
-build_figures.chapters <- function(x) {
-    lapply(x, function(y) build_figures(y))
-    invisible()
-}
-
-##' @export
-build_figures.chapter <- function(x) {
-    lapply(figure_files(x, "R"), build_figure)
-    invisible()
-}
-
-##' Build a figure
-##'
-##' @param figure The path to the figure R script
-##' @export
-build_figure <- function(figure) {
-    source(figure, local = TRUE, chdir = TRUE)
-}
-
 
 ##' Preview figures
 ##'
@@ -118,30 +85,6 @@ preview_figures.chapters <- function(x) {
 preview_figures.chapter <- function(x) {
     lapply(figure_files(x, "tex"), preview_figure)
     invisible()
-}
-
-##' Get Assets
-##'
-##' Determine the assets directory given a report, chapter or chapter
-##' file in the report project.
-##' @param x The report object, chapter object or filename.
-##' @return character string with path to assets.
-##' @export
-assets <- function(x) UseMethod("assets")
-
-##' @export
-assets.report <- function(x) {
-    file.path(x$path, "assets")
-}
-
-##' @export
-assets.chapter <- function(x) {
-    file.path(dirname(dirname(x$path)), "assets")
-}
-
-##' @keywords internal
-assets.character <- function(x) {
-    file.path(dirname(dirname(dirname(x))), "assets")
 }
 
 ##' Preview a figure

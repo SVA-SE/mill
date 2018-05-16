@@ -4,10 +4,7 @@
 \alias{references}
 \title{TeX references}
 \usage{
-references(x)
-}
-\arguments{
-\item{x}{the report or chapter object.}
+references()
 }
 \value{
 data.frame with the found references.

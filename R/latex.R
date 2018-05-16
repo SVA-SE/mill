@@ -39,25 +39,24 @@ luatex <- function(texname, clean = FALSE) {
 
 ##' TeX references
 ##'
-##' @param x the report or chapter object.
 ##' @return data.frame with the found references.
 ##' @export
-references <- function(x) UseMethod("references")
-
-##' @export
-references.report <- function(x) {
-    references(x$chapters)
+references <- function() {
+    if (in_chapter()) {
+        return(references_chapter())
+    } else if (in_report()) {
+        return(do.call("rbind", lapply(list.files("chapters"), function(chapter) {
+            wd <- setwd(paste0("chapters/", chapter))
+            ref <- references()
+            setwd(wd)
+            ref
+        })))
+    }
 }
 
-##' @export
-references.chapters <- function(x) {
-    do.call("rbind", lapply(x, function(y) references(y)))
-}
-
-##' @export
-references.chapter <- function(x) {
+references_chapter <- function() {
     pattern <- "[\\]label[{][^}]*[}]|[\\]ref[{][^}]*[}]"
-    files <- chapter_tex_files(x)
+    files <- chapter_tex_files()
 
     do.call("rbind", (lapply(files, function(filename) {
         tex <- readLines(filename)
@@ -67,7 +66,7 @@ references.chapter <- function(x) {
         }))
 
         if (length(m)) {
-            filename = file.path("chapters", x$title, basename(filename))
+            filename = paste0("chapters/", basename(getwd()), "/", filename)
             tex <- m
             cmd <- sub("[\\]([^{]+)[{][^}]*[}]", "\\1", tex)
             marker <- sub("[\\][^{]+[{]([^}]*)[}]", "\\1", tex)
@@ -91,24 +90,21 @@ references.chapter <- function(x) {
 
 ##' Get the chapter tex files
 ##'
-##' @param x the chapter object
 ##' @importFrom methods is
 ##' @keywords internal
-chapter_tex_files <- function(x, type = c("all", "text", "fig", "table")) {
-
+chapter_tex_files <- function(type = c("all", "text", "fig", "table")) {
     type = match.arg(type)
-    stopifnot(is(x, "chapter"))
 
     text_files <- NULL
     fig_files  <- NULL
     tab_files  <- NULL
 
     if (type %in% c("all", "text"))
-        text_files <- file.path(x$path, "text.tex")
+        text_files <- "text.tex"
     if (type %in% c("all", "fig"))
-        fig_files <- figure_files(x, "tex")
+        fig_files <- figure_files("tex")
     if (type %in% c("all", "table"))
-        tab_files <- table_files(x, "tex")
+        tab_files <- table_files("tex")
 
     c(text_files, fig_files, tab_files)
 }

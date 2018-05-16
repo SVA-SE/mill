@@ -4,10 +4,7 @@
 \alias{preview_tables}
 \title{Preview tables}
 \usage{
-preview_tables(x)
-}
-\arguments{
-\item{x}{The report object or chapter object}
+preview_tables()
 }
 \value{
 invisible NULL

@@ -4,7 +4,7 @@
 \alias{check_apply_typeset_patch}
 \title{Check apply patch 'typeset.patch' to 'text.tex'}
 \usage{
-check_apply_typeset_patch(x)
+check_apply_typeset_patch()
 }
 \description{
 Checking that applying patches doesn't generate warnings or

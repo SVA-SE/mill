@@ -1,173 +1,222 @@
-##' Trim whitespace
-##'
-##' @param str character string to trim
-##' @return trimmed character string
-##' @keywords internal
-trim <- function(str) {
-    trimws(gsub("[*]", "", str))
+##' @export
+authors <- function(x, ...) {
+    UseMethod("authors")
 }
 
-##' Contributor
-##'
-##' Extract one contributor from one row of the project excel sheet.
-##' @param row the row with the contributor.
-##' @param title the title of the chapter.
-##' @return a contributor object
-##' @keywords internal
-contributor <- function(row, title) {
-    stopifnot(is.data.frame(row))
-    stopifnot(all(c("Name", "Email", "Organisation", "Chapter") %in%
-                  colnames(row)))
-    stopifnot(nrow(row) == 1)
-
-    structure(list(name = trim(row$Name[1]),
-                   email = trim(row$Email[1]),
-                   organisation = trim(row$Organisation[1]),
-                   contact = length(grep(paste0(title, "*"), row$Chapter[1], fixed = TRUE)) > 0),
-              class = "contributor")
+##' @export
+authors.report <- function(x, ...) {
+    authors(chapters(x), ...)
 }
 
-##' @keywords internal
-authors <- function(sheet, title) {
-    stopifnot(is.data.frame(sheet))
-    result <- lapply(grep(title, sheet$Chapter), function(i) {
-        contributor(sheet[i, ], title = title)
-    })
-    class(result) <- "authors"
-    result
+##' @export
+authors.chapters <- function(x, ...) {
+    sort(unique(unlist(sapply(x$section, authors, ...))))
 }
 
-##' @keywords internal
-chapters <- function(sheet, path) {
-    stopifnot(is.data.frame(sheet))
-    stopifnot("Chapter" %in% colnames(sheet))
-    titles <- sort(unique(trim(unlist(strsplit(sheet$Chapter, ",")))))
-    result <- lapply(titles, function(title) {
-        structure(list(title = title,
-                       path = file.path(path, "chapters", title),
-                       authors = authors(sheet, title)),
-                  .Names = c("title", "path", "authors"),
-                  class = "chapter")
-    })
-    class(result) <- "chapters"
-    result
+##' @export
+authors.chapter <- function(x, ...) {
+    for (i in seq_len(length(x$section))) {
+        if (inherits(x$section[[i]], "authors"))
+            return(authors(x$section[[i]], ...))
+    }
+
+    stop("Unable to find 'Authors'")
+}
+
+##' @export
+authors.authors <- function(x, ...) {
+    unlist(lapply(x$contents[[1]]$items, function(y) {
+        y$item
+    }))
+}
+
+##' @noRd
+chapters <- function(x) {
+    stopifnot(inherits(x, "report"))
+    for (i in seq_len(length(x$contents))) {
+        if (inherits(x$contents[[i]], "chapters"))
+            return(x$contents[[i]])
+    }
+
+    stop("Unable to find 'Chapters'")
 }
 
 ##' Load configuration for the report
 ##'
 ##' @param path The path to the root folder of the project.
-##' @importFrom readxl read_excel
-##' @importFrom readxl excel_sheets
 ##' @export
 load_report <- function(path = ".") {
     path <- normalizePath(path, mustWork = TRUE)
-    filename <- file.path(path, "report.xlsx")
-    df <- read_excel(filename)
+    filename <- file.path(path, "README.org")
+    org <- org_doc(readLines(filename))
+    class(org) <- c("report", class(org))
 
-    structure(list(report       = excel_sheets(filename)[1],
-                   path         = path,
-                   chapters     = chapters(df, path)),
-              class = "report")
+    ii <- length(org$contents)
+    for (i in seq_len(ii)) {
+        if (inherits(org$contents[[i]], "org_headline")) {
+            if (identical(grep("Chapters", org$contents[[i]]$headline), 1L)) {
+                cl <- c("chapters", "org_headline")
+                class(org$contents[[i]]) <- cl
+
+                jj <- length(org$contents[[i]]$section)
+                for (j in seq_len(jj)) {
+                    stopifnot(inherits(org$contents[[i]]$section[[j]],
+                                       "org_headline"))
+                    cl <- c("chapter", "org_headline")
+                    class(org$contents[[i]]$section[[j]]) <- cl
+
+                    kk <- length(org$contents[[i]]$section[[j]]$section)
+                    for (k in seq_len(kk)) {
+                        d <- org$contents[[i]]$section[[j]]$section[[k]]
+                        if (inherits(d, "org_drawer") && d$name == "AUTHORS") {
+                            cl <- c("authors", "org_drawer")
+                            class(org$contents[[i]]$section[[j]]$section[[k]]) <- cl
+
+                            ll <- length(org$contents[[i]]$section[[j]]$section[[k]]$contents[[1]]$items)
+                            for (l in seq_len(ll)) {
+                                cl <- c("author", "org_item")
+                                class(org$contents[[i]]$section[[j]]$section[[k]]$contents[[1]]$items[[l]]) <- cl
+                            }
+
+                            break;
+                        }
+
+                        if (identical(k, kk))
+                            stop("Unable to find 'Authors'")
+                    }
+                }
+
+                break
+            }
+        }
+
+        if (identical(i, ii))
+            stop("Unable to find 'Chapters'")
+    }
+
+    org
 }
 
 ##' @method summary report
 ##' @export
 summary.report <- function(object, ...) {
-    cat("Report: ", object$report, "\n\n", sep = "")
-    print(object$chapters)
+    print(object, ..., main_only = FALSE)
 }
 
 ##' @export
 print.report <- function(x, ...) {
-    cat("Report: ", x$report, "\n", sep = "")
-    do.call("rbind", lapply(x, function(y) as.data.frame(y)))
-
-    ## Contributors
-    authors <- lapply(x$chapters, function(chapter) {
-        sapply(chapter$authors, function(author) {
-            author$name
-        })
-    })
-    authors <- unique(unlist(authors))
-    cat("Contributors: ", length(authors), "\n", sep = "")
-
-    cat("Chapters: ", length(x$chapters), "\n", sep = "")
-}
-
-##' @export
-print.author <- function(x, ..., indent = "") {
-    cat(indent,
-        x$name, " [", x$organisation, "] <", x$email, ">\n", sep = "")
-}
-
-##' @export
-print.contributor <- function(x, ..., indent = "") {
-    cat(indent,
-        ifelse(x$contact, "*", " "),
-        x$name, " (", x$organisation, ") <", x$email, ">\n", sep = "")
+    cat("Report: ", report_title(x), "\n", sep = "")
+    cat("Progress: [", report_progress(x), "%]\n", sep = "")
+    cat("Authors: ", length(authors(x)), "\n", sep = "")
+    print(chapters(x), ...)
 }
 
 ##' @export
 print.chapters <- function(x, ...) {
-    cat("Chapters:\n")
-    lapply(x, print, indent = "  ")
+    cat("Chapters: ", length(x$section), "\n", sep = "")
+    lapply(x$section, function(y) {print(y, ..., indent = "  ")})
     invisible()
 }
 
 ##' @export
-print.chapter <- function(x, ..., indent = "") {
-    cat(indent, x$title, "\n", sep = "")
-    print(x$authors, indent = paste0(indent, "  "))
-    cat("\n")
-}
-
-##' @export
-print.contacts <- function(x, ..., indent = "") {
-    cat(indent, "Contacts:\n", sep = "")
-    lapply(x, print, indent = paste0(indent, "  "))
+print.chapter <- function(x, ..., indent = "", main_only = TRUE) {
+    cat(indent, chapter_state(x), " ", chapter_title(x), "\n", sep = "")
+    indent <- paste0(indent, "  ")
+    x <- authors(x)
+    if (isTRUE(main_only)) {
+        i <- 1
+    } else {
+        i <- seq_len(length(x))
+    }
+    lapply(x[i], function(y) {
+        cat(indent, y, "\n", sep = "")
+    })
     invisible()
 }
 
-##' @export
-print.authors <- function(x, ..., indent = "") {
-    cat(indent, "Authors:\n", sep = "")
-    lapply(x, print, indent = paste0(indent, "  "))
-    invisible()
+##' @noRd
+report_keyword <- function(x, key) {
+    stopifnot(inherits(x, "report"))
+
+    ii <- length(x$contents)
+    for (i in seq_len(ii)) {
+        if (inherits(x$contents[[i]], "org_headline")) {
+            if (identical(grep("Org-mode configuration", x$contents[[i]]$headline), 1L)) {
+                jj <- length(x$contents[[i]]$section)
+                for (j in seq_len(jj)) {
+                    if (inherits(x$contents[[i]]$section[[j]], "org_keyword")) {
+                        if (identical(x$contents[[i]]$section[[j]]$key, key)) {
+                            return(x$contents[[i]]$section[[j]]$value)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    stop("Unable to find keyword: ", key)
 }
 
-##' @export
-as.data.frame.report <- function(x, ...) {
-    as.data.frame(x$chapters)
+##' @noRd
+report_title <- function(x) {
+    report_keyword(x, "TITLE")
 }
 
-as.data.frame.chapters <- function(x, ...) {
-    do.call("rbind", lapply(x, function(y) as.data.frame(y)))
+##' @noRd
+report_progress <- function(x) {
+    ## Determine valid todo states for a chapter
+    todos <- report_keyword(x, "TODO")
+    todos <- gsub("[(][^)]*[)]", "", todos)
+    todos <- gsub("[|]", "", todos)
+    todos <- trimws(unlist(strsplit(todos, " ")))
+    todos <- todos[nchar(todos) > 0]
+
+    completed <- sum(sapply(chapters(x)$section, function(y) {
+        s <- chapter_state(y)
+        stopifnot(s %in% todos)
+        match(s, todos)
+    }))
+
+    as.integer(100 * completed / (length(todos) * length(chapters(x)$section)))
 }
 
-as.data.frame.chapter <- function(x, ...) {
-    cbind(chapter = x$title, as.data.frame(x$authors))
+##' @noRd
+chapter_state <- function(x) {
+    stopifnot(inherits(x, "chapter"))
+    m <- regexpr("[^[:space:]]+", x$headline)
+    m <- regmatches(x$headline, m)
+    trimws(m)
 }
 
-as.data.frame.authors <- function(x) {
-    cbind(role = "Author",
-          do.call("rbind", lapply(x, function(y) as.data.frame(y))))
+##' @noRd
+chapter_title <- function(x) {
+    stopifnot(inherits(x, "chapter"))
+    m <- regexpr("[^[]+[]]{2}$", x$headline)
+    m <- regmatches(x$headline, m)
+    trimws(sub("[]]{2}$", "", m))
 }
 
-as.data.frame.contributor <- function(x) {
-    data.frame(name = x$name, email = x$email, organisation = x$organisation)
+##' @noRd
+chapter_path <- function(x) {
+    stopifnot(inherits(x, "chapter"))
+    file.path("chapters", chapter_title(x))
 }
 
 ##' @export
 `[.report` <- function(x, i) {
-    if (is.character(i))
-        i <- grep(i, sapply(x$chapters, "[", "title"), ignore.case = TRUE)
-    x$chapters[i]
+    if (is.character(i)) {
+        i <- grep(i, sapply(chapters(x)$section, chapter_title),
+                  ignore.case = TRUE)
+    }
+    chapters(x)$section[i]
 }
 
 ##' @export
 `[[.report` <- function(x, i) {
-    if (is.character(i))
-        i <- grep(i, sapply(x$chapters, "[", "title"), ignore.case = TRUE)
+    if (is.character(i)) {
+        i <- grep(i, sapply(chapters(x)$section, chapter_title),
+                  ignore.case = TRUE)
+    }
     stopifnot(identical(length(i), 1L))
-    x$chapters[[i]]
+    chapters(x)$section[[i]]
 }

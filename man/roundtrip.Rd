@@ -4,12 +4,7 @@
 \alias{roundtrip}
 \title{Roundtrip tex to docx}
 \usage{
-roundtrip(x, ...)
-}
-\arguments{
-\item{x}{The object to convert.}
-
-\item{...}{Additional arguments.}
+roundtrip()
 }
 \value{
 invisible NULL.

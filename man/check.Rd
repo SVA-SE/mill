@@ -4,10 +4,7 @@
 \alias{check}
 \title{Check report}
 \usage{
-check(path = ".")
-}
-\arguments{
-\item{path}{The path to the report.}
+check()
 }
 \value{
 invisible \code{FALSE} if OK, else invisible \code{TRUE}.

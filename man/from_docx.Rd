@@ -4,12 +4,10 @@
 \alias{from_docx}
 \title{Convert from docx to tex}
 \usage{
-from_docx(x, ...)
+from_docx(repo = NULL)
 }
 \arguments{
-\item{x}{The report object to convert.}
-
-\item{...}{Additional arguments.}
+\item{repo}{the report git repository.}
 }
 \value{
 invisible NULL.
