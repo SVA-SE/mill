@@ -1,39 +1,34 @@
 ##' Export files to workspace
 ##'
-##' Authors make contributions to chapters in the workspace.
-##' @param x The object to export. The docx files are exported to
-##'     workspace/chapters/title.
+##' Authors make contributions to chapters in the workspace. The docx
+##' files are exported to workspace/chapters/title.
 ##' @return invisible NULL.
 ##' @export
-export <- function(x) UseMethod("export")
+export <- function() {
+    if (in_chapter()) {
+        chapter <- basename(getwd())
 
-##' @export
-export.default <- function(x) {
-    export(load_report())
-}
+        to <- paste0("../../workspace/chapters/", chapter)
+        if (!dir.exists(to))
+            dir.create(to, recursive = TRUE)
 
-##' @export
-export.report <- function(x) {
-    lapply(x$chapters, function(y) export(y))
-    invisible()
-}
+        ## Export text.docx to renamed title.docx
+        from <- "text.docx"
+        if (!file.exists(from))
+            to_docx()
+        file.copy(from, paste0(to, "/", chapter, ".docx"), overwrite = TRUE)
 
-##' @export
-export.chapter <- function(x) {
-    to <- file.path("workspace", "chapters", x$title)
-    if (!dir.exists(to))
-        dir.create(to, recursive = TRUE)
-
-    ## Export text.docx to renamed title.docx
-    from <- file.path(x$path, "text.docx")
-    if (!file.exists(from))
-        to_docx(x)
-    file.copy(from, paste0(file.path(to, x$title), ".docx"), overwrite = TRUE)
-
-    ## Export data and preview files
-    lapply(c(figure_files(x, "xlsx"), preview_files(x)), function(from) {
-        file.copy(from, file.path(to, basename(from)), overwrite = TRUE)
-    })
+        ## Export data and preview files
+        lapply(c(figure_files("xlsx"), preview_files()), function(from) {
+            file.copy(from, file.path(to, basename(from)), overwrite = TRUE)
+        })
+    } else if (in_report()) {
+        lapply(list.files("chapters"), function(chapter) {
+            wd <- setwd(paste0("chapters/", chapter))
+            export()
+            setwd(wd)
+        })
+    }
 
     invisible()
 }

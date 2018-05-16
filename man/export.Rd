@@ -4,15 +4,12 @@
 \alias{export}
 \title{Export files to workspace}
 \usage{
-export(x)
-}
-\arguments{
-\item{x}{The object to export. The docx files are exported to
-workspace/chapters/title.}
+export()
 }
 \value{
 invisible NULL.
 }
 \description{
-Authors make contributions to chapters in the workspace.
+Authors make contributions to chapters in the workspace. The docx
+files are exported to workspace/chapters/title.
 }
