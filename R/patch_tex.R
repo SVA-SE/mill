@@ -12,7 +12,7 @@ apply_patch <- function() {
 
         if (!identical(output,
                        "patching file typeset.tex (read from text.tex)")) {
-            stop(paste("Unable to apply patch: ", chapter_title(x)))
+            stop(paste("Unable to apply patch: ", basename(getwd())))
         }
     } else if (in_report()) {
         lapply(list.files("chapters"), function(chapter) {

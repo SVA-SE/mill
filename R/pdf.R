@@ -1,24 +1,30 @@
 ##' Build report
 ##'
-##' @param x The report object
-##' @param ... Additional parameters
+##' @param type The report type to create
 ##' @return invisible NULL
 ##' @export
-to_pdf <- function(x, ...) UseMethod("to_pdf")
+to_pdf <- function(type = c("print", "web")) {
+    if (in_chapter()) {
+        to_pdf_chapter(build = TRUE, type = type)
+    } else if (in_report()) {
+        to_pdf_report(type = type)
+    }
 
-##' @export
-to_pdf.default <- function(x, ...) {
-    to_pdf(load_report())
+    invisible(NULL)
 }
 
-##' @export
-to_pdf.report <- function(x, type = c("print", "web"), ...) {
+##' @noRd
+to_pdf_report <- function(type = c("print", "web")) {
     type <- match.arg(type)
     ## Nuke previous build
     unlink("build", recursive = TRUE)
     dir.create("build")
 
-    lapply(chapters(x)$section, function(y) to_pdf(y, build = FALSE, type = type, ...))
+    lapply(list.files("chapters"), function(chapter) {
+        wd <- setwd(paste0("chapters/", chapter))
+        to_pdf_chapter(build = FALSE, type = type)
+        setwd(wd)
+    })
 
     wd <- setwd("build")
     on.exit(setwd(wd))
@@ -49,24 +55,23 @@ to_pdf.report <- function(x, type = c("print", "web"), ...) {
     ## Build the preview pdf file.
     luatex("report.tex")
 
-    invisible()
+    invisible(NULL)
 }
 
-##' @export
-to_pdf.chapter <- function(x, build = TRUE, type = c("print", "web"), ...) {
+##' @noRd
+to_pdf_chapter <- function(build = TRUE, type = c("print", "web")) {
     type <- match.arg(type)
-    wd <- setwd(chapter_path(x))
+    chapter <- basename(getwd())
     on.exit(unlink("typeset.tex"), add = TRUE)
     if (build) {
-        filename <- paste0(chapter_title(x), ".tex")
+        filename <- paste0(chapter, ".tex")
         on.exit(unlink(filename), add = TRUE)
     }
-    on.exit(setwd(wd), add = TRUE)
 
     ## Create typeset.tex
-    apply_patch(x)
+    apply_patch()
 
-    if (build) {
+    if (isTRUE(build)) {
         ## read in the pieces of the chapter
         presnippet <- readLines("../../assets/latex/pre-snippet.tex")
 
@@ -81,10 +86,10 @@ to_pdf.chapter <- function(x, build = TRUE, type = c("print", "web"), ...) {
         luatex(filename)
     } else {
         file.copy("typeset.tex",
-                  paste0("../../build/", normalize_title(x$title), ".tex"))
+                  paste0("../../build/", normalize_title(chapter), ".tex"))
 
         ## Copy the figures (.pdf and .tex) and tables (.tex)
-        ref <- references(x)
+        ref <- references()
         lapply(ref[ref$reftype == "fig", "marker"], function(marker) {
             marker <- paste0(gsub(":", "_", marker), c(".pdf", ".tex"))
             file.copy(marker, paste0("../../build/", marker))
