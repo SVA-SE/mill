@@ -1,30 +1,35 @@
+##' List authors
+##'
+##' @param x the report object, for example, a chapter, to list autors
+##'     in.
+##' @return authors
 ##' @export
-authors <- function(x, ...) {
+authors <- function(x) {
     UseMethod("authors")
 }
 
 ##' @export
-authors.report <- function(x, ...) {
-    authors(chapters(x), ...)
+authors.report <- function(x) {
+    authors(chapters(x))
 }
 
 ##' @export
-authors.chapters <- function(x, ...) {
-    sort(unique(unlist(sapply(x$section, authors, ...))))
+authors.chapters <- function(x) {
+    sort(unique(unlist(sapply(x$section, authors))))
 }
 
 ##' @export
-authors.chapter <- function(x, ...) {
+authors.chapter <- function(x) {
     for (i in seq_len(length(x$section))) {
         if (inherits(x$section[[i]], "authors"))
-            return(authors(x$section[[i]], ...))
+            return(authors(x$section[[i]]))
     }
 
     stop("Unable to find 'Authors'")
 }
 
 ##' @export
-authors.authors <- function(x, ...) {
+authors.authors <- function(x) {
     unlist(lapply(x$contents[[1]]$items, function(y) {
         y$item
     }))
