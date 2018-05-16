@@ -4,12 +4,7 @@
 \alias{from_docx}
 \title{Convert from docx to tex}
 \usage{
-from_docx(x, ...)
-}
-\arguments{
-\item{x}{The report object to convert.}
-
-\item{...}{Additional arguments.}
+from_docx()
 }
 \value{
 invisible NULL.

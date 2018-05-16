@@ -81,46 +81,37 @@ import <- function() {
 ##' 'tex'. The chapter 'text.docx' is converted to 'text.tex'. Each
 ##' chapter 'text.tex' is added, but not commited, to the report git
 ##' repository.
-##' @param x The report object to convert.
-##' @param ... Additional arguments.
 ##' @return invisible NULL.
-##' @export
-from_docx <- function(x, ...) UseMethod("from_docx")
-
+##' @importFrom git2r add
 ##' @importFrom git2r repository
 ##' @export
-from_docx.report <- function(x, ...) {
-    if (length(list(...)) > 0)
-        warning("Additional arguments ignored")
+from_docx <- function() {
+    if (in_chapter()) {
+        chapter <- basename(getwd())
 
-    repo <- repository()
-    lapply(chapters(x)$section, function(y) from_docx(y, repo = repo))
-    invisible()
-}
+        ## Convert the docx to a temporary tex file.
+        f_tex <- tempfile(fileext = ".tex")
+        f_docx <- "text.docx"
+        pandoc(paste("--top-level-division=chapter ",
+                     shQuote(f_docx), "-o", shQuote(f_tex)))
 
-##' @importFrom git2r add
-##' @export
-from_docx.chapter <- function(x, repo = NULL, ...) {
-    if (length(list(...)) > 0)
-        warning("Additional arguments ignored")
+        ## Tweak incoming tex file
+        tex <- readLines(f_tex)
+        file.remove(f_tex)
+        tex <- convert_docx_ref_to_ref(tex, chapter)
+        tex <- make_labels_chapter_specific(tex, chapter)
+        tex <- make_hypertargets_chapter_specific(tex, chapter)
+        tex <- asterisk(tex, "add")
+        writeLines(tex, "text.tex")
+        add(repository("../.."), paste0("chapters/", chapter, "/text.tex"))
+    } else if (in_report()) {
+        lapply(list.files("chapters"), function(chapter) {
+            wd <- setwd(paste0("chapters/", chapter))
+            from_docx()
+            setwd(wd)
+        })
+    }
 
-    ## Convert the docx to a temporary tex file.
-    f_tex <- tempfile(fileext = ".tex")
-    on.exit(file.remove(f_tex))
-    f_docx <- file.path(chapter_path(x), "text.docx")
-    pandoc(paste("--top-level-division=chapter ",
-                 shQuote(f_docx), "-o", shQuote(f_tex)))
-
-    ## Tweak incoming tex file
-    tex <- readLines(f_tex)
-    tex <- convert_docx_ref_to_ref(tex, chapter_title(x))
-    tex <- make_labels_chapter_specific(tex, chapter_title(x))
-    tex <- make_hypertargets_chapter_specific(tex, chapter_title(x))
-    tex <- asterisk(tex, "add")
-    writeLines(tex, file.path(chapter_path(x), "text.tex"))
-
-    if (!is.null(repo))
-        add(repo, file.path(chapter_path(x), "text.tex"))
     invisible()
 }
 
