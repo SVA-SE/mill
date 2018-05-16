@@ -29,8 +29,8 @@ check <- function() {
     result <- check_tex_to_docx_round_trip()
     result <- c(result, check_apply_typeset_patch())
     result <- c(result, check_reference_format())
-    result <- c(result, check_missing_figure_reference_files())
-    result <- c(result, check_missing_table_reference_files())
+    result <- c(result, check_missing_figure_reference_files(report))
+    result <- c(result, check_missing_table_reference_files(report))
 
     invisible(any(result))
 }
@@ -220,7 +220,7 @@ check_missing_figure_reference_files.chapters <- function(x) {
 
 check_missing_figure_reference_files.chapter <- function(x) {
     ## Get references for figure files
-    ref <- references(x)
+    ref <- references()
     ref <- ref[ref$cmd == "ref" & ref$reftype == "fig", ]
 
     ## Expected files from figure references: 'fig:chapter:id'
@@ -273,7 +273,7 @@ check_missing_table_reference_files.chapters <- function(x) {
 
 check_missing_table_reference_files.chapter <- function(x) {
     ## Get references for table files
-    ref <- references(x)
+    ref <- references()
     ref <- ref[ref$cmd == "ref" & ref$reftype == "tab", ]
 
     ## Expected files from table references: 'tab:chapter:id'
