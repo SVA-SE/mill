@@ -48,7 +48,7 @@ create_Makefile <- function() {
                    "\tRscript -e \"mill::export()\"",
                    "",
                    "roundtrip:",
-                   "\tRscript -e \"mill::round_trip()\"",
+                   "\tRscript -e \"mill::roundtrip()\"",
                    "",
                    ".PHONY: all check export roundtrip web")
 
