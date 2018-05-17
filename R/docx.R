@@ -241,7 +241,8 @@ roundtrip <- function() {
     if (in_chapter()) {
         ## Check if the working tree is clean
         repo <- repository("../..")
-        if (length(unlist(status(repo, untracked = FALSE))))
+        s <- status(repo)
+        if (length(c(s$staged, s$unstaged)))
             stop("Working tree is not clean")
 
         to_docx(repo = NULL)
