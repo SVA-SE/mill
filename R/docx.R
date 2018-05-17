@@ -127,7 +127,7 @@ normalize_title <- function(title) {
 ##' @param tex The tex character vector
 ##' @param title The chapter title
 ##' @return tex character vector
-##' @keywords internal
+##' @noRd
 convert_docx_ref_to_ref <- function(tex, title) {
     title <- normalize_title(title)
     pattern <- "[{][[][}]([^:]*)[:]([^{]*)[{}[]][}]"
@@ -139,7 +139,7 @@ convert_docx_ref_to_ref <- function(tex, title) {
 ##'
 ##' @param tex The tex character vector
 ##' @return tex character vector
-##' @keywords internal
+##' @noRd
 convert_ref_to_docx_ref <- function(tex) {
     pattern <- "\\\\ref[{]([^:]*)[:][^:]*[:]([^}]*)[}]"
     replacement <- "[\\1:\\2]"
@@ -151,7 +151,7 @@ convert_ref_to_docx_ref <- function(tex) {
 ##' @param tex The tex character vector
 ##' @param title The chapter title
 ##' @return tex character vector
-##' @keywords internal
+##' @noRd
 make_hypertargets_chapter_specific <- function(tex, title) {
     title <- normalize_title(title)
     pattern <- "[\\]hypertarget[{]([^}]*)[}]"
@@ -164,7 +164,7 @@ make_hypertargets_chapter_specific <- function(tex, title) {
 ##' @param tex The tex character vector
 ##' @param title The chapter title
 ##' @return tex character vector
-##' @keywords internal
+##' @noRd
 make_labels_chapter_specific <- function(tex, title) {
     title <- normalize_title(title)
     pattern <- "[\\]label[{]([^}]*)[}]"
@@ -176,7 +176,7 @@ make_labels_chapter_specific <- function(tex, title) {
 ##'
 ##' @param tex The tex character vector
 ##' @return tex character vector
-##' @keywords internal
+##' @noRd
 asterisk <- function(tex, direction = c("add", "remove")) {
     replacement <- switch(match.arg(direction),
                           add = "\\1*\\3",
