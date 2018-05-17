@@ -10,7 +10,7 @@ create_Makefile <- function() {
                    "\tRscript -e \"mill::to_pdf()\"",
                    "",
                    "import:",
-                   "\tRscript -e \"mill::import(); mill::to_docx()\"",
+                   "\tRscript -e \"mill::import(); mill::from_docx()\"",
                    "",
                    "diff:",
                    "\tdiff -c --label=text --label=typeset text.tex typeset.tex > typeset.patch; [ $$? -eq 1 ]",
@@ -29,7 +29,10 @@ create_Makefile <- function() {
                    "",
                    "rpd: roundtrip patch diff",
                    "",
-                   "PHONY: pdf import diff patch roundtrip table_preview build_figures rpd",
+                   "export:",
+                   "\tRscript -e \"mill::export()\"",
+                   "",
+                   "PHONY: pdf import diff patch roundtrip table_preview build_figures rpd export",
                    "")
 
         writeLines(lines, "Makefile")
