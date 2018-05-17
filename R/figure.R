@@ -34,13 +34,9 @@ preview_pattern <- function(items = c("all", "figure", "table")) {
 }
 
 ##' @keywords internal
-preview_files <- function(x, items) UseMethod("preview_files")
-
-##' @keywords internal
-preview_files.chapter <- function(x, items = "all") {
-    list.files(path = x$path,
-               pattern = preview_pattern(items),
-               full.names = TRUE)
+preview_files <- function(items = "all") {
+    stopifnot(in_chapter())
+    list.files(pattern = preview_pattern(items))
 }
 
 ##' Build figures

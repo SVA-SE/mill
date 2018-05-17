@@ -60,7 +60,7 @@ do_init <- function(x, repo, import) UseMethod("do_init")
 do_init.report <- function(x, repo, import) {
     do_init(x$chapters, repo, import)
 
-    create_Makefile(x)
+    create_Makefile()
 
     add(repo, file.path(x$path, "report.xlsx"))
 
