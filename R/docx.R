@@ -233,7 +233,6 @@ to_docx <- function(repo = NULL) {
 ##' Roundtrip tex to docx
 ##'
 ##' @return invisible NULL.
-##' @importFrom git2r diff
 ##' @importFrom git2r repository
 ##' @importFrom git2r reset
 ##' @importFrom git2r status
@@ -242,8 +241,7 @@ roundtrip <- function() {
     if (in_chapter()) {
         ## Check if the working tree is clean
         repo <- repository("../..")
-        d <- diff(repo)
-        if (length(d@files))
+        if (length(unlist(status(repo, untracked = FALSE))))
             stop("Working tree is not clean")
 
         to_docx(repo = NULL)
