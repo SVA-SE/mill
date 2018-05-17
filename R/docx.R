@@ -108,6 +108,10 @@ from_docx <- function(repo = NULL) {
             add(repo, paste0("chapters/", chapter, "/text.tex"))
     } else if (in_report()) {
         repo <- repository()
+        s <- status(repo)
+        if (length(c(s$staged, s$unstaged)))
+            stop("Working tree is not clean")
+
         lapply(list.files("chapters"), function(chapter) {
             wd <- setwd(paste0("chapters/", chapter))
             from_docx(repo = repo)
