@@ -91,7 +91,7 @@ to_pdf_chapter <- function(build = TRUE, type = c("print", "web")) {
         ## Copy the figures (.pdf, .png and .tex) and tables (.tex)
         ref <- references()
         lapply(ref[ref$reftype == "fig", "marker"], function(marker) {
-            marker <- paste0(gsub(":", "_", marker), c(".pdf", ".tex", ".png"))
+            marker <- paste0(gsub(":", "_", marker), c(".pdf", ".tex", ".png", ".eps"))
             file.copy(marker, paste0("../../build/", marker))
         })
         lapply(ref[ref$reftype == "tab", "marker"], function(marker) {
