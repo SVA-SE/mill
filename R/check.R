@@ -226,7 +226,7 @@ check_missing_figure_reference_files.chapter <- function(x) {
     ## Expected files from figure references: 'fig:chapter:id'
     if (nrow(ref)) {
         id <- sapply(strsplit(ref$marker, ":"), "[", 3)
-        filename <- paste0("fig_", normalize_title(x$title), "_", id, ".tex")
+        filename <- paste0("fig_", normalize_title(chapter_title(x)), "_", id, ".tex")
         ref_fig_files <- file.path(chapter_path(x), filename)
     } else {
         ref_fig_files <- character(0)
@@ -279,7 +279,7 @@ check_missing_table_reference_files.chapter <- function(x) {
     ## Expected files from table references: 'tab:chapter:id'
     if (nrow(ref)) {
         id <- sapply(strsplit(ref$marker, ":"), "[", 3)
-        filename <- paste0("tab_", normalize_title(x$title), "_", id, ".tex")
+        filename <- paste0("tab_", normalize_title(chapter_title(x)), "_", id, ".tex")
         ref_tab_files <- file.path(chapter_path(x), filename)
     } else {
         ref_tab_files <- character(0)
