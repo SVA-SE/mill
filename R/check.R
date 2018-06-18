@@ -234,7 +234,7 @@ check_missing_figure_reference_files.chapter <- function(x) {
 
     ## Observed tex files
     fig_files <- list.files(path = chapter_path(x),
-                            pattern = "tex$", full.names = TRUE)
+                            pattern = "tex$")
 
     setdiff(ref_fig_files, fig_files)
 }
