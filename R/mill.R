@@ -35,6 +35,24 @@ authors.authors <- function(x) {
     }))
 }
 
+## I assume this should actually be solved as a print method and
+## format method for an authors class object
+##' @export
+formatted_authors <- function(x) {
+    auths <- authors(x)
+    names <- unlist(lapply(regmatches(auths, regexec('- (.*) \\(', auths)), "[", 2))
+    names <- do.call("rbind", lapply(names, function(y){
+        lastname <- tail(strsplit(y, " ")[[1]], 1)
+        ## R doesn't seem to know what to do with sorting alphabetically
+        ## Å, Ä, Ö. So I cheat here:
+        lastname <- gsub("^Å", "ZZZZZA", lastname)
+        lastname <- gsub("^Ä", "ZZZZZB", lastname)
+        lastname <- gsub("^Ö", "ZZZZZC", lastname)
+        c(lastname, y)
+    }))
+    names[,2][order(names[,1])]
+}
+
 ##' @noRd
 chapters <- function(x) {
     stopifnot(inherits(x, "report"))
