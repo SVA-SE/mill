@@ -35,19 +35,39 @@ authors.authors <- function(x) {
     }))
 }
 
-## I assume this should actually be solved as a print method and
-## format method for an authors class object
-##' @export
+##' Formatting authors
+##'
+##' This function gets a unique list of authors and sorts them
+##' alphabetically. I assume this should actually be solved as a print
+##' method and format method for an authors class object.
+##'
+##' We also have a lexigraphical sort problem in this function that is
+##' solved with a hack that might have a better cross platform
+##' solution.
+##'
+##' @title formatted authors
+##' @param x A report object
+##' @return A unique sorted list of authors
+##' @author Thomas Rosendal
+##' @importFrom utils tail
+##' @examples
+##' \dontrun{
+##' writeLines(paste(formatted_authors(load_report()),
+##'                  collapse = ",\n"),
+##'            "assets/front-matter/authors.tex")
+##' }
 formatted_authors <- function(x) {
     auths <- authors(x)
     names <- unlist(lapply(regmatches(auths, regexec('- (.*) \\(', auths)), "[", 2))
     names <- do.call("rbind", lapply(names, function(y){
         lastname <- tail(strsplit(y, " ")[[1]], 1)
-        ## R doesn't seem to know what to do with sorting alphabetically
-        ## Å, Ä, Ö. So I cheat here:
-        lastname <- gsub("^Å", "ZZZZZA", lastname)
-        lastname <- gsub("^Ä", "ZZZZZB", lastname)
-        lastname <- gsub("^Ö", "ZZZZZC", lastname)
+        ## Sorting of non-ASCII characters is system dependant and we
+        ## expect the text in the report to be UTF-8. Therefore we can
+        ## fix the sorting by replacing the Swedish ÅÄÖ with sortable
+        ## ASCII strings:
+        lastname <- gsub(paste0("^", rawToChar(as.raw(c(0xc3, 0x85)))), "ZZZZZA", lastname)
+        lastname <- gsub(paste0("^", rawToChar(as.raw(c(0xc3, 0x84)))), "ZZZZZB", lastname)
+        lastname <- gsub(paste0("^", rawToChar(as.raw(c(0xc3, 0x96)))), "ZZZZZC", lastname)
         c(lastname, y)
     }))
     names[,2][order(names[,1])]
