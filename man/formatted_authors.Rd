@@ -4,7 +4,7 @@
 \alias{formatted_authors}
 \title{formatted authors}
 \usage{
-formatted_authors(x)
+formatted_authors(x, format = c("name", "email"))
 }
 \arguments{
 \item{x}{A report object}
