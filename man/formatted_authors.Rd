@@ -8,6 +8,8 @@ formatted_authors(x, format = c("name", "email"))
 }
 \arguments{
 \item{x}{A report object}
+
+\item{format}{The format of the author list you want}
 }
 \value{
 A unique sorted list of authors
@@ -26,9 +28,12 @@ solution.
 }
 \examples{
 \dontrun{
+## Update the authors list for front matter
 writeLines(paste(formatted_authors(load_report()),
                  collapse = ",\\n"),
            "assets/front-matter/authors.tex")
+## Or get the emails in a send list format
+paste(formatted_authors(load_report(), format = "email"), collapse = ";")
 }
 }
 \author{
