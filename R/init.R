@@ -141,10 +141,8 @@ do_init.chapter <- function(x, repo, import) {
     add(repo, filename)
 
     import_text_input(x, repo, import, figure_pattern())
-    import_text_input(x, repo, import, "^table-[^.]+[.]tex$")
     import_text_input(x, repo, import, "^tab_[^.]+[.]tex$")
-    import_text_input(x, repo, import, "^fig_[^.]+[.]tex$")
-    import_text_input(x, repo, import, "^img_[^.]+[.]png2$")
+    import_text_input(x, repo, import, "^img_[^.]$")
     import_text_input(x, repo, import, "^typeset[.]patch$")
 
     invisible()
