@@ -4,12 +4,14 @@
 \alias{pdf_diff}
 \title{pdf_diff}
 \usage{
-pdf_diff(reference, new)
+pdf_diff(reference, new, dir = tempdir())
 }
 \arguments{
 \item{reference}{Path to a pdf file}
 
 \item{new}{Path to a pdf file}
+
+\item{dir}{directory to perform the comparison inside}
 }
 \value{
 data.frame A data.frame with 3 columns: page,

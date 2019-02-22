@@ -4,10 +4,12 @@
 \alias{pdf_split}
 \title{pdf_split}
 \usage{
-pdf_split(path)
+pdf_split(path, dir)
 }
 \arguments{
 \item{path}{The path to the pdffile}
+
+\item{dir}{directory to perform the comparison inside}
 }
 \value{
 list A list of the filenames of the resultant 1 page pdfs

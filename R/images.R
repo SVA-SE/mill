@@ -31,6 +31,7 @@ reduce_image <- function(from, to) {
 ##' @title image_diff
 ##' @param reference Path to a reference image
 ##' @param new Path to an image to compare to the reference image
+##' @param dir directory to perform the comparison inside
 ##' @return numeric The percent difference between the two images
 ##' @importFrom tools file_ext
 image_diff <- function(reference, new, dir) {
@@ -86,6 +87,7 @@ pdf_np <- function(path) {
 ##'
 ##' @title pdf_split
 ##' @param path The path to the pdffile
+##' @param dir directory to perform the comparison inside
 ##' @return list A list of the filenames of the resultant 1 page pdfs
 pdf_split <- function(path, dir) {
     if(system2("pdftk", "-version", stdout = FALSE) != 0) {
@@ -115,10 +117,11 @@ pdf_split <- function(path, dir) {
 ##' @title pdf_diff
 ##' @param reference Path to a pdf file
 ##' @param new Path to a pdf file
+##' @param dir directory to perform the comparison inside
 ##' @return data.frame A data.frame with 3 columns: page,
 ##'     percent_diff, composite.
 ##' @export
-pdf_diff <- function(reference, new, dir) {
+pdf_diff <- function(reference, new, dir = tempdir()) {
     reference <- normalizePath(reference, mustWork = TRUE)
     new <- normalizePath(new, mustWork = TRUE)
     stopifnot(pdf_np(reference) == pdf_np(new))

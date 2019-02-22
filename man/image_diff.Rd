@@ -4,12 +4,14 @@
 \alias{image_diff}
 \title{image_diff}
 \usage{
-image_diff(reference, new)
+image_diff(reference, new, dir)
 }
 \arguments{
 \item{reference}{Path to a reference image}
 
 \item{new}{Path to an image to compare to the reference image}
+
+\item{dir}{directory to perform the comparison inside}
 }
 \value{
 numeric The percent difference between the two images
