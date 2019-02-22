@@ -33,7 +33,7 @@ reduce_image <- function(from, to) {
 ##' @param new Path to an image to compare to the reference image
 ##' @return numeric The percent difference between the two images
 ##' @importFrom tools file_ext
-image_diff <- function(reference, new) {
+image_diff <- function(reference, new, dir) {
     if(system2("convert", "-version", stdout = FALSE) != 0) {
         stop("In order to use this tool you need to install 'imagemagick'")
     }
@@ -44,7 +44,7 @@ image_diff <- function(reference, new) {
         stopifnot(pdf_np(reference) == 1)
         stopifnot(pdf_np(new) == 1)
     }
-    output <- tempfile(fileext = paste0(".", fileext1))
+    output <- tempfile(tmpdir = dir, fileext = paste0(".", fileext1))
     reference <- normalizePath(reference, mustWork = TRUE)
     new <- normalizePath(new, mustWork = TRUE)
     args <- c("-verbose", "-metric MAE")
@@ -87,14 +87,14 @@ pdf_np <- function(path) {
 ##' @title pdf_split
 ##' @param path The path to the pdffile
 ##' @return list A list of the filenames of the resultant 1 page pdfs
-pdf_split <- function(path) {
+pdf_split <- function(path, dir) {
     if(system2("pdftk", "-version", stdout = FALSE) != 0) {
             stop("In order to use this tool you need to install 'pdftk'")
     }
     path <- normalizePath(path, mustWork = TRUE)
     np <- pdf_np(path)
     files <- lapply(seq_len(np), function(i) {
-        outfile <- tempfile(fileext = ".pdf")
+        outfile <- tempfile(tmpdir = dir, fileext = ".pdf")
         arg1 <- paste("cat", i)
         arg2 <- paste("output", outfile)
         system2("pdftk", args = c(path, arg1, arg2),
@@ -118,15 +118,15 @@ pdf_split <- function(path) {
 ##' @return data.frame A data.frame with 3 columns: page,
 ##'     percent_diff, composite.
 ##' @export
-pdf_diff <- function(reference, new) {
+pdf_diff <- function(reference, new, dir) {
     reference <- normalizePath(reference, mustWork = TRUE)
     new <- normalizePath(new, mustWork = TRUE)
     stopifnot(pdf_np(reference) == pdf_np(new))
     np <- pdf_np(reference)
-    pages_ref <- pdf_split(reference)
-    pages_new <- pdf_split(new)
+    pages_ref <- pdf_split(reference, dir)
+    pages_new <- pdf_split(new, dir)
     do.call("rbind", lapply(seq_len(np), function(i) {
-        id <- image_diff(pages_ref[i], pages_new[i])
+        id <- image_diff(pages_ref[i], pages_new[i], dir)
         data.frame(page = i,
                    percent_diff = id[[1]],
                    composite = id[[2]],
