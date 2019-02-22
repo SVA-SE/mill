@@ -35,6 +35,9 @@ reduce_image <- function(from, to) {
 ##' @return numeric The percent difference between the two images
 ##' @importFrom tools file_ext
 image_diff <- function(reference, new, dir) {
+    if(is.null(dir)){
+        dir <- tempdir()
+    }
     if(system2("convert", "-version", stdout = FALSE) != 0) {
         stop("In order to use this tool you need to install 'imagemagick'")
     }
@@ -90,6 +93,9 @@ pdf_np <- function(path) {
 ##' @param dir directory to perform the comparison inside
 ##' @return list A list of the filenames of the resultant 1 page pdfs
 pdf_split <- function(path, dir) {
+    if(is.null(dir)){
+        dir <- tempdir()
+    }
     if(system2("pdftk", "-version", stdout = FALSE) != 0) {
             stop("In order to use this tool you need to install 'pdftk'")
     }
@@ -121,7 +127,10 @@ pdf_split <- function(path, dir) {
 ##' @return data.frame A data.frame with 3 columns: page,
 ##'     percent_diff, composite.
 ##' @export
-pdf_diff <- function(reference, new, dir = tempdir()) {
+pdf_diff <- function(reference, new, dir = NULL) {
+    if(is.null(dir)){
+        dir <- tempdir()
+    }
     reference <- normalizePath(reference, mustWork = TRUE)
     new <- normalizePath(new, mustWork = TRUE)
     stopifnot(pdf_np(reference) == pdf_np(new))
