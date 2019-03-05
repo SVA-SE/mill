@@ -26,11 +26,11 @@ figure_files <- function(fileext = "all") {
 ##' @keywords internal
 preview_pattern <- function(items = c("all", "figure", "table")) {
     items <- switch(match.arg(items),
-                    all    = "((table)|(figure))",
-                    figure = "figure",
-                    table  = "table")
+                    all    = "((tab)|(fig))",
+                    figure = "fig",
+                    table  = "tab")
 
-    paste0("^preview-", items, "-[^.]*[.]pdf$")
+    paste0("^preview-", items, "_[^.]*[.]pdf$")
 }
 
 ##' @keywords internal

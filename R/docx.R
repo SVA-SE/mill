@@ -19,7 +19,8 @@ export <- function() {
         file.copy(from, paste0(to, "/", chapter, ".docx"), overwrite = TRUE)
 
         ## Export data and preview files
-        lapply(c(figure_files("xlsx"), preview_files()), function(from) {
+        files <- c(figure_files("xlsx"), figure_files("pdf"), preview_files())
+        lapply(files, function(from) {
             file.copy(from, file.path(to, basename(from)), overwrite = TRUE)
         })
     } else if (in_report()) {
