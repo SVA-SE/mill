@@ -113,6 +113,32 @@ org_state_change <- function(x) {
     list(result = state_change, remainder = x)
 }
 
+##' @noRd
+org_schedule <- function(x) {
+    scheduled <- regmatches(x[1], regexpr("SCHEDULED: <[^>]*>", x[1]))
+    scheduled <- gsub("SCHEDULED: ", "", scheduled)
+    if(identical(scheduled, character(0))) scheduled <- NULL
+
+    deadline <- regmatches(x[1], regexpr("DEADLINE: <[^>]*>", x[1]))
+    deadline <- gsub("DEADLINE: ", "", deadline)
+    if(identical(deadline, character(0))) deadline <- NULL
+
+    if(all(is.null(deadline), is.null(scheduled))) return(NULL)
+
+    schedule <- structure(list(scheduled = scheduled,
+                               deadline = deadline),
+                          class = "org_schedule")
+
+    ## Extract remainder
+    if (length(x) > 1) {
+        x <- x[-1]
+    } else {
+        x = NULL
+    }
+
+    list(result = schedule, remainder = x)
+}
+
 
 ##' @noRd
 org_list <- function(x) {
@@ -185,7 +211,6 @@ org_drawer <- function(x) {
     list(result = drawer, remainder = remainder)
 }
 
-##' EXTRACT TAGS FROM HEADLINE
 ##' @noRd
 org_tags <- function(x) {
     tags <- regmatches(x, regexpr(":.*:$", x))
@@ -245,6 +270,8 @@ org_headline <- function(x) {
                 org <- org_keyword(x)
             if(is.null(org))
                 org <- org_state_change(x)
+            if(is.null(org))
+                org <- org_schedule(x)
             if (is.null(org))
                 org <- org_paragraph(x)
 
