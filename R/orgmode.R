@@ -96,6 +96,25 @@ org_clock <- function(x) {
 }
 
 ##' @noRd
+org_state_change <- function(x) {
+    if (!identical(grep("^- State ", x[1]), 1L))
+        return(NULL)
+
+    state_change <- structure(list(state_change = trimws(sub("^- State", "", x[1])),
+                                   class = "org_state_change"))
+
+    ## Extract remainder
+    if (length(x) > 1) {
+        x <- x[-1]
+    } else {
+        x = NULL
+    }
+
+    list(result = state_change, remainder = x)
+}
+
+
+##' @noRd
 org_list <- function(x) {
     if (!identical(grep("^-", x[1]), 1L))
         return(NULL)
@@ -224,6 +243,8 @@ org_headline <- function(x) {
                 org <- org_dynamic_block(x)
             if(is.null(org))
                 org <- org_keyword(x)
+            if(is.null(org))
+                org <- org_state_change(x)
             if (is.null(org))
                 org <- org_paragraph(x)
 
