@@ -166,6 +166,14 @@ org_drawer <- function(x) {
     list(result = drawer, remainder = remainder)
 }
 
+##' EXTRACT TAGS FROM HEADLINE
+##' @noRd
+org_tags <- function(x) {
+    tags <- regmatches(x, regexpr(":.*:$", x))
+    tags <- unlist(strsplit(tags, ":"))
+    tags[tags != ""]
+}
+
 ##' STARS KEYWORD PRIORITY TITLE TAGS
 ##' @noRd
 org_headline <- function(x) {
@@ -176,7 +184,14 @@ org_headline <- function(x) {
     level <- nchar(regmatches(x[1], regexpr("^[*]+", x[1])))
 
     ## Extract the headline
-    headline <- trimws(sub("[*]*", "", x[1]))
+    headline_text <- trimws(sub("[*]*", "", x[1]))
+    headline <- trimws(strsplit(headline_text, ":")[[1]][1])
+    if(is.na(headline)) headline <- ""
+
+    ## Extract the tags
+    tags <- org_tags(headline_text)
+
+    ##
     x <- x[-1]
 
     ## Find end of contents under headline i.e. search for lines that
@@ -223,6 +238,7 @@ org_headline <- function(x) {
 
     list(result = structure(list(level = level,
                                  headline = headline,
+                                 tags = tags,
                                  section = section),
                             class = "org_headline"),
          remainder = remainder)
