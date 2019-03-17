@@ -9,7 +9,7 @@ os:
   - osx
 
 r:
-  - 3.2
+  - 3.3
   - oldrel
   - release
   - devel
@@ -17,7 +17,7 @@ r:
 matrix:
   exclude:
   - os: osx
-    r: 3.2
+    r: 3.3
   - os: osx
     r: devel
 
