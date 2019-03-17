@@ -225,3 +225,63 @@ result_expected <- structure(list(result = structure(list(key = "STARTUP",
 result_observed <- mill:::org_keyword("#+STARTUP: logdrawer")
 
 stopifnot(identical(result_observed, result_expected))
+
+############################
+### Parse a state change ###
+############################
+
+result_observed <- mill:::org_state_change("- State \"DONE\"       from \"STARTED(s!)|\" [2018-12-07 fre 20:12]")
+
+result_expected <- structure(list(result = list(state_change = "\"DONE\"       from \"STARTED(s!)|\" [2018-12-07 fre 20:12]",
+                                                class = "org_state_change"),
+                                  remainder = NULL),
+                             .Names = c("result", "remainder"))
+
+stopifnot(identical(result_observed, result_expected))
+
+########################
+### Parse a schedule ###
+########################
+
+schedule1 <- "SCHEDULED: <2018-11-26 mån> DEADLINE: <2018-11-27 tis>"
+schedule1_exp <- list(result = structure(list(scheduled = "<2018-11-26 mån>",
+                                              deadline = "<2018-11-27 tis>"),
+                                         class = "org_schedule"),
+                      remainder = NULL)
+
+schedule2 <- "SCHEDULED: <2018-11-26 mån 08:05>--<2018-11-26 mån 17:00> DEADLINE: <2018-11-27 tis>"
+schedule2_exp <- list(result = structure(list(scheduled = "<2018-11-26 mån 08:05>--<2018-11-26 mån 17:00>",
+                                              deadline = "<2018-11-27 tis>"),
+                                         class = "org_schedule"),
+                      remainder = NULL)
+
+schedule3 <- "DEADLINE: <2018-11-27 tis>"
+schedule3_exp <- list(result = structure(list(scheduled = NULL, deadline = "<2018-11-27 tis>"),
+                                         class = "org_schedule"),
+                      remainder = NULL)
+
+schedule4 <- "DEADLINE: <2018-11-27 tis> SCHEDULED: <2018-11-26 mån 08:05>--<2018-11-26 mån 17:00>"
+schedule4_exp <- list(result = structure(list(scheduled = "<2018-11-26 mån 08:05>--<2018-11-26 mån 17:00>",
+                                              deadline = "<2018-11-27 tis>"),
+                                         class = "org_schedule"),
+                      remainder = NULL)
+
+schedule5 <- "SCHEDULED: <2018-11-26 mån 08:05>--<2018-11-26 mån 17:00>"
+schedule5_exp <- list(result = structure(list(scheduled = "<2018-11-26 mån 08:05>--<2018-11-26 mån 17:00>",
+                                              deadline = NULL),
+                                         class = "org_schedule"),
+                      remainder = NULL)
+
+schedule6 <- "foobar"
+schedule6_exp <- NULL
+
+schedule7  <- ""
+schedule7_exp <- NULL
+
+stopifnot(identical(mill:::org_schedule(schedule1), schedule1_exp))
+stopifnot(identical(mill:::org_schedule(schedule2), schedule2_exp))
+stopifnot(identical(mill:::org_schedule(schedule3), schedule3_exp))
+stopifnot(identical(mill:::org_schedule(schedule4), schedule4_exp))
+stopifnot(identical(mill:::org_schedule(schedule5), schedule5_exp))
+stopifnot(identical(mill:::org_schedule(schedule6), schedule6_exp))
+stopifnot(identical(mill:::org_schedule(schedule7), schedule7_exp))

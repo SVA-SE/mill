@@ -115,15 +115,14 @@ org_state_change <- function(x) {
 
 ##' @noRd
 org_schedule <- function(x) {
-    scheduled <- regmatches(x[1], regexpr("SCHEDULED: <[^>]*>", x[1]))
-    scheduled <- gsub("SCHEDULED: ", "", scheduled)
-    if(identical(scheduled, character(0))) scheduled <- NULL
+    if (!identical(grep("SCHEDULED:|DEADLINE:", x[1]), 1L))
+        return(NULL)
 
-    deadline <- regmatches(x[1], regexpr("DEADLINE: <[^>]*>", x[1]))
-    deadline <- gsub("DEADLINE: ", "", deadline)
-    if(identical(deadline, character(0))) deadline <- NULL
-
-    if(all(is.null(deadline), is.null(scheduled))) return(NULL)
+    words <- regmatches(x[1], gregexpr("SCHEDULED:|DEADLINE:", x[1]), invert = NA)[[1]]
+    deadline <- trimws(words[grep("DEADLINE:", words)+1])
+    if(identical(grep("<[^>]*>", deadline), integer(0))) deadline  <- NULL
+    scheduled <- trimws(words[grep("SCHEDULED:", words)+1])
+    if(identical(grep("<[^>]*>", scheduled), integer(0))) scheduled  <- NULL
 
     schedule <- structure(list(scheduled = scheduled,
                                deadline = deadline),
@@ -138,7 +137,6 @@ org_schedule <- function(x) {
 
     list(result = schedule, remainder = x)
 }
-
 
 ##' @noRd
 org_list <- function(x) {
