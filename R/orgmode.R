@@ -270,7 +270,9 @@ org_headline <- function(x) {
                 org <- org_state_change(x)
             if(is.null(org))
                 org <- org_schedule(x)
-            if (is.null(org))
+            if(is.null(org))
+                org <- org_list(x)
+            if(is.null(org))
                 org <- org_paragraph(x)
 
             section[[length(section) + 1]] <- org$result
