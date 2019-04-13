@@ -224,7 +224,7 @@ add_empty_line_between_references <- function(tex) {
         return(tex)
 
     ## Add empty lines to tex.
-    tex[i] <- "\\\\\\\\"
+    tex[i] <- "~\\\\"
 
     tex
 }
