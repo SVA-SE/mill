@@ -229,6 +229,15 @@ add_empty_line_between_references <- function(tex) {
     tex
 }
 
+##' Convert style of empty line from tex to docx
+##'
+##' @param tex The tex character vector
+##' @return tex character vector
+##' @noRd
+convert_style_of_empty_line_from_tex_to_docx <- function(tex) {
+    gsub("\\\\\\\\", "", tex)
+}
+
 ##' Convert from tex to docx
 ##'
 ##' Use pandoc (http://pandoc.org/) to convert from 'tex' to
@@ -244,6 +253,7 @@ to_docx <- function(repo = NULL) {
         tex <- readLines("text.tex")
         tex <- asterisk(tex, "remove")
         tex <- convert_ref_to_docx_ref(tex)
+        tex <- convert_style_of_empty_line_from_tex_to_docx(tex)
         f_tex <- tempfile(fileext = ".tex")
         writeLines(tex, f_tex)
         f_docx <- "text.docx"
