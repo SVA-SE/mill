@@ -104,6 +104,7 @@ from_docx <- function(repo = NULL) {
         tex <- make_labels_chapter_specific(tex, chapter)
         tex <- make_hypertargets_chapter_specific(tex, chapter)
         tex <- asterisk(tex, "add")
+        tex <- add_empty_line_between_references(tex)
         writeLines(tex, "text.tex")
         if (!is.null(repo))
             add(repo, paste0("chapters/", chapter, "/text.tex"))
@@ -196,6 +197,36 @@ asterisk <- function(tex, direction = c("add", "remove")) {
             tex <- gsub(patterns[i], replacement, tex)
         }
     return(tex)
+}
+
+##' Add an empty line between references
+##'
+##' @param tex The tex character vector
+##' @return tex character vector
+##' @noRd
+add_empty_line_between_references <- function(tex) {
+    ## Find the line for the reference section.
+    i <- grep("^\\\\section[*][{]References[}]", tex)
+    if (!length(i))
+        return(tex)
+
+    ## We expect one reference section.
+    stopifnot(identical(length(i), 1L))
+
+    ## Skip the first empty line after the reference section line.
+    i <- i + 2
+
+    ## Determine the indices to empty lines after the reference
+    ## section.
+    j <- which(nchar(tex) == 0)
+    i <- j[j > i]
+    if (!length(i))
+        return(tex)
+
+    ## Add empty lines to tex.
+    tex[i] <- "\\\\\\\\"
+
+    tex
 }
 
 ##' Convert from tex to docx
