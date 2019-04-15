@@ -16,7 +16,7 @@ create_Makefile <- function() {
                    "\tdiff -c --label=text --label=typeset text.tex typeset.tex > typeset.patch; [ $$? -eq 1 ]",
                    "",
                    "patch:",
-                   "\tpatch text.tex -i typeset.patch -o typeset.tex",
+                   "\tRscript -e \"mill::apply_patch()\"",
                    "",
                    "roundtrip:",
                    "\tRscript -e \"mill::roundtrip()\"",
@@ -50,10 +50,13 @@ create_Makefile <- function() {
                    "export:",
                    "\tRscript -e \"mill::export()\"",
                    "",
+                   "patch:",
+                   "\tRscript -e \"mill::apply_patch()\"",
+                   "",
                    "roundtrip:",
                    "\tRscript -e \"mill::roundtrip()\"",
                    "",
-                   ".PHONY: all check export roundtrip web")
+                   ".PHONY: all check export patch roundtrip web")
 
         writeLines(lines, "Makefile")
         add(repository(), "Makefile")
