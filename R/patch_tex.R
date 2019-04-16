@@ -4,6 +4,11 @@
 ##' @export
 apply_patch <- function() {
     if (in_chapter()) {
+        if (!file.exists("typeset.patch")) {
+            file.copy(from = "text.tex", to = "typeset.tex", overwrite = TRUE)
+            return(invisible(NULL))
+        }
+
         output <- tryCatch(system2("patch",
                                    args = c("text.tex", "-i", "typeset.patch",
                                             "-o", "typeset.tex"),
