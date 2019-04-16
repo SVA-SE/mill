@@ -105,6 +105,7 @@ from_docx <- function(repo = NULL) {
         tex <- make_hypertargets_chapter_specific(tex, chapter)
         tex <- asterisk(tex, "add")
         tex <- add_empty_line_between_references(tex)
+        tex <- add_multicols(tex)
         writeLines(tex, "text.tex")
         if (!is.null(repo))
             add(repo, paste0("chapters/", chapter, "/text.tex"))
@@ -238,6 +239,33 @@ convert_style_of_empty_line_from_tex_to_docx <- function(tex) {
     gsub("\\\\\\\\", "", tex)
 }
 
+##' Add multicols when converting to tex from docx
+##'
+##' @param tex The tex character vector.
+##' @return tex character vector.
+##' @noRd
+add_multicols <- function(tex) {
+    c(tex, "\\end{multicols}")
+}
+
+##' Remove multicols when converting to docx from tex
+##'
+##' @param tex The tex character vector.
+##' @return tex character vector.
+##' @noRd
+remove_multicols <- function(tex) {
+    ## Handle conversion to docx
+    i <- grep("^[\\][e][n][d][{]multicols[}]$", tex)
+    if (length(i)) {
+        ## We expect one \end{multicols}.
+        stopifnot(identical(length(i), 1L))
+
+        tex <- tex[-i]
+    }
+
+    tex
+}
+
 ##' Convert from tex to docx
 ##'
 ##' Use pandoc (http://pandoc.org/) to convert from 'tex' to
@@ -254,6 +282,7 @@ to_docx <- function(repo = NULL) {
         tex <- asterisk(tex, "remove")
         tex <- convert_ref_to_docx_ref(tex)
         tex <- convert_style_of_empty_line_from_tex_to_docx(tex)
+        tex <- remove_multicols(tex)
         f_tex <- tempfile(fileext = ".tex")
         writeLines(tex, f_tex)
         f_docx <- "text.docx"
