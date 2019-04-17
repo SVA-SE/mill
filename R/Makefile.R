@@ -32,7 +32,10 @@ create_Makefile <- function() {
                    "export:",
                    "\tRscript -e \"mill::export()\"",
                    "",
-                   "PHONY: pdf import diff patch roundtrip table_preview build_figures rpd export",
+                   "clean:",
+                   "\tRscript -e \"mill::cleanup()\"",
+                   "",
+                   "PHONY: pdf import diff patch roundtrip table_preview build_figures rpd export clean",
                    "")
 
         writeLines(lines, "Makefile")

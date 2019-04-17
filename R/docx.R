@@ -367,3 +367,23 @@ roundtrip <- function() {
 
     invisible()
 }
+
+##' Cleanup temporary files
+##'
+##' @return invisible NULL.
+##' @export
+cleanup <- function() {
+    if (in_chapter()) {
+        unlink("text.docx")
+        unlink("typeset.tex")
+        unlink("typeset.tex.rej")
+    } else if (in_report()) {
+        lapply(list.files("chapters"), function(chapter) {
+            wd <- setwd(paste0("chapters/", chapter))
+            cleanup()
+            setwd(wd)
+        })
+    }
+
+    invisible()
+}
