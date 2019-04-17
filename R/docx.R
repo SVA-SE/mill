@@ -276,8 +276,8 @@ remove_multicols <- function(tex) {
 style_numprint <- function(tex, output = c("docx", "tex"))
 {
     remove <- switch(match.arg(output),
-                  docx = TRUE,
-                  tex  = FALSE)
+                     docx = TRUE,
+                     tex  = FALSE)
 
     if (isTRUE(remove))
         return(gsub("[\\]numprint[{]([[:digit:]]+)[}]", "\\1", tex))
