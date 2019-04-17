@@ -106,6 +106,7 @@ from_docx <- function(repo = NULL) {
         tex <- asterisk(tex, "add")
         tex <- add_empty_line_between_references(tex)
         tex <- add_multicols(tex)
+        tex <- style_numprint(tex, output = "tex")
         writeLines(tex, "text.tex")
         if (!is.null(repo))
             add(repo, paste0("chapters/", chapter, "/text.tex"))
@@ -266,6 +267,34 @@ remove_multicols <- function(tex) {
     tex
 }
 
+##' Style of numprint when converting between various formats
+##'
+##' @param tex The tex character vector.
+##' @param output The output format of the conversion.
+##' @return tex character vector.
+##' @noRd
+style_numprint <- function(tex, output = c("docx", "tex"))
+{
+    remove <- switch(match.arg(output),
+                  docx = TRUE,
+                  tex  = FALSE)
+
+    if (isTRUE(remove))
+        return(gsub("[\\]numprint[{]([[:digit:]]+)[}]", "\\1", tex))
+
+    ## Find the line for the reference section to make sure not to add
+    ## \numprint{} to numbers in references. Use the complete text if
+    ## the chapter doesn't contain a reference section.
+    i <- grep("^\\\\section[*][{]References[}]", tex)
+    if (!length(i))
+        i <- length(tex)
+    stopifnot(identical(length(i), 1L))
+    i <- seq_len(i)
+
+    c(gsub("([[:digit:]]{5,}(?!-))", "\\\\numprint{\\1}", tex[i], perl = TRUE),
+      tex[-i])
+}
+
 ##' Convert from tex to docx
 ##'
 ##' Use pandoc (http://pandoc.org/) to convert from 'tex' to
@@ -283,6 +312,7 @@ to_docx <- function(repo = NULL) {
         tex <- convert_ref_to_docx_ref(tex)
         tex <- convert_style_of_empty_line_from_tex_to_docx(tex)
         tex <- remove_multicols(tex)
+        tex <- style_numprint(tex, output = "docx")
         f_tex <- tempfile(fileext = ".tex")
         writeLines(tex, f_tex)
         f_docx <- "text.docx"
