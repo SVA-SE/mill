@@ -105,6 +105,7 @@ from_docx <- function(repo = NULL) {
         tex <- make_hypertargets_chapter_specific(tex, chapter)
         tex <- asterisk(tex, "add")
         tex <- add_empty_line_between_references(tex)
+        tex <- style_toc(tex, output = "tex")
         tex <- add_multicols(tex)
         tex <- style_numprint(tex, output = "tex")
         writeLines(tex, "text.tex")
@@ -295,6 +296,53 @@ style_numprint <- function(tex, output = c("docx", "tex"))
       tex[-i])
 }
 
+##' Style table of contents when converting between various formats
+##'
+##' @param tex The tex character vector.
+##' @param output The output format of the conversion.
+##' @return tex character vector.
+##' @noRd
+style_toc <- function(tex, output = c("docx", "tex"))
+{
+    remove <- switch(match.arg(output),
+                     docx = TRUE,
+                     tex  = FALSE)
+
+    if (isTRUE(remove)) {
+        i <- grep("^[\\]addcontentsline[{]toc[}][{]chapter[}][{]", tex)
+
+        if (length(i)) {
+            ## We expect one '\addcontentsline{toc}{chapter}'.
+            stopifnot(identical(length(i), 1L))
+
+            tex <- tex[-i]
+        }
+
+        return(tex)
+    }
+
+    ## Determine the name of the chapter from
+    ## '\chapter*{name-of-chapter}'. Then create a toc using the
+    ## chapter name.
+    chapter <- paste(tex, collapse = " ")
+    chapter <- sub("^.+[\\]chapter[*][{]", "", chapter)
+    chapter <- unlist(strsplit(chapter, "}"))[1]
+    toc <- paste0("\\addcontentsline{toc}{chapter}{", chapter, "}")
+
+    ## Find the line for the chapter section. Since chapter section
+    ## can run over multiple lines, look for the first label '\label{sec:'.
+    i <- min(grep("\\\\label[{]sec[:]", tex))
+    stopifnot(identical(length(i), 1L))
+
+    ## Split the tex into two parts and inject the toc between them.
+    tex_a <- tex[seq_len(i)]
+    tex_b <- character(0)
+    if (i < length(tex))
+        tex_b <- tex[seq(from = i + 1, to = length(tex), by = 1)]
+
+    c(tex_a, toc, tex_b)
+}
+
 ##' Convert from tex to docx
 ##'
 ##' Use pandoc (http://pandoc.org/) to convert from 'tex' to
@@ -311,6 +359,7 @@ to_docx <- function(repo = NULL) {
         tex <- asterisk(tex, "remove")
         tex <- convert_ref_to_docx_ref(tex)
         tex <- convert_style_of_empty_line_from_tex_to_docx(tex)
+        tex <- style_toc(tex, output = "docx")
         tex <- remove_multicols(tex)
         tex <- style_numprint(tex, output = "docx")
         f_tex <- tempfile(fileext = ".tex")
