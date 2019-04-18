@@ -106,7 +106,7 @@ from_docx <- function(repo = NULL) {
         tex <- asterisk(tex, "add")
         tex <- add_empty_line_between_references(tex)
         tex <- style_toc(tex, output = "tex")
-        tex <- add_multicols(tex)
+        tex <- style_multicols(tex, output = "tex")
         tex <- style_numprint(tex, output = "tex")
         writeLines(tex, "text.tex")
         if (!is.null(repo))
@@ -241,31 +241,50 @@ convert_style_of_empty_line_from_tex_to_docx <- function(tex) {
     gsub("\\\\\\\\", "", tex)
 }
 
-##' Add multicols when converting to tex from docx
+##' Handle multicols when converting between tex and docx
 ##'
 ##' @param tex The tex character vector.
+##' @param output The output format of the conversion.
 ##' @return tex character vector.
 ##' @noRd
-add_multicols <- function(tex) {
-    c(tex, "\\end{multicols}")
-}
+style_multicols <- function(tex, output = c("docx", "tex"))
+{
+    remove <- switch(match.arg(output),
+                     docx = TRUE,
+                     tex  = FALSE)
 
-##' Remove multicols when converting to docx from tex
-##'
-##' @param tex The tex character vector.
-##' @return tex character vector.
-##' @noRd
-remove_multicols <- function(tex) {
-    ## Handle conversion to docx
-    i <- grep("^[\\][e][n][d][{]multicols[}]$", tex)
-    if (length(i)) {
-        ## We expect one \end{multicols}.
-        stopifnot(identical(length(i), 1L))
+    if (isTRUE(remove)) {
+        ## Check for '\begin{multicols}{2}'.
+        i <- grep("^[\\]begin[{]multicols[}][{]2[}]$", tex)
+        if (length(i)) {
+            stopifnot(identical(length(i), 1L))
+            tex <- tex[-i]
+        }
 
-        tex <- tex[-i]
+        ## Check for '\end{multicols}'.
+        i <- grep("^[\\][e][n][d][{]multicols[}]$", tex)
+        if (length(i)) {
+            stopifnot(identical(length(i), 1L))
+            tex <- tex[-i]
+        }
+
+        return(tex)
     }
 
-    tex
+    ## Find the addcontentsline.
+    i <- grep("^[\\]addcontentsline[{]toc[}][{]chapter[}][{]", tex)
+    stopifnot(identical(length(i), 1L))
+
+    ## Split the tex into two parts and inject the begin multicols
+    ## between them.
+    tex_a <- tex[seq_len(i)]
+    tex_b <- character(0)
+    if (i < length(tex))
+        tex_b <- tex[seq(from = i + 1, to = length(tex), by = 1)]
+    tex <- c(tex_a, "\\begin{multicols}{2}", tex_b)
+
+    ## Add end multicols
+    c(tex, "\\end{multicols}")
 }
 
 ##' Style of numprint when converting between various formats
@@ -360,7 +379,7 @@ to_docx <- function(repo = NULL) {
         tex <- convert_ref_to_docx_ref(tex)
         tex <- convert_style_of_empty_line_from_tex_to_docx(tex)
         tex <- style_toc(tex, output = "docx")
-        tex <- remove_multicols(tex)
+        tex <- style_multicols(tex, output = "docx")
         tex <- style_numprint(tex, output = "docx")
         f_tex <- tempfile(fileext = ".tex")
         writeLines(tex, f_tex)
