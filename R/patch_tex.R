@@ -39,17 +39,14 @@ create_patch <- function() {
         if (!file.exists("typeset.tex"))
             stop("Missing file 'typeset.tex'")
 
-        output <- tryCatch(system2("diff",
-                                   args = c("-c", "--label=text",
-                                            "--label=typeset", "text.tex",
-                                            "typeset.tex > typeset.patch"),
-                                   stdout = TRUE, stderr = TRUE),
-                           warning = function(w) w)
+        system2("diff",
+                args = c("-c", "--label=text",
+                         "--label=typeset", "text.tex",
+                         "typeset.tex > typeset.patch"))
 
-        ## if (!identical(output,
-        ##                "patching file typeset.tex (read from text.tex)")) {
-        ##     stop(paste("Unable to create patch: ", basename(getwd())))
-        ## }
+        ## Drop empty patch
+        if (!file.size("typeset.patch"))
+            unlink("typeset.patch")
     } else if (in_report()) {
         lapply(list.files("chapters"), function(chapter) {
             wd <- setwd(paste0("chapters/", chapter))
