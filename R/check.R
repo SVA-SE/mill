@@ -141,15 +141,9 @@ check_apply_typeset_patch <- function() {
 
     l <- sapply(list.files("chapters"), function(chapter) {
         wd <- setwd(paste0("chapters/", chapter))
-        output <- tryCatch(system2("patch",
-                                   args = c("text.tex", "-i", "typeset.patch",
-                                            "-o", "typeset.tex"),
-                                   stdout = TRUE, stderr = TRUE),
-                           warning = function(w) w)
+        result <- tryCatch(apply_patch(), error = function(e) chapter)
         setwd(wd)
-        if (identical(output, "patching file typeset.tex (read from text.tex)"))
-            return(NULL)
-        paste0(chapter, "/typeset.patch")
+        result
     })
 
     l <- l[!sapply(l, is.null)]
