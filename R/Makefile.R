@@ -13,7 +13,7 @@ create_Makefile <- function() {
                    "\tRscript -e \"mill::import(); mill::from_docx()\"",
                    "",
                    "diff:",
-                   "\tdiff -c --label=text --label=typeset text.tex typeset.tex > typeset.patch; [ $$? -eq 1 ]",
+                   "\tRscript -e \"mill::create_patch()\"",
                    "",
                    "patch:",
                    "\tRscript -e \"mill::apply_patch()\"",
