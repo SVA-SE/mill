@@ -45,8 +45,8 @@ check_expect_clean_repository <- function() {
     cat("* checking that repository is clean ... ")
 
     ## Check if the working tree is clean
-    d <- diff(repository())
-    if (length(d@files)) {
+    s <- status(repository())
+    if (length(s$unstaged) || length(s$staged)) {
         cat("ERROR\n")
         return(TRUE)
     }
