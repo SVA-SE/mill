@@ -83,6 +83,7 @@ to_pdf_chapter <- function(build = TRUE, type = c("print", "web")) {
         writeLines(tex, filename)
 
         ## copy in the missing-image file
+        on.exit(file.remove("missing-photo.png"))
         file.copy("../../assets/missing-photo.png", ".")
 
         ## Build the filename pdf file.
