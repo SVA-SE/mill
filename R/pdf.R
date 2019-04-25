@@ -82,6 +82,9 @@ to_pdf_chapter <- function(build = TRUE, type = c("print", "web")) {
                  "\\end{document}")
         writeLines(tex, filename)
 
+        ## copy in the missing-image file
+        file.copy("../../assets/missing-photo.png", ".")
+
         ## Build the filename pdf file.
         luatex(filename)
     } else {
