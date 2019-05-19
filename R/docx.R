@@ -76,6 +76,20 @@ import <- function() {
     invisible()
 }
 
+style_fun <- function(tex, chapter)
+{
+    tex <- style_drop_figures_and_tables(tex)
+    tex <- convert_docx_ref_to_ref(tex, chapter)
+    tex <- make_labels_chapter_specific(tex, chapter)
+    tex <- make_hypertargets_chapter_specific(tex, chapter)
+    tex <- asterisk(tex, "add")
+    tex <- add_empty_line_between_references(tex)
+    tex <- style_toc(tex, output = "tex")
+    tex <- style_multicols(tex, output = "tex")
+    tex <- style_numprint(tex, output = "tex")
+    tex
+}
+
 ##' Convert from docx to tex
 ##'
 ##' Use pandoc (http://pandoc.org/) to convert from 'docx' to
@@ -100,15 +114,7 @@ from_docx <- function(repo = NULL) {
         ## Tweak incoming tex file
         tex <- readLines(f_tex)
         file.remove(f_tex)
-        tex <- style_drop_figures_and_tables(tex)
-        tex <- convert_docx_ref_to_ref(tex, chapter)
-        tex <- make_labels_chapter_specific(tex, chapter)
-        tex <- make_hypertargets_chapter_specific(tex, chapter)
-        tex <- asterisk(tex, "add")
-        tex <- add_empty_line_between_references(tex)
-        tex <- style_toc(tex, output = "tex")
-        tex <- style_multicols(tex, output = "tex")
-        tex <- style_numprint(tex, output = "tex")
+        tex <- style_fun(tex, chapter)
         writeLines(tex, "text.tex")
         if (!is.null(repo))
             add(repo, paste0("chapters/", chapter, "/text.tex"))
