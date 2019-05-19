@@ -100,6 +100,7 @@ from_docx <- function(repo = NULL) {
         ## Tweak incoming tex file
         tex <- readLines(f_tex)
         file.remove(f_tex)
+        tex <- style_drop_figures_and_tables(tex)
         tex <- convert_docx_ref_to_ref(tex, chapter)
         tex <- make_labels_chapter_specific(tex, chapter)
         tex <- make_hypertargets_chapter_specific(tex, chapter)
@@ -129,6 +130,38 @@ from_docx <- function(repo = NULL) {
 
 normalize_title <- function(title) {
     gsub("[[:space:]]+", "-", tolower(title))
+}
+
+drop_section <- function(tex, section)
+{
+    i <- grep(paste0("^[\\]section[{]", section, "[}]"), tex)
+    if (length(i) && i > 2) {
+        section <- tolower(section)
+        if (startsWith(tex[i - 1], paste0("\\hypertarget{", section, "}{%"))) {
+            i <- i - 2
+        }
+
+        ## Remove empty lines.
+        while (i > 1 && nchar(tex[i]) == 0) {
+            i <- i - 1
+        }
+
+        tex <- tex[seq_len(i)]
+    }
+
+    tex
+}
+
+##' Remove figures and tables sections
+##'
+##' @param tex The tex character vector
+##' @return tex character vector
+##' @noRd
+style_drop_figures_and_tables <- function(tex)
+{
+    tex <- drop_section(tex, "Figures")
+    tex <- drop_section(tex, "Tables")
+    tex
 }
 
 ##' Convert the docx references to tex ref
