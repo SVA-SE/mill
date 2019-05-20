@@ -12,7 +12,9 @@ Depends:
 Imports:
     git2r,
     methods,
+    tools,
     utils,
-    tools
+    xml2
 LazyData: TRUE
+Encoding: UTF-8
 RoxygenNote: 6.1.1
