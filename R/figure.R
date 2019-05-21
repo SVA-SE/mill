@@ -48,6 +48,13 @@ build_figures <- function() {
         lapply(figure_files("R"), function(figure) {
             source(figure, local = TRUE, chdir = TRUE)
         })
+
+        ## Convert figure files to png
+        lapply(figure_files("pdf"), function(from) {
+            to <- paste0(file_path_sans_ext(from), ".png")
+            system(paste("convert", from, "-flatten", to))
+        })
+
     } else if (in_report()) {
         lapply(list.files("chapters"), function(chapter) {
             wd <- setwd(paste0("chapters/", chapter))
