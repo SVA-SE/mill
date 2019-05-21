@@ -452,8 +452,8 @@ format_docx_table_as_tex <- function(tbl, output, indentation = "", standalone =
     lines <- c(lines, paste0(indentation, format(tbl$caption, output, ...)))
 
     lines <- c(lines, paste0(indentation,
-                             "\\begin{tabular}{",
-                             paste0(rep("l", dim(tbl)[2]), collapse = ""),
+                             "\\begin{tabular}{l",
+                             paste0(rep("r", dim(tbl)[2]-1), collapse = ""),
                              "}"))
 
     indentation <- paste0("  ", indentation)
