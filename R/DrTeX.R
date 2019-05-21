@@ -206,7 +206,19 @@ docx_paragraph <- function(xml)
 ##' @export
 format.docx_paragraph <- function(x, ...)
 {
-    xml_text(x$content)
+    lines <- lapply(xml_find_all(x$content, "w:r"), function(r) {
+        line <- character(0)
+
+        superscript <- xml_find_first(r, "w:rPr/w:vertAlign[@w:val='superscript']")
+        if (!is.na(superscript))
+            line <- paste0(line, "\\textsuperscript{")
+        line <- paste0(line, xml_text(r))
+        if (!is.na(superscript))
+            line <- paste0(line, "}")
+        line
+    })
+
+    paste0(unlist(lines), collapse = "")
 }
 
 ##' @export
@@ -453,12 +465,13 @@ format_docx_table_as_tex <- function(tbl, output, indentation = "", standalone =
 
         for (j in seq_len(ncol(row))) {
             cell <- row[j]
-            value <- format(cell, output, ...)
+            value <- docx_paragraph(xml_find_first(cell$content, "w:p"))
 
             if (ncol(cell) > 1) {
-                line <- paste0(line, "\\multicolumn{", ncol(cell), "}{l}{", value, "}")
+                line <- paste0(line, "\\multicolumn{", ncol(cell),
+                               "}{l}{", format(value), "}")
             } else {
-                line <- paste0(line, value)
+                line <- paste0(line, format(value))
             }
 
             if (j == ncol(row)) {
