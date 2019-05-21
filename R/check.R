@@ -221,14 +221,13 @@ check_missing_figure_reference_files.chapter <- function(x) {
     if (nrow(ref)) {
         id <- sapply(strsplit(ref$marker, ":"), "[", 3)
         filename <- paste0("fig_", normalize_title(chapter_title(x)), "_", id, ".tex")
-        ref_fig_files <- file.path(chapter_path(x), filename)
+        ref_fig_files <- filename
     } else {
         ref_fig_files <- character(0)
     }
 
     ## Observed tex files
-    fig_files <- list.files(path = chapter_path(x),
-                            pattern = "tex$")
+    fig_files <- list.files(pattern = "tex$")
 
     setdiff(ref_fig_files, fig_files)
 }
@@ -274,14 +273,13 @@ check_missing_table_reference_files.chapter <- function(x) {
     if (nrow(ref)) {
         id <- sapply(strsplit(ref$marker, ":"), "[", 3)
         filename <- paste0("tab_", normalize_title(chapter_title(x)), "_", id, ".tex")
-        ref_tab_files <- file.path(chapter_path(x), filename)
+        ref_tab_files <- filename
     } else {
         ref_tab_files <- character(0)
     }
 
     ## Observed tex files
-    tab_files <- list.files(path = chapter_path(x),
-                            pattern = "tex$", full.names = TRUE)
+    tab_files <- list.files(pattern = "tex$")
 
     setdiff(ref_tab_files, tab_files)
 }
