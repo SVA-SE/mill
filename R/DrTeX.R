@@ -150,17 +150,59 @@ docx_footnote <- function(xml)
         footnote <- xml_find_first(xml, xpath)
         if (is.na(footnote))
             break
-        content[[i]] <- footnote
+        content[[i]] <- structure(list(content = footnote),
+                                  class = "docx_paragraph")
         i <- i + 1
     }
 
     structure(list(content = content), class = "docx_footnote")
 }
 
+##' @importFrom xml2 xml_text
+##' @export
+format.docx_footnote <- function(x, indentation = "", ...)
+{
+    lines <- paste0(indentation, "\\begin{tablenotes}")
+
+    ## Write items.
+    indentation <- paste0("  ", indentation)
+    for (i in seq_len(length(x$content))) {
+        lines <- c(lines,
+                   paste0(indentation,
+                          "\\item ",
+                          format(x$content[[i]])))
+    }
+
+    indentation <- substr(indentation, 3, nchar(indentation))
+    lines <- c(lines, paste0(indentation, "\\end{tablenotes}"))
+
+    lines
+}
+
+##' @export
+print.docx_footnote <- function(x, ...)
+{
+    cat(format(x, ...), "\n", sep = "")
+    invisible(x)
+}
+
 ##' @export
 length.docx_footnote <- function(x)
 {
     length(x$content)
+}
+
+##' @export
+format.docx_paragraph <- function(x, ...)
+{
+    xml_text(x$content)
+}
+
+##' @export
+print.docx_paragraph <- function(x, ...)
+{
+    cat(format(x, ...), "\n", sep = "")
+    invisible(x)
 }
 
 ##' Column widths
@@ -423,22 +465,8 @@ format_docx_table_as_tex <- function(tbl, output, indentation = "", standalone =
     lines <- c(lines, paste0(indentation, "\\end{tabular}"))
 
     if (length(tbl$footnote) || isTRUE(threeparttable)) {
-        if (length(tbl$footnote)){
-            lines <- c(lines, paste0(indentation, "\\begin{tablenotes}"))
-
-            ## Write items.
-            indentation <- paste0("  ", indentation)
-            for (i in seq_len(length(tbl$footnote))) {
-                lines <- c(lines,
-                           paste0(indentation,
-                                  "\\item ",
-                                  xml_text(tbl$footnote$content[[i]])))
-            }
-
-            indentation <- substr(indentation, 3, nchar(indentation))
-            lines <- c(lines, paste0(indentation, "\\end{tablenotes}"))
-        }
-
+        if (length(tbl$footnote))
+            lines <- c(lines, format(tbl$footnote, indentation))
         indentation <- substr(indentation, 3, nchar(indentation))
         lines <- c(lines, paste0(indentation, "\\end{threeparttable}"))
     }
@@ -470,7 +498,7 @@ format.docx_table <- function(x, output = c("ascii", "tex"), ...)
 ##' @export
 print.docx_table <- function(x, ...)
 {
-    cat(format(x, ...), "\n", sep = "")
+    cat(format(x, ...), "\n", sep = "\n")
     invisible(x)
 }
 
