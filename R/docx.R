@@ -118,6 +118,16 @@ from_docx <- function(repo = NULL) {
         writeLines(tex, "text.tex")
         if (!is.null(repo))
             add(repo, paste0("chapters/", chapter, "/text.tex"))
+
+        ## Convert tables
+        lapply(docx_tables(f_docx), function(tbl) {
+            prefix <- normalize_title(chapter)
+            lbl <- format(tbl$label, prefix = prefix)
+            filename <- paste0(gsub(":", "_", lbl), ".tex")
+            writeLines(format(tbl, output = "tex", prefix = prefix), filename)
+            if (!is.null(repo))
+                add(repo, paste0("chapters/", chapter, "/", filename))
+        })
     } else if (in_report()) {
         repo <- repository()
         s <- status(repo)
