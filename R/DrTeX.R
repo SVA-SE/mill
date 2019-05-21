@@ -62,20 +62,21 @@ docx_table <- function(xml)
 ##' @export
 docx_caption <- function(xml)
 {
-    stopifnot(identical(xml_name(xml), "p"))
-    structure(list(content = xml), class = "docx_caption")
+    structure(list(content = docx_paragraph(xml)), class = "docx_caption")
 }
 
 ##' @importFrom xml2 xml_text
 ##' @export
-format.docx_caption <- function(x, output = c("ascii", "tex"), prefix = "", ...)
+format.docx_caption <- function(x, output = c("ascii", "tex"), ...)
 {
+    str <- format(x$content, output = output)
+
     if (match.arg(output) == "ascii")
-        return(xml_text(x$content))
+        return(str)
 
     ## Determine the label for the caption.
     pattern <- "^(Table|Figure)[[:space:]]*[[](tab|fig):[^]]+[]]:[[:space:]]*"
-    str <- sub(pattern, "", xml_text(x$content))
+    str <- sub(pattern, "", str)
 
     paste0("\\caption{", str, "}")
 }
@@ -95,8 +96,7 @@ print.docx_caption <- function(x, ...)
 ##' @export
 docx_label <- function(xml)
 {
-    stopifnot(identical(xml_name(xml), "p"))
-    structure(list(content = xml), class = "docx_label")
+    structure(list(content = docx_paragraph(xml)), class = "docx_label")
 }
 
 ##' @importFrom xml2 xml_text
@@ -104,7 +104,7 @@ docx_label <- function(xml)
 format.docx_label <- function(x, output = c("ascii", "tex"), prefix = "", ...)
 {
     pattern <- "^(Table|Figure)[[:space:]]*[[](tab|fig):[^]]+[]]:[[:space:]]*"
-    str <- xml_text(x$content)
+    str <- format(x$content, output = "ascii")
     lbl <- regmatches(str, regexpr(pattern, str))
     lbl <- sub("^Table[[:space:]]*[[]", "", sub("[]]:[[:space:]]*$", "", lbl))
 
@@ -129,7 +129,7 @@ print.docx_label <- function(x, ...)
 ##' @export
 length.docx_label <- function(x)
 {
-    nchar(xml_text(x$content))
+    nchar(format(x$content, output = "ascii"))
 }
 
 ##' Create a docx footnote object
@@ -150,8 +150,7 @@ docx_footnote <- function(xml)
         footnote <- xml_find_first(xml, xpath)
         if (is.na(footnote))
             break
-        content[[i]] <- structure(list(content = footnote),
-                                  class = "docx_paragraph")
+        content[[i]] <- docx_paragraph(footnote)
         i <- i + 1
     }
 
@@ -190,6 +189,18 @@ print.docx_footnote <- function(x, ...)
 length.docx_footnote <- function(x)
 {
     length(x$content)
+}
+
+##' Create a docx paragraph object
+##'
+##' @param xml the xml node for the docx paragraph.
+##' @importFrom xml2 xml_name
+##' @return a \code{docx_paragraph} object.
+##' @export
+docx_paragraph <- function(xml)
+{
+    stopifnot(identical(xml_name(xml), "p"))
+    structure(list(content = xml), class = "docx_paragraph")
 }
 
 ##' @export
