@@ -77,7 +77,7 @@ format.docx_caption <- function(x, output = c("ascii", "tex"), prefix = "", ...)
     pattern <- "^(Table|Figure)[[:space:]]*[[](tab|fig):[^]]+[]]:[[:space:]]*"
     str <- sub(pattern, "", xml_text(x$content))
 
-    paste0("\\caption{", str, "}\n")
+    paste0("\\caption{", str, "}")
 }
 
 ##' @export
@@ -103,9 +103,6 @@ docx_label <- function(xml)
 ##' @export
 format.docx_label <- function(x, output = c("ascii", "tex"), prefix = "", ...)
 {
-    if (match.arg(output) == "ascii")
-        return("")
-
     pattern <- "^(Table|Figure)[[:space:]]*[[](tab|fig):[^]]+[]]:[[:space:]]*"
     str <- xml_text(x$content)
     lbl <- regmatches(str, regexpr(pattern, str))
@@ -116,7 +113,10 @@ format.docx_label <- function(x, output = c("ascii", "tex"), prefix = "", ...)
     if (nchar(prefix))
         lbl <- sub("^tab:", paste0("tab:", prefix, ":"), lbl)
 
-    paste0("\\label{", lbl, "}\n")
+    if (match.arg(output) == "ascii")
+        return(lbl)
+
+    paste0("\\label{", lbl, "}")
 }
 
 ##' @export
@@ -344,7 +344,7 @@ bottom_border <- function(tbl, i, lines, indentation)
     b <- xml_find_all(tbl[i]$content, xpath)
     if (length(b) == ncol(tbl)) {
         border <- ifelse(i < nrow(tbl), "\\midrule", "\\bottomrule")
-        lines <- c(lines, paste0(indentation, border, "\n"))
+        lines <- c(lines, paste0(indentation, border))
     }
 
     lines
@@ -360,19 +360,19 @@ format_docx_table_as_tex <- function(tbl, output, indentation = "", standalone =
     lines <- character(0)
 
     if (isTRUE(standalone)) {
-        lines <- c(lines, paste0(indentation, "\\documentclass{article}\n"))
-        lines <- c(lines, paste0(indentation, "\\usepackage{booktabs}\n"))
-        lines <- c(lines, paste0(indentation, "\\usepackage[margin=1in]{geometry}\n"))
+        lines <- c(lines, paste0(indentation, "\\documentclass{article}"))
+        lines <- c(lines, paste0(indentation, "\\usepackage{booktabs}"))
+        lines <- c(lines, paste0(indentation, "\\usepackage[margin=1in]{geometry}"))
         if (length(tbl$footnote) || isTRUE(threeparttable))
-            lines <- c(lines, paste0(indentation, "\\usepackage{threeparttable}\n"))
-        lines <- c(lines, paste0(indentation, "\\begin{document}\n"))
+            lines <- c(lines, paste0(indentation, "\\usepackage{threeparttable}"))
+        lines <- c(lines, paste0(indentation, "\\begin{document}"))
     }
 
-    lines <- c(lines, paste0(indentation, "\\begin{table}\n"))
+    lines <- c(lines, paste0(indentation, "\\begin{table}"))
 
     if (length(tbl$footnote) || isTRUE(threeparttable)) {
         indentation <- paste0("  ", indentation)
-        lines <- c(lines, paste0(indentation, "\\begin{threeparttable}\n"))
+        lines <- c(lines, paste0(indentation, "\\begin{threeparttable}"))
     }
 
     indentation <- paste0("  ", indentation)
@@ -381,7 +381,7 @@ format_docx_table_as_tex <- function(tbl, output, indentation = "", standalone =
     lines <- c(lines, paste0(indentation,
                              "\\begin{tabular}{",
                              paste0(rep("l", dim(tbl)[2]), collapse = ""),
-                             "}\n"))
+                             "}"))
 
     indentation <- paste0("  ", indentation)
     lines <- top_border(tbl, lines, indentation)
@@ -401,7 +401,7 @@ format_docx_table_as_tex <- function(tbl, output, indentation = "", standalone =
             }
 
             if (j == ncol(row)) {
-                line <- paste0(line, " \\\\\n")
+                line <- paste0(line, " \\\\")
             } else {
                 line <- paste0(line, " & ")
             }
@@ -412,29 +412,29 @@ format_docx_table_as_tex <- function(tbl, output, indentation = "", standalone =
     }
 
     indentation <- substr(indentation, 3, nchar(indentation))
-    lines <- c(lines, paste0(indentation, "\\end{tabular}\n"))
+    lines <- c(lines, paste0(indentation, "\\end{tabular}"))
 
     if (length(tbl$footnote) || isTRUE(threeparttable)) {
         if (length(tbl$footnote)){
-            lines <- c(lines, paste0(indentation, "\\begin{tablenotes}\n"))
+            lines <- c(lines, paste0(indentation, "\\begin{tablenotes}"))
             ## FIXME: Write items.
             ## \item\textsuperscript{A} 2 forest reindeer 1 blesbok.
-            lines <- c(lines, paste0(indentation, "\\end{tablenotes}\n"))
+            lines <- c(lines, paste0(indentation, "\\end{tablenotes}"))
         }
 
         indentation <- substr(indentation, 3, nchar(indentation))
-        lines <- c(lines, paste0(indentation, "\\end{threeparttable}\n"))
+        lines <- c(lines, paste0(indentation, "\\end{threeparttable}"))
     }
 
     if (length(tbl$label))
         lines <- c(lines, paste0(indentation, format(tbl$label, output, ...)))
 
     indentation <- substr(indentation, 3, nchar(indentation))
-    lines <- c(lines, paste0(indentation, "\\end{table}\n"))
+    lines <- c(lines, paste0(indentation, "\\end{table}"))
 
     if (isTRUE(standalone)) {
         indentation <- substr(indentation, 3, nchar(indentation))
-        lines <- c(lines, paste0(indentation, "\\end{document}\n"))
+        lines <- c(lines, paste0(indentation, "\\end{document}"))
     }
 
     lines
