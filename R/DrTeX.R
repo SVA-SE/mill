@@ -343,7 +343,7 @@ top_border <- function(tbl, lines, indentation)
     if (nrow(tbl) > 0) {
         xpath <- "w:tc/w:tcPr/w:tcBorders/w:top"
         b <- xml_find_all(tbl[1]$content, xpath)
-        if (length(b) == ncol(tbl))
+        if (length(b) == ncol(tbl[1]))
             lines <- c(lines, paste0(indentation,"\\toprule"))
     }
 
