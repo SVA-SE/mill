@@ -228,7 +228,8 @@ format.docx_paragraph <- function(x, ...)
         line
     })
 
-    paste0(unlist(lines), collapse = "")
+    lines <- paste0(unlist(lines), collapse = "")
+    gsub("%", "\\%", lines, fixed = TRUE)
 }
 
 ##' @export
