@@ -419,7 +419,7 @@ top_border <- function(tbl, lines, indentation)
         xpath <- "w:tc/w:tcPr/w:tcBorders/w:top"
         b <- xml_find_all(tbl[1]$content, xpath)
         if (length(b) == ncol(tbl[1]))
-            lines <- c(lines, paste0(indentation,"\\toprule"))
+            lines <- c(lines, paste0(indentation,"\\toprule"), "")
     }
 
     lines
@@ -431,8 +431,11 @@ bottom_border <- function(tbl, i, lines, indentation)
     xpath <- "w:tc/w:tcPr/w:tcBorders/w:bottom"
     b <- xml_find_all(tbl[i]$content, xpath)
     if (length(b) == ncol(tbl)) {
-        border <- ifelse(i < nrow(tbl), "\\midrule", "\\bottomrule")
-        lines <- c(lines, paste0(indentation, border))
+        if (i < nrow(tbl)) {
+            lines <- c(lines, paste0(indentation, "\\midrule"), "")
+        } else {
+            lines <- c(lines, paste0(indentation, "\\bottomrule"), "")
+        }
     }
 
     lines
@@ -461,37 +464,42 @@ format_docx_table_as_tex <- function(tbl, output, indentation = "", standalone =
     indentation <- paste0("  ", indentation)
     lines <- c(lines, paste0(indentation, format(tbl$caption, output, ...)))
 
-    lines <- c(lines, paste0(indentation,
-                             "\\begin{tabular}{l",
-                             paste0(rep("r", dim(tbl)[2]-1), collapse = ""),
-                             "}"))
+    lines <- c(lines, paste0(indentation, "\\begin{tabular}{"))
+    indentation <- paste0("    ", indentation)
+    for (i in seq_len(ncol(tbl))) {
+        align <- ifelse (i == 1, "l", "r")
+        if (i == ncol(tbl))
+            align <- paste0(align, "}")
+        lines <- c(lines, paste0(indentation, align))
+    }
+    lines <- c(lines, "")
 
-    indentation <- paste0("  ", indentation)
+    indentation <- substr(indentation, 3, nchar(indentation))
     lines <- top_border(tbl, lines, indentation)
 
     for (i in seq_len(nrow(tbl))) {
         row <- tbl[i]
-        line <- indentation
 
         for (j in seq_len(ncol(row))) {
             cell <- row[j]
             value <- docx_paragraph(xml_find_first(cell$content, "w:p"))
+            value <- format(value)
 
             if (ncol(cell) > 1) {
-                line <- paste0(line, "\\multicolumn{", ncol(cell),
-                               "}{l}{", format(value), "}")
-            } else {
-                line <- paste0(line, format(value))
+                value <- paste0("\\multicolumn{", ncol(cell),
+                                "}{l}{", value, "}")
             }
 
             if (j == ncol(row)) {
-                line <- paste0(line, " \\\\")
+                value <- paste0(value, " \\\\")
             } else {
-                line <- paste0(line, " & ")
+                value <- paste0(value, " &")
             }
+
+            lines <- c(lines, paste0(indentation, value))
         }
 
-        lines <- c(lines, line)
+        lines <- c(lines, "")
         lines <- bottom_border(tbl, i, lines, indentation)
     }
 
