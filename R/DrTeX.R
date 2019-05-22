@@ -146,7 +146,7 @@ docx_footnote <- function(xml)
     repeat {
         xpath <- paste0("following-sibling::w:p[",
                         i,
-                        "][./w:pPr/w:pStyle[@w:val='FootnoteText']]")
+                        "][./w:pPr/w:pStyle[@w:val='FootnoteText' or @w:val='Fotnotstext']]")
         footnote <- xml_find_first(xml, xpath)
         if (is.na(footnote))
             break
