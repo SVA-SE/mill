@@ -122,8 +122,7 @@ from_docx <- function(repo = NULL) {
         ## Convert tables
         lapply(docx_tables(f_docx), function(tbl) {
             prefix <- normalize_title(chapter)
-            lbl <- format(tbl$label, prefix = prefix)
-            filename <- paste0(gsub(":", "_", lbl), ".tex")
+            filename <- paste0(gsub(":", "_", format(tbl$label)), ".tex")
             writeLines(format(tbl, output = "tex", prefix = prefix), filename)
             if (!is.null(repo))
                 add(repo, paste0("chapters/", chapter, "/", filename))
