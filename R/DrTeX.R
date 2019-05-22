@@ -228,8 +228,15 @@ format.docx_paragraph <- function(x, ...)
         line
     })
 
-    lines <- paste0(unlist(lines), collapse = "")
-    gsub("%", "\\%", lines, fixed = TRUE)
+    p <- paste0(unlist(lines), collapse = "")
+
+    ## Escape '%'
+    p <- gsub("%", "\\%", p, fixed = TRUE)
+
+    ## Numprint
+    p <- gsub("([[:digit:]]{5,}(?!-))", "\\\\numprint{\\1}", p, perl = TRUE)
+
+    p
 }
 
 ##' @export
