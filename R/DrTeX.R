@@ -69,7 +69,7 @@ docx_caption <- function(xml)
 ##' @export
 format.docx_caption <- function(x, output = c("ascii", "tex"), ...)
 {
-    str <- format(x$content, output = output)
+    str <- trimws(format(x$content, output = output))
 
     if (match.arg(output) == "ascii")
         return(str)
@@ -104,7 +104,7 @@ docx_label <- function(xml)
 format.docx_label <- function(x, output = c("ascii", "tex"), prefix = "", ...)
 {
     pattern <- "^(Table|Figure)[[:space:]]*[[](tab|fig):[^]]+[]]:[[:space:]]*"
-    str <- format(x$content, output = "ascii")
+    str <- trimws(format(x$content, output = "ascii"))
     lbl <- regmatches(str, regexpr(pattern, str))
     lbl <- sub("^Table[[:space:]]*[[]", "", sub("[]]:[[:space:]]*$", "", lbl))
 
