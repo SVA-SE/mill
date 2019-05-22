@@ -31,6 +31,8 @@ check <- function() {
     result <- c(result, check_reference_format())
     result <- c(result, check_missing_figure_reference_files(report))
     result <- c(result, check_missing_table_reference_files(report))
+    result <- c(result, check_range_character())
+    result <- c(result, check_thousand_separator())
 
     invisible(any(result))
 }
@@ -282,4 +284,90 @@ check_missing_table_reference_files.chapter <- function(x) {
     tab_files <- list.files(pattern = "tex$")
 
     setdiff(ref_tab_files, tab_files)
+}
+
+##' Check range character format
+##'
+##' Checking that the range character is '--' and not '-'
+##' @noRd
+check_range_character <- function()
+{
+    cat("* checking range character ... ")
+
+    pattern <- "[0-9]-[0-9]"
+
+    ## List all tex files
+    tex_files <- list.files("chapters", pattern = "[.]tex$",
+                            recursive = TRUE, full.names = TRUE)
+
+    ## Drop 'typeset.tex'
+    tex_files <- tex_files[!(basename(tex_files) %in% "typeset.tex")]
+
+    l <- sapply(tex_files, function(filename) {
+        lines <- readLines(filename)
+
+        ## Find the line for the reference section. Use the complete
+        ## text if the file doesn't contain a reference section.
+        i <- grep("^\\\\section[*][{]References[}]", lines)
+        if (!length(i))
+            i <- length(lines)
+        stopifnot(identical(length(i), 1L))
+        lines <- lines[seq_len(i)]
+
+        lines <- grep(pattern, lines)
+        length(lines) > 0
+    })
+
+    l <- tex_files[l]
+    if (length(l)) {
+        cat("ERROR\n")
+        lapply(l, function(filename) {
+            cat("   ", filename, "  line(s): ")
+            lines <- grep(pattern, readLines(filename))
+            lines <- paste(lines, collapse = ", ")
+            cat(lines, "\n")
+        })
+        return(TRUE)
+    }
+
+    cat("OK\n")
+    FALSE
+}
+
+##' Check for thousand separator
+##'
+##' @noRd
+check_thousand_separator <- function()
+{
+    cat("* checking thousand separator ... ")
+
+    pattern <- "[0-9]\\s+[0-9]"
+
+    ## List all tex files.
+    tex_files <- list.files("chapters", pattern = "[.]tex$",
+                            recursive = TRUE, full.names = TRUE)
+
+    ## Drop 'typeset.tex' and 'fig_*.tex' files.
+    tex_files <- tex_files[!(basename(tex_files) %in% "typeset.tex")]
+    tex_files <- tex_files[!startsWith(basename(tex_files), "fig_")]
+
+    l <- sapply(tex_files, function(filename) {
+        lines <- grep(pattern, readLines(filename))
+        length(lines) > 0
+    })
+
+    l <- tex_files[l]
+    if (length(l)) {
+        cat("ERROR\n")
+        lapply(l, function(filename) {
+            cat("   ", filename, "  line(s): ")
+            lines <- grep(pattern, readLines(filename))
+            lines <- paste(lines, collapse = ", ")
+            cat(lines, "\n")
+        })
+        return(TRUE)
+    }
+
+    cat("OK\n")
+    FALSE
 }
