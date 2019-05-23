@@ -294,7 +294,7 @@ check_range_character <- function()
 {
     cat("* checking range character ... ")
 
-    pattern <- "[0-9]-[0-9]"
+    pattern <- "(?<!(-|\\d))\\d+-\\d+(?!(-|\\d))"
 
     ## List all tex files
     tex_files <- list.files("chapters", pattern = "[.]tex$",
@@ -314,7 +314,7 @@ check_range_character <- function()
         stopifnot(identical(length(i), 1L))
         lines <- lines[seq_len(i)]
 
-        lines <- grep(pattern, lines)
+        lines <- grep(pattern, lines, perl = TRUE)
         length(lines) > 0
     })
 
@@ -323,7 +323,7 @@ check_range_character <- function()
         cat("ERROR\n")
         lapply(l, function(filename) {
             cat("   ", filename, "  line(s): ")
-            lines <- grep(pattern, readLines(filename))
+            lines <- grep(pattern, readLines(filename), perl = TRUE)
             lines <- paste(lines, collapse = ", ")
             cat(lines, "\n")
         })
