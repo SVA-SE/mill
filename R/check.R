@@ -33,6 +33,8 @@ check <- function() {
     result <- c(result, check_missing_table_reference_files(report))
     result <- c(result, check_range_character())
     result <- c(result, check_thousand_separator())
+    result <- c(result, check_multiple_dots())
+    result <- c(result, check_multiple_commas())
 
     invisible(any(result))
 }
@@ -352,6 +354,80 @@ check_thousand_separator <- function()
     ## Drop 'typeset.tex' and 'fig_*.tex' files.
     tex_files <- tex_files[!(basename(tex_files) %in% "typeset.tex")]
     tex_files <- tex_files[!startsWith(basename(tex_files), "fig_")]
+
+    l <- sapply(tex_files, function(filename) {
+        lines <- grep(pattern, readLines(filename))
+        length(lines) > 0
+    })
+
+    l <- tex_files[l]
+    if (length(l)) {
+        cat("ERROR\n")
+        lapply(l, function(filename) {
+            cat("   ", filename, "  line(s): ")
+            lines <- grep(pattern, readLines(filename))
+            lines <- paste(lines, collapse = ", ")
+            cat(lines, "\n")
+        })
+        return(TRUE)
+    }
+
+    cat("OK\n")
+    FALSE
+}
+
+##' Check for multiple '.'
+##'
+##' @noRd
+check_multiple_dots <- function()
+{
+    cat("* checking multiple dots ... ")
+
+    pattern <- "[.]\\s*[.]"
+
+    ## List all tex files.
+    tex_files <- list.files("chapters", pattern = "[.]tex$",
+                            recursive = TRUE, full.names = TRUE)
+
+    ## Drop 'typeset.tex'.
+    tex_files <- tex_files[!(basename(tex_files) %in% "typeset.tex")]
+
+    l <- sapply(tex_files, function(filename) {
+        lines <- grep(pattern, readLines(filename))
+        length(lines) > 0
+    })
+
+    l <- tex_files[l]
+    if (length(l)) {
+        cat("ERROR\n")
+        lapply(l, function(filename) {
+            cat("   ", filename, "  line(s): ")
+            lines <- grep(pattern, readLines(filename))
+            lines <- paste(lines, collapse = ", ")
+            cat(lines, "\n")
+        })
+        return(TRUE)
+    }
+
+    cat("OK\n")
+    FALSE
+}
+
+##' Check for multiple ','
+##'
+##' @noRd
+check_multiple_commas <- function()
+{
+    cat("* checking multiple commas ... ")
+
+    pattern <- "[,]\\s*[,]"
+
+    ## List all tex files.
+    tex_files <- list.files("chapters", pattern = "[.]tex$",
+                            recursive = TRUE, full.names = TRUE)
+
+    ## Drop 'typeset.tex'.
+    tex_files <- tex_files[!(basename(tex_files) %in% "typeset.tex")]
 
     l <- sapply(tex_files, function(filename) {
         lines <- grep(pattern, readLines(filename))
