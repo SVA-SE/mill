@@ -10,7 +10,7 @@ create_Makefile <- function() {
                    "\tRscript -e \"mill::to_pdf()\"",
                    "",
                    "import:",
-                   "\tRscript -e \"mill::import(); mill::from_docx()\"",
+                   "\tRscript -e \"mill::import(); mill::from_docx(git2r::repository())\"",
                    "",
                    "diff:",
                    "\tRscript -e \"mill::create_patch()\"",
