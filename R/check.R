@@ -294,7 +294,9 @@ check_range_character <- function()
 {
     cat("* checking range character ... ")
 
-    pattern <- "(?<!(-|\\d))\\d+-\\d+(?!(-|\\d))"
+    ## Identify for example '2016-2017' but exclude '3-19-11-N-311' or
+    ## '{1-1}'.
+    pattern <- "(?<!(-|\\d|{))\\d+-\\d+(?!(-|\\d|}))"
 
     ## List all tex files
     tex_files <- list.files("chapters", pattern = "[.]tex$",
