@@ -420,33 +420,12 @@ format_docx_table_as_ascii <- function(tbl, output, ...)
     lines
 }
 
-top_border <- function(tbl, lines, indentation)
-{
-    ## Check if every cell in the firts row contains a top border.
-    if (nrow(tbl) > 0) {
-        xpath <- "w:tc/w:tcPr/w:tcBorders/w:top"
-        b <- xml_find_all(tbl[1]$content, xpath)
-        if (length(b) == ncol(tbl[1]))
-            lines <- c(lines, paste0(indentation,"\\toprule"), "")
-    }
-
-    lines
-}
-
-bottom_border <- function(tbl, i, lines, indentation)
+is_midrule <- function(tbl, i)
 {
     ## Check if every cell in the row contains a bottom border.
     xpath <- "w:tc/w:tcPr/w:tcBorders/w:bottom"
     b <- xml_find_all(tbl[i]$content, xpath)
-    if (length(b) == ncol(tbl)) {
-        if (i < nrow(tbl)) {
-            lines <- c(lines, paste0(indentation, "\\midrule"), "")
-        } else {
-            lines <- c(lines, paste0(indentation, "\\bottomrule"), "")
-        }
-    }
-
-    lines
+    length(b) == ncol(tbl) && i < nrow(tbl)
 }
 
 format_docx_table_as_tex <- function(tbl,
@@ -455,6 +434,7 @@ format_docx_table_as_tex <- function(tbl,
                                      standalone = FALSE,
                                      threeparttable = FALSE,
                                      position = "[H]",
+                                     addlinespace = 3,
                                      ...)
 {
     lines <- character(0)
@@ -489,7 +469,10 @@ format_docx_table_as_tex <- function(tbl,
     lines <- c(lines, "")
 
     indentation <- substr(indentation, 3, nchar(indentation))
-    lines <- top_border(tbl, lines, indentation)
+    lines <- c(lines, paste0(indentation,"\\toprule"), "")
+
+    ## Keep track of the line number for the last '\midrule'.
+    midrule <- NA
 
     for (i in seq_len(nrow(tbl))) {
         row <- tbl[i]
@@ -514,7 +497,17 @@ format_docx_table_as_tex <- function(tbl,
         }
 
         lines <- c(lines, "")
-        lines <- bottom_border(tbl, i, lines, indentation)
+
+        if (is_midrule(tbl, i)) {
+            lines <- c(lines, paste0(indentation, "\\midrule"), "")
+            midrule <- i
+        } else if (((i - midrule) %% addlinespace) == 0 && i < nrow(tbl)) {
+            lines <- c(lines, paste0(indentation, "\\addlinespace"))
+            lines <- c(lines, "")
+        }
+
+        if (i == nrow(tbl))
+            lines <- c(lines, paste0(indentation, "\\bottomrule"), "")
     }
 
     indentation <- substr(indentation, 3, nchar(indentation))
