@@ -523,12 +523,15 @@ format_docx_table_as_tex <- function(tbl,
     if (length(tbl$footnote) || isTRUE(threeparttable)) {
         if (length(tbl$footnote))
             lines <- c(lines, format(tbl$footnote, indentation))
+
+        if (length(tbl$label))
+            lines <- c(lines, paste0(indentation, format(tbl$label, output, ...)))
+
         indentation <- substr(indentation, 3, nchar(indentation))
         lines <- c(lines, paste0(indentation, "\\end{threeparttable}"))
-    }
-
-    if (length(tbl$label))
+    } else if (length(tbl$label)) {
         lines <- c(lines, paste0(indentation, format(tbl$label, output, ...)))
+    }
 
     indentation <- substr(indentation, 3, nchar(indentation))
     lines <- c(lines, paste0(indentation, "\\end{table}"))
