@@ -449,7 +449,13 @@ bottom_border <- function(tbl, i, lines, indentation)
     lines
 }
 
-format_docx_table_as_tex <- function(tbl, output, indentation = "", standalone = FALSE, threeparttable = FALSE, ...)
+format_docx_table_as_tex <- function(tbl,
+                                     output,
+                                     indentation = "",
+                                     standalone = FALSE,
+                                     threeparttable = FALSE,
+                                     position = "[H]",
+                                     ...)
 {
     lines <- character(0)
 
@@ -462,7 +468,7 @@ format_docx_table_as_tex <- function(tbl, output, indentation = "", standalone =
         lines <- c(lines, paste0(indentation, "\\begin{document}"))
     }
 
-    lines <- c(lines, paste0(indentation, "\\begin{table}"))
+    lines <- c(lines, paste0(indentation, "\\begin{table}", position))
 
     if (length(tbl$footnote) || isTRUE(threeparttable)) {
         indentation <- paste0("  ", indentation)
