@@ -29,12 +29,13 @@ check <- function() {
     result <- check_tex_to_docx_round_trip()
     result <- c(result, check_apply_typeset_patch())
     result <- c(result, check_reference_format())
-    result <- c(result, check_missing_figure_reference_files(report))
-    result <- c(result, check_missing_table_reference_files(report))
+    ## result <- c(result, check_missing_figure_reference_files(report))
+    ## result <- c(result, check_missing_table_reference_files(report))
     result <- c(result, check_range_character())
     result <- c(result, check_thousand_separator())
     result <- c(result, check_multiple_dots())
     result <- c(result, check_multiple_commas())
+    result <- c(result, check_apostrophe())
 
     invisible(any(result))
 }
@@ -421,6 +422,46 @@ check_multiple_commas <- function()
     cat("* checking multiple commas ... ")
 
     pattern <- "[,]\\s*[,]"
+
+    ## List all tex files.
+    tex_files <- list.files("chapters", pattern = "[.]tex$",
+                            recursive = TRUE, full.names = TRUE)
+
+    ## Drop 'typeset.tex'.
+    tex_files <- tex_files[!(basename(tex_files) %in% "typeset.tex")]
+
+    l <- sapply(tex_files, function(filename) {
+        lines <- grep(pattern, readLines(filename))
+        length(lines) > 0
+    })
+
+    l <- tex_files[l]
+    if (length(l)) {
+        cat("ERROR\n")
+        lapply(l, function(filename) {
+            cat("   ", filename, "  line(s): ")
+            lines <- grep(pattern, readLines(filename))
+            lines <- paste(lines, collapse = ", ")
+            cat(lines, "\n")
+        })
+        return(TRUE)
+    }
+
+    cat("OK\n")
+    FALSE
+}
+
+##' Check for incorrect apostrophe character (´)
+##'
+##' Specifically the use of an acute accent character in place of the
+##' perferred U+0027 character.
+##'
+##' @noRd
+check_apostrophe <- function()
+{
+    cat("* checking for incorrect apostrophe character ...")
+
+    pattern <- "\u00b4"
 
     ## List all tex files.
     tex_files <- list.files("chapters", pattern = "[.]tex$",
