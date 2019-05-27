@@ -236,6 +236,9 @@ format.docx_paragraph <- function(x, ...)
     ## Numprint
     p <- gsub("([[:digit:]]{5,}(?!-))", "\\\\numprint{\\1}", p, perl = TRUE)
 
+    ## replace U+00a0 with ~ '%'
+    p <- gsub("\u00a0", "~", p, fixed = TRUE)
+
     p
 }
 
