@@ -381,10 +381,10 @@ format_docx_table_as_ascii <- function(tbl, output, ...)
     ## Line for the top and bottom borders.
     l <- paste0("+", paste0(rep("---", ncol(tbl)), collapse = "+"), "+")
 
-    lines <- paste0(format(tbl$caption, output), "\n")
+    lines <- format(tbl$caption, output)
     for (i in seq_len(nrow(tbl))) {
         if (i == 1)
-            lines <- c(lines, paste0(l, "\n"))
+            lines <- c(lines, l)
 
         row <- tbl[i]
         for (j in seq_len(ncol(row))) {
@@ -416,8 +416,7 @@ format_docx_table_as_ascii <- function(tbl, output, ...)
         if (i == nrow(tbl))
             hb <- l
 
-        lines <- c(lines, paste0(vb, "\n"))
-        lines <- c(lines, paste0(hb, "\n"))
+        lines <- c(lines, vb, hb)
     }
 
     lines
