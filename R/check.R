@@ -39,6 +39,8 @@ check <- function() {
                                       "checking for incorrect apostrophe character"))
     result <- c(result, check_pattern("[/]\\s*[\\]numprint[{]100000[}]",
                                       "checking for incorrect 'per 100000 inhabitants'"))
+    result <- c(result, check_pattern("[0-9]\\s+[\\][%]",
+                                      "checking for space between digit and '%'"))
 
     invisible(any(result))
 }
