@@ -4,7 +4,7 @@
 \alias{luatex_cmd}
 \title{Select a luatex system call}
 \usage{
-luatex_cmd()
+luatex_cmd(options = "--interaction=nonstopmode")
 }
 \value{
 character string, giving the luatex command to run. On
