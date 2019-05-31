@@ -35,7 +35,10 @@ check <- function() {
     result <- c(result, check_thousand_separator())
     result <- c(result, check_pattern("[.]\\s*[.]", "checking multiple dots"))
     result <- c(result, check_pattern("[,]\\s*[,]", "checking multiple commas"))
-    result <- c(result, check_pattern("\u00b4", "checking for incorrect apostrophe character"))
+    result <- c(result, check_pattern("\u00b4",
+                                      "checking for incorrect apostrophe character"))
+    result <- c(result, check_pattern("[/][\\]numprint[{]100000[}]",
+                                      "checking for incorrect 'per 100000 inhabitants'"))
 
     invisible(any(result))
 }
