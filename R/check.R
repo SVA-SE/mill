@@ -41,6 +41,7 @@ check <- function() {
                                       "checking for incorrect 'per 100000 inhabitants'"))
     result <- c(result, check_pattern("[0-9]\\s+[\\][%]",
                                       "checking for space between digit and '%'"))
+    result <- c(result, check_highlight())
 
     invisible(any(result))
 }
@@ -409,6 +410,35 @@ check_pattern <- function(pattern, description)
             lines <- grep(pattern, readLines(filename))
             lines <- paste(lines, collapse = ", ")
             cat(lines, "\n")
+        })
+        return(TRUE)
+    }
+
+    cat("OK\n")
+    FALSE
+}
+
+##' Utility function to check for highlights in patch-files.
+##'
+##' @noRd
+check_highlight <- function()
+{
+    cat("* checking for highlights in patches ...")
+
+    ## List all patch files.
+    patch_files <- list.files("chapters", pattern = "[.]patch$",
+                              recursive = TRUE, full.names = TRUE)
+
+    l <- sapply(patch_files, function(filename) {
+        lines <- grep("[\\]hl[{]", readLines(filename))
+        length(lines) > 0
+    })
+
+    l <- patch_files[l]
+    if (length(l)) {
+        cat("ERROR\n")
+        lapply(l, function(filename) {
+            cat("   ", filename, "\n")
         })
         return(TRUE)
     }
