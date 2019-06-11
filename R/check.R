@@ -43,6 +43,8 @@ check <- function() {
                                       "checking for space between digit and '%'"))
     result <- c(result, check_pattern("http[:]//",
                                       "checking for 'http://'"))
+    result <- c(result, check_pattern("2017",
+                                      "checking for '2017'"))
     result <- c(result, check_highlight())
 
     invisible(any(result))
