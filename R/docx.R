@@ -189,7 +189,10 @@ convert_docx_ref_to_ref <- function(tex, title) {
     title <- normalize_title(title)
     pattern <- "[{][[][}]([^:]*)[:]([^{]*)[{}[]][}]"
     replacement <- paste0("\\\\ref{\\1:", title, ":\\2}")
-    gsub(pattern, replacement, tex)
+    tex <- gsub(pattern, replacement, tex)
+
+    ## Replace space between 'something \ref' with 'something~\ref'.
+    gsub("\\s+\\\\ref", "~\\\\ref", tex)
 }
 
 ##' Convert the tex ref to docx ref
