@@ -41,6 +41,8 @@ check <- function() {
                                       "checking for incorrect 'per 100000 inhabitants'"))
     result <- c(result, check_pattern("[0-9]\\s+[\\][%]",
                                       "checking for space between digit and '%'"))
+    result <- c(result, check_pattern("http[:]//",
+                                      "checking for 'http://'"))
     result <- c(result, check_highlight())
 
     invisible(any(result))
