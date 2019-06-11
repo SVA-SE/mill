@@ -4,7 +4,7 @@
 ##'     Windows: \code{texify --pdf --engine=luatex
 ##'     --max-iterations=50}, else \code{lualatex}.
 ##' @keywords internal
-luatex_cmd <- function(options = "--interaction=nonstopmode") {
+luatex_cmd <- function(options = c("--interaction=nonstopmode", "-V 7")) {
     if(.Platform$OS.type == "windows")
         return("texify --pdf --engine=luatex --max-iterations=50")
     return(paste("lualatex", options))
