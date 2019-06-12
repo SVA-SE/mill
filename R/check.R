@@ -21,7 +21,7 @@ check <- function() {
         return(invisible(TRUE))
     }
     cat("OK\n    ")
-    cat(capture.output(report), sep = "\n    ")
+    cat(capture.output(report)[1:4], sep = "\n    ")
 
     if (check_expect_clean_repository())
         return(invisible(TRUE))
@@ -43,8 +43,20 @@ check <- function() {
                                       "checking for space between digit and '%'"))
     result <- c(result, check_pattern("http[:]//",
                                       "checking for 'http://'"))
-    result <- c(result, check_pattern("2017",
-                                      "checking for '2017'"))
+    ## result <- c(result, check_pattern("2017",
+    ##                                   "checking for '2017'"))
+    result <- c(result, check_pattern("(?<![a-z\\{])figure(?![a-z])",
+                                      "checking for lowercase 'figure'",
+                                      perl = TRUE))
+    result <- c(result, check_pattern("(?<![a-z\\{])table(?![a-z])",
+                                      "checking for lowercase 'table'",
+                                      perl = TRUE))
+    result <- c(result, check_pattern("[fF]ig(?![u:_])",
+                                      "checking for shortform of figure",
+                                      perl = TRUE))
+    result <- c(result, check_pattern("(?<![a-z\\{])[tT]ab(?![l:_])",
+                                      "checking for shortform of table",
+                                      perl = TRUE))
     result <- c(result, check_highlight())
 
     invisible(any(result))
@@ -390,7 +402,7 @@ check_thousand_separator <- function()
 ##' Utility function to check for a pattern in tex-files.
 ##'
 ##' @noRd
-check_pattern <- function(pattern, description)
+check_pattern <- function(pattern, description, perl = FALSE)
 {
     cat(paste("*", description, "... "))
 
@@ -402,7 +414,7 @@ check_pattern <- function(pattern, description)
     tex_files <- tex_files[!(basename(tex_files) %in% "typeset.tex")]
 
     l <- sapply(tex_files, function(filename) {
-        lines <- grep(pattern, readLines(filename))
+        lines <- grep(pattern, readLines(filename), perl = perl)
         length(lines) > 0
     })
 
@@ -411,7 +423,7 @@ check_pattern <- function(pattern, description)
         cat("ERROR\n")
         lapply(l, function(filename) {
             cat("   ", filename, "  line(s): ")
-            lines <- grep(pattern, readLines(filename))
+            lines <- grep(pattern, readLines(filename), perl = perl)
             lines <- paste(lines, collapse = ", ")
             cat(lines, "\n")
         })
