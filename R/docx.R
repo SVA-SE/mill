@@ -59,7 +59,7 @@ import <- function() {
         chapter <- basename(getwd())
         from <- paste0("../../workspace/chapters/", chapter)
         if (!dir.exists(from))
-            stop("Invalid directory")
+            stop("Invalid directory:", from)
 
         ## Import title.docx to text.docx
         from <- paste0(from, "/", chapter, ".docx")
