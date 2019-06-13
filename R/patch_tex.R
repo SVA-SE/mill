@@ -28,6 +28,19 @@ do_apply_patch <- function(from, patchfile, to)
 apply_patch <- function() {
     if (in_chapter()) {
         do_apply_patch("text.tex", "typeset.patch", "typeset.tex")
+
+        ## Table patching
+        chapter <- basename(getwd())
+        table_files <- list.files(pattern = "^tab_[^.]+[.]tex")
+        pattern <- paste0("^tab_", normalize_title(chapter), "_")
+        i <- grepl(pattern = pattern, x = table_files)
+        table_files <- table_files[!i]
+
+        lapply(table_files, function(from) {
+            patch <- paste0(file_path_sans_ext(from), ".patch")
+            to <-sub("^tab", paste0("tab_", normalize_title(chapter)), from)
+            do_apply_patch(from, patch, to)
+        })
     } else if (in_report()) {
         lapply(list.files("chapters"), function(chapter) {
             wd <- setwd(paste0("chapters/", chapter))
@@ -66,6 +79,19 @@ do_create_patch <- function(from, to, patchfile)
 create_patch <- function() {
     if (in_chapter()) {
         do_create_patch("text.tex", "typeset.tex", "typeset.patch")
+
+        ## Table diff
+        chapter <- basename(getwd())
+        table_files <- list.files(pattern = "^tab_[^.]+[.]tex")
+        pattern <- paste0("^tab_", normalize_title(chapter), "_")
+        i <- grepl(pattern = pattern, x = table_files)
+        table_files <- table_files[!i]
+
+        lapply(table_files, function(from) {
+            patch <- paste0(file_path_sans_ext(from), ".patch")
+            to <-sub("^tab", paste0("tab_", normalize_title(chapter)), from)
+            do_create_patch(from, to, patch)
+        })
     } else if (in_report()) {
         lapply(list.files("chapters"), function(chapter) {
             wd <- setwd(paste0("chapters/", chapter))
