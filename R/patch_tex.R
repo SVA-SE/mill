@@ -1,24 +1,33 @@
+do_apply_patch <- function(from, patchfile, to)
+{
+    if (!file.exists(patchfile)) {
+        file.copy(from = from, to = to, overwrite = TRUE)
+        return(NULL)
+    }
+
+    output <- tryCatch(system2("patch",
+                               args = c(from,
+                                        "-i", patchfile,
+                                        "-o", to),
+                               stdout = TRUE, stderr = TRUE),
+                       warning = function(w) w)
+
+    if (!identical(output,
+                   paste0("patching file ", to, " (read from ", from, ")")))
+    {
+        stop(paste("Unable to apply patch: ", basename(getwd())))
+    }
+
+    NULL
+}
+
 ##' Apply patch
 ##'
 ##' @return invisible(NULL)
 ##' @export
 apply_patch <- function() {
     if (in_chapter()) {
-        if (!file.exists("typeset.patch")) {
-            file.copy(from = "text.tex", to = "typeset.tex", overwrite = TRUE)
-            return(invisible(NULL))
-        }
-
-        output <- tryCatch(system2("patch",
-                                   args = c("text.tex", "-i", "typeset.patch",
-                                            "-o", "typeset.tex"),
-                                   stdout = TRUE, stderr = TRUE),
-                           warning = function(w) w)
-
-        if (!identical(output,
-                       "patching file typeset.tex (read from text.tex)")) {
-            stop(paste("Unable to apply patch: ", basename(getwd())))
-        }
+        do_apply_patch("text.tex", "typeset.patch", "typeset.tex")
     } else if (in_report()) {
         lapply(list.files("chapters"), function(chapter) {
             wd <- setwd(paste0("chapters/", chapter))
