@@ -39,23 +39,33 @@ apply_patch <- function() {
     invisible(NULL)
 }
 
+do_create_patch <- function(from, to, patchfile)
+{
+    if (!file.exists(to))
+        stop(paste0("Missing file '", to, "'"))
+
+    if (!file.exists(from))
+        stop(paste0("Missing file '", from, "'"))
+
+    system2("diff",
+            args = c("-c", "--label=text",
+                     "--label=typeset",
+                     from, to, ">", patchfile))
+
+    ## Drop empty patch
+    if (!file.size(patchfile))
+        unlink(patchfile)
+
+    NULL
+}
+
 ##' Create patch
 ##'
 ##' @return invisible(NULL)
 ##' @export
 create_patch <- function() {
     if (in_chapter()) {
-        if (!file.exists("typeset.tex"))
-            stop("Missing file 'typeset.tex'")
-
-        system2("diff",
-                args = c("-c", "--label=text",
-                         "--label=typeset", "text.tex",
-                         "typeset.tex > typeset.patch"))
-
-        ## Drop empty patch
-        if (!file.size("typeset.patch"))
-            unlink("typeset.patch")
+        do_create_patch("text.tex", "typeset.tex", "typeset.patch")
     } else if (in_report()) {
         lapply(list.files("chapters"), function(chapter) {
             wd <- setwd(paste0("chapters/", chapter))
