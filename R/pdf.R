@@ -119,7 +119,7 @@ to_pdf_chapter <- function(build = TRUE, type = c("print", "web")) {
         if (file.exists(from)) {
             to <- paste0("../../build/", from)
             file.copy(from, to)
-        })
+        }
     }
 
     invisible(NULL)
