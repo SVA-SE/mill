@@ -113,6 +113,11 @@ to_pdf_chapter <- function(build = TRUE, type = c("print", "web")) {
                 file.copy(from, to)
             }
         })
+
+        ## Copy the infocus text if its there
+        file <- list.files(pattern = "^fig_.*infocus.tex$")
+        stopifnot(length(file) <= 1)
+        file.copy(file, paste0("../../build/", file))
     }
 
     invisible(NULL)
