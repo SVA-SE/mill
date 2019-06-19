@@ -114,9 +114,9 @@ to_pdf_chapter <- function(build = TRUE, type = c("print", "web")) {
             }
         })
 
-        ## Copy any 'infocus' tex-files in the chapter
-        files <- list.files(pattern = "_infocus[.]tex$")
-        lapply(files, function(from) {
+        ## Copy the 'infocus' tex-file in the chapter (if it exists).
+        from <- paste0("infocus_", normalize_title(chapter), ".tex")
+        if (file.exists(from)) {
             to <- paste0("../../build/", from)
             file.copy(from, to)
         })
