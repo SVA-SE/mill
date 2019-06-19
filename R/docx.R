@@ -80,17 +80,17 @@ import <- function() {
 
 style_fun <- function(tex, chapter)
 {
-    tex <- style_drop_section(tex, "In focus")
     tex <- style_drop_section(tex, "Figures")
     tex <- style_drop_section(tex, "Tables")
     tex <- convert_docx_ref_to_ref(tex, chapter)
     tex <- make_labels_chapter_specific(tex, chapter)
     tex <- make_hypertargets_chapter_specific(tex, chapter)
     tex <- asterisk(tex, "add")
-    tex <- add_empty_line_between_references(tex)
     tex <- style_toc(tex, output = "tex")
-    tex <- style_multicols(tex, output = "tex")
     tex <- style_numprint(tex, output = "tex")
+    tex <- style_drop_section(tex, "In focus", "infocus.tex")
+    tex <- add_empty_line_between_references(tex)
+    tex <- style_multicols(tex, output = "tex")
     tex
 }
 
@@ -152,18 +152,24 @@ normalize_title <- function(title)
     gsub("[[:space:]]+", "-", tolower(title))
 }
 
-style_drop_section <- function(tex, section)
+style_drop_section <- function(tex, section, filename = NULL)
 {
-    i <- grep(paste0("^[\\]section[{]", section, "[}]"), tex)
+    i <- grep(paste0("^[\\]section[*]?[{]", section, "[}]"), tex)
     if (length(i) && i > 2) {
         section <- normalize_title(section)
-        if (startsWith(tex[i - 1], paste0("\\hypertarget{", section, "}{%"))) {
+        if (startsWith(tex[i - 1], paste0("\\hypertarget{"))) {
             i <- i - 2
         }
 
         ## Remove empty lines.
-        while (i > 1 && nchar(tex[i]) == 0) {
+        while (i > 1 && ((nchar(tex[i]) == 0) || tex[i] == "\\\\\\\\")) {
             i <- i - 1
+        }
+
+        if (!is.null(filename)) {
+            j <- seq(from = i + 1, to = length(tex))
+            writeLines(tex[j], filename)
+            git2r::add(repository(), filename)
         }
 
         tex <- tex[seq_len(i)]
