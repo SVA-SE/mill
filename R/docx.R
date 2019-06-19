@@ -495,6 +495,14 @@ cleanup <- function() {
         unlink("text.docx")
         unlink("typeset.tex")
         unlink("typeset.tex.rej")
+
+        ## Table tex-files
+        ref <- references()
+        lapply(ref[ref$reftype == "tab", "marker"], function(marker) {
+            marker <- paste0(gsub(":", "_", marker), ".tex")
+            unlink(marker)
+        })
+
     } else if (in_report()) {
         lapply(list.files("chapters"), function(chapter) {
             wd <- setwd(paste0("chapters/", chapter))
