@@ -156,7 +156,7 @@ style_drop_section <- function(tex, section)
 {
     i <- grep(paste0("^[\\]section[{]", section, "[}]"), tex)
     if (length(i) && i > 2) {
-        section <- tolower(section)
+        section <- normalize_title(section)
         if (startsWith(tex[i - 1], paste0("\\hypertarget{", section, "}{%"))) {
             i <- i - 2
         }
