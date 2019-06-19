@@ -41,6 +41,12 @@ apply_patch <- function() {
             to <-sub("^tab", paste0("tab_", normalize_title(chapter)), from)
             do_apply_patch(from, patch, to)
         })
+
+        ## Infocus patching
+        if (file.exists("infocus.tex")) {
+            to <-paste0("infocus_", normalize_title(chapter), ".tex")
+            do_apply_patch("infocus.tex", "infocus.patch", to)
+        }
     } else if (in_report()) {
         lapply(list.files("chapters"), function(chapter) {
             wd <- setwd(paste0("chapters/", chapter))
@@ -92,6 +98,14 @@ create_patch <- function() {
             to <-sub("^tab", paste0("tab_", normalize_title(chapter)), from)
             do_create_patch(from, to, patch)
         })
+
+        ## Infocus diff
+        from <- paste0("infocus_", normalize_title(chapter), ".tex")
+        if (file.exists("infocus.tex")) {
+            do_create_patch("infocus.tex",
+                            paste0("infocus_", normalize_title(chapter), ".tex"),
+                            "infocus.patch")
+        }
     } else if (in_report()) {
         lapply(list.files("chapters"), function(chapter) {
             wd <- setwd(paste0("chapters/", chapter))
