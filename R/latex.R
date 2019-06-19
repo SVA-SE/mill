@@ -59,6 +59,8 @@ references_chapter <- function() {
     files <- chapter_tex_files()
 
     do.call("rbind", (lapply(files, function(filename) {
+        if (!file.exists(filename))
+            stop("Missing file:", paste0(getwd(), "/", filename))
         tex <- readLines(filename)
         m <- regmatches(tex, gregexpr(pattern, tex))
         m <- unlist(lapply(m, function(y) {
