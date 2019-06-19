@@ -80,7 +80,9 @@ import <- function() {
 
 style_fun <- function(tex, chapter)
 {
-    tex <- style_drop_figures_and_tables(tex)
+    tex <- style_drop_section(tex, "In focus")
+    tex <- style_drop_section(tex, "Figures")
+    tex <- style_drop_section(tex, "Tables")
     tex <- convert_docx_ref_to_ref(tex, chapter)
     tex <- make_labels_chapter_specific(tex, chapter)
     tex <- make_hypertargets_chapter_specific(tex, chapter)
@@ -145,11 +147,12 @@ from_docx <- function(repo = NULL) {
     invisible()
 }
 
-normalize_title <- function(title) {
+normalize_title <- function(title)
+{
     gsub("[[:space:]]+", "-", tolower(title))
 }
 
-drop_section <- function(tex, section)
+style_drop_section <- function(tex, section)
 {
     i <- grep(paste0("^[\\]section[{]", section, "[}]"), tex)
     if (length(i) && i > 2) {
@@ -166,18 +169,6 @@ drop_section <- function(tex, section)
         tex <- tex[seq_len(i)]
     }
 
-    tex
-}
-
-##' Remove figures and tables sections
-##'
-##' @param tex The tex character vector
-##' @return tex character vector
-##' @noRd
-style_drop_figures_and_tables <- function(tex)
-{
-    tex <- drop_section(tex, "Figures")
-    tex <- drop_section(tex, "Tables")
     tex
 }
 
