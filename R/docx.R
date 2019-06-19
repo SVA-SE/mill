@@ -63,6 +63,8 @@ import <- function() {
 
         ## Import title.docx to text.docx
         from <- paste0(from, "/", chapter, ".docx")
+        if (!file.exists(from))
+            stop("Missing file:", from)
         to <- "text.docx"
         file.copy(from, to, overwrite = TRUE)
     } else if (in_report()) {
