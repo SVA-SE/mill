@@ -206,29 +206,29 @@ docx_paragraph <- function(xml)
 ##' @export
 format.docx_paragraph <- function(x, ...)
 {
-    lines <- lapply(xml_find_all(x$content, "w:r"), function(r) {
+    p <- lapply(xml_find_all(x$content, "w:r"), function(r) {
+        n <- 0
         line <- character(0)
 
-        superscript <- xml_find_first(r, "w:rPr/w:vertAlign[@w:val='superscript']")
-        if (!is.na(superscript))
+        if (!is.na(xml_find_first(r, "w:rPr/w:vertAlign[@w:val='superscript']"))) {
             line <- paste0(line, "\\textsuperscript{")
-        italic <- xml_find_first(r, "w:rPr/w:i")
-        if (!is.na(italic))
+            n <- n + 1
+        }
+
+        if (!is.na(xml_find_first(r, "w:rPr/w:i"))) {
             line <- paste0(line, "\\textit{")
-        bold <- xml_find_first(r, "w:rPr/w:b")
-        if (!is.na(bold))
+            n <- n + 1
+        }
+
+        if (!is.na(xml_find_first(r, "w:rPr/w:b"))) {
             line <- paste0(line, "\\textbf{")
-        line <- paste0(line, xml_text(r))
-        if (!is.na(bold))
-            line <- paste0(line, "}")
-        if (!is.na(italic))
-            line <- paste0(line, "}")
-        if (!is.na(superscript))
-            line <- paste0(line, "}")
-        line
+            n <- n + 1
+        }
+
+        paste0(line, xml_text(r), rep("}", n))
     })
 
-    p <- paste0(unlist(lines), collapse = "")
+    p <- paste0(unlist(p), collapse = "")
 
     ## Escape '%'
     p <- gsub("%", "\\%", p, fixed = TRUE)
