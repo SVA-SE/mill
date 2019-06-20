@@ -30,7 +30,7 @@ check <- function() {
     result <- c(result, check_apply_typeset_patch())
     result <- c(result, check_reference_format())
     result <- c(result, check_missing_figure_reference_files())
-    ## result <- c(result, check_missing_table_reference_files(report))
+    result <- c(result, check_missing_table_reference_files())
     result <- c(result, check_range_character())
     result <- c(result, check_thousand_separator())
     result <- c(result, check_pattern("[.]\\s*[.]", "checking multiple dots"))
@@ -227,14 +227,14 @@ check_missing_figure_reference_files <- function()
         ## Expected files from figure references: 'fig:chapter:id'
         if (nrow(ref)) {
             id <- sapply(strsplit(ref$marker, ":"), "[", 3)
-            filename <- paste0("fig_", normalize_title(basename(chapter)), "_", id, ".tex")
+            filename <- paste0(chapter, "/fig_", normalize_title(basename(chapter)), "_", id, ".tex")
             ref_fig_files <- filename
         } else {
             ref_fig_files <- character(0)
         }
 
         ## Observed tex files
-        fig_files <- list.files(pattern = "tex$")
+        fig_files <- paste0(chapter, "/", list.files(pattern = "tex$"))
 
         setwd(wd)
 
@@ -255,15 +255,35 @@ check_missing_figure_reference_files <- function()
 ##'
 ##' Check for table references in the 'text.tex' file that does not
 ##' have a corresponding 'table.tex' file.
-##' @param x the report or chapter object.
-##' @keywords internal
-check_missing_table_reference_files <- function(x)
-    UseMethod("check_missing_table_reference_files")
-
-check_missing_table_reference_files.report <- function(x) {
+check_missing_table_reference_files <- function()
+{
     cat("* checking missing table reference files ... ")
 
-    ref <- check_missing_table_reference_files(chapters(x))
+    chapters <- list.files("chapters", full.names = TRUE)
+    ref <- unlist(lapply(chapters, function(chapter) {
+        wd <- setwd(chapter)
+
+        ## Get references for table files
+        ref <- references()
+        ref <- ref[ref$cmd == "ref" & ref$reftype == "tab", ]
+
+        ## Expected files from table references: 'tab:chapter:id'
+        if (nrow(ref)) {
+            id <- sapply(strsplit(ref$marker, ":"), "[", 3)
+            filename <- paste0(chapter, "/tab_", id, ".tex")
+            ref_tab_files <- filename
+        } else {
+            ref_tab_files <- character(0)
+        }
+
+        ## Observed tex files
+        tab_files <- paste0(chapter, "/", list.files(pattern = "tex$"))
+
+        setwd(wd)
+
+        setdiff(ref_tab_files, tab_files)
+    }))
+
     if (length(ref)) {
         cat("ERROR\n    ")
         cat(ref, sep = "\n    ")
@@ -272,35 +292,6 @@ check_missing_table_reference_files.report <- function(x) {
 
     cat("OK\n")
     FALSE
-}
-
-check_missing_table_reference_files.chapters <- function(x) {
-    unlist(lapply(x$section, function(y) {
-        wd <- setwd(chapter_path(y))
-        ref <- check_missing_table_reference_files(y)
-        setwd(wd)
-        ref
-    }))
-}
-
-check_missing_table_reference_files.chapter <- function(x) {
-    ## Get references for table files
-    ref <- references()
-    ref <- ref[ref$cmd == "ref" & ref$reftype == "tab", ]
-
-    ## Expected files from table references: 'tab:chapter:id'
-    if (nrow(ref)) {
-        id <- sapply(strsplit(ref$marker, ":"), "[", 3)
-        filename <- paste0("tab_", normalize_title(chapter_title(x)), "_", id, ".tex")
-        ref_tab_files <- filename
-    } else {
-        ref_tab_files <- character(0)
-    }
-
-    ## Observed tex files
-    tab_files <- list.files(pattern = "tex$")
-
-    setdiff(ref_tab_files, tab_files)
 }
 
 ##' Check range character format
