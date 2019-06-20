@@ -211,7 +211,7 @@ check_reference_format <- function(x) {
 ##'
 ##' Check for figure references in the 'text.tex' file that does not
 ##' have a corresponding 'figure.tex' file.
-##' @keywords internal
+##' @noRd
 check_missing_figure_reference_files <- function()
 {
     cat("* checking missing figure reference files ... ")
@@ -255,6 +255,7 @@ check_missing_figure_reference_files <- function()
 ##'
 ##' Check for table references in the 'text.tex' file that does not
 ##' have a corresponding 'table.tex' file.
+##' @noRd
 check_missing_table_reference_files <- function()
 {
     cat("* checking missing table reference files ... ")
