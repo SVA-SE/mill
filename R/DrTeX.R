@@ -242,6 +242,24 @@ format.docx_paragraph <- function(x, ...)
     ## replace U+2013 with -- (en dash)
     p <- gsub("\u2013", "--", p, fixed = TRUE)
 
+    ## Merge duplicated font styles, for example,
+    ## \textit{A}\textit{B} -> \textit{AB}
+    repeat {
+        done <- TRUE
+
+        for (style in c("textit", "textbf", "textsuperscript")) {
+            pattern <- paste0("[\\]", style, "[{]([^}]*)[}][\\]", style, "[{]")
+            if (length(grep(pattern, p))) {
+                done <- FALSE
+                replacement <- paste0("\\\\", style, "{\\1")
+                p <- sub(pattern, replacement, p)
+            }
+        }
+
+        if (done)
+            break
+    }
+
     p
 }
 
