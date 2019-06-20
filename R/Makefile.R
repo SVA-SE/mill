@@ -21,9 +21,6 @@ create_Makefile <- function() {
                    "roundtrip:",
                    "\tRscript -e \"mill::roundtrip()\"",
                    "",
-                   "table_preview:",
-                   "\tRscript -e \"mill::preview_tables()\"",
-                   "",
                    "build_figures:",
                    "\tRscript -e \"mill::build_figures()\"",
                    "",
@@ -35,7 +32,7 @@ create_Makefile <- function() {
                    "clean:",
                    "\tRscript -e \"mill::cleanup()\"",
                    "",
-                   "PHONY: pdf import diff patch roundtrip table_preview build_figures rpd export clean",
+                   "PHONY: pdf import diff patch roundtrip build_figures rpd export clean",
                    "")
 
         writeLines(lines, "Makefile")
