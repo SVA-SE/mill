@@ -203,6 +203,29 @@ docx_paragraph <- function(xml)
     structure(list(content = xml), class = "docx_paragraph")
 }
 
+## Merge duplicated font styles, for example,
+## \textit{A}\textit{B} -> \textit{AB}
+merge_font_styles <- function(x)
+{
+    repeat {
+        done <- TRUE
+
+        for (style in c("textit", "textbf", "textsuperscript")) {
+            pattern <- paste0("[\\]", style, "[{]([^}]*)[}](\\s*)[\\]", style, "[{]")
+            if (length(grep(pattern, x))) {
+                done <- FALSE
+                replacement <- paste0("\\\\", style, "{\\1\\2")
+                x <- sub(pattern, replacement, x)
+            }
+        }
+
+        if (done)
+            break
+    }
+
+    x
+}
+
 ##' @export
 format.docx_paragraph <- function(x, ...)
 {
@@ -242,25 +265,7 @@ format.docx_paragraph <- function(x, ...)
     ## replace U+2013 with -- (en dash)
     p <- gsub("\u2013", "--", p, fixed = TRUE)
 
-    ## Merge duplicated font styles, for example,
-    ## \textit{A}\textit{B} -> \textit{AB}
-    repeat {
-        done <- TRUE
-
-        for (style in c("textit", "textbf", "textsuperscript")) {
-            pattern <- paste0("[\\]", style, "[{]([^}]*)[}][\\]", style, "[{]")
-            if (length(grep(pattern, p))) {
-                done <- FALSE
-                replacement <- paste0("\\\\", style, "{\\1")
-                p <- sub(pattern, replacement, p)
-            }
-        }
-
-        if (done)
-            break
-    }
-
-    p
+    merge_font_styles(p)
 }
 
 ##' @export
