@@ -248,7 +248,7 @@ format.docx_paragraph <- function(x, ...)
             n <- n + 1
         }
 
-        paste0(line, xml_text(r), rep("}", n))
+        paste0(line, xml_text(r), paste0(rep("}", n), collapse = ""))
     })
 
     p <- paste0(unlist(p), collapse = "")
