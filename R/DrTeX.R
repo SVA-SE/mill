@@ -248,13 +248,19 @@ format.docx_paragraph <- function(x, ...)
             n <- n + 1
         }
 
-        paste0(line, xml_text(r), paste0(rep("}", n), collapse = ""))
+        r <- xml_text(r)
+
+        ## Escape '%'
+        r <- gsub("%", "\\%", r, fixed = TRUE)
+
+        ## replace & with \&
+        r <- gsub("&", "\\&", r, fixed = TRUE)
+
+        paste0(line, r, paste0(rep("}", n), collapse = ""))
     })
 
     p <- paste0(unlist(p), collapse = "")
-
-    ## Escape '%'
-    p <- gsub("%", "\\%", p, fixed = TRUE)
+    p <- merge_font_styles(p)
 
     ## Numprint
     p <- gsub("([[:digit:]]{5,}(?!-))", "\\\\numprint{\\1}", p, perl = TRUE)
@@ -265,7 +271,7 @@ format.docx_paragraph <- function(x, ...)
     ## replace U+2013 with -- (en dash)
     p <- gsub("\u2013", "--", p, fixed = TRUE)
 
-    merge_font_styles(p)
+    p
 }
 
 ##' @export
