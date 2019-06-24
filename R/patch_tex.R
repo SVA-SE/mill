@@ -109,8 +109,8 @@ create_patch <- function() {
     } else if (in_report()) {
         lapply(list.files("chapters"), function(chapter) {
             wd <- setwd(paste0("chapters/", chapter))
+            on.exit(setwd(wd), add = TRUE)
             create_patch()
-            setwd(wd)
         })
     }
 
