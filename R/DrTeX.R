@@ -265,6 +265,9 @@ format.docx_paragraph <- function(x, ...)
     ## replace U+2013 with -- (en dash)
     p <- gsub("\u2013", "--", p, fixed = TRUE)
 
+    ## replace & with \&
+    p <- gsub("&", "\\&", p, fixed = TRUE)
+
     merge_font_styles(p)
 }
 
