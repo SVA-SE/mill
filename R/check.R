@@ -68,7 +68,7 @@ check <- function() {
 ##' To protect against overwriting un-committed changes.
 ##' @importFrom git2r diff
 ##' @importFrom git2r repository
-##' @keywords internal
+##' @noRd
 check_expect_clean_repository <- function() {
     cat("* checking that repository is clean ... ")
 
@@ -88,7 +88,7 @@ check_expect_clean_repository <- function() {
 ##'
 ##' pandoc is required to check for example 'tex' to 'docx' round
 ##' trip.
-##' @keywords internal
+##' @noRd
 check_expect_pandoc_is_installed <- function() {
     cat("* checking that 'pandoc' is installed ... ")
 
@@ -108,7 +108,7 @@ check_expect_pandoc_is_installed <- function() {
 ##' Check that GNU patch is installed
 ##'
 ##' patch is required to check that applying patches work.
-##' @keywords internal
+##' @noRd
 check_expect_patch_is_installed <- function() {
     cat("* checking that 'patch' is installed ... ")
 
@@ -161,7 +161,7 @@ check_tex_to_docx_round_trip <- function() {
 
 ##' Check for open track changes in each chapter docx-file.
 ##'
-##' @keywords internal
+##' @noRd
 check_open_track_changes <- function()
 {
     cat("* checking for open track changes ... ")
@@ -199,7 +199,7 @@ check_open_track_changes <- function()
 ##'
 ##' Checking that applying patches doesn't generate warnings or
 ##' errors.
-##' @keywords internal
+##' @noRd
 check_apply_typeset_patch <- function() {
     cat("* checking apply typeset patch ... ")
 
