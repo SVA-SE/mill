@@ -73,7 +73,8 @@ check <- function() {
                                       perl = TRUE))
     result <- c(result, check_pattern("[\\][^{]*[{].[}][.]",
                                       "checking for one character command followed by '.' e.g. '\\textit{S}.'"))
-    result <- c(result, check_highlight())
+    result <- c(result, check_pattern("[\\]hl[{]",
+                                      "checking for highlights"))
 
     invisible(any(result))
 }
