@@ -354,19 +354,16 @@ check_pattern <- function(pattern, description, perl = FALSE)
 {
     cat(paste("*", description, "... "))
 
-    ## List all tex files.
-    tex_files <- list.files("chapters", pattern = "[.]tex$",
-                            recursive = TRUE, full.names = TRUE)
+    ## List files.
+    files <- list.files("chapters", pattern = "[.](tex|patch)$",
+                        recursive = TRUE, full.names = TRUE)
 
-    ## Drop 'typeset.tex'.
-    tex_files <- tex_files[!(basename(tex_files) %in% "typeset.tex")]
-
-    l <- sapply(tex_files, function(filename) {
+    l <- sapply(files, function(filename) {
         lines <- grep(pattern, readLines(filename), perl = perl)
         length(lines) > 0
     })
 
-    l <- tex_files[l]
+    l <- files[l]
     if (length(l)) {
         cat("ERROR\n")
         lapply(l, function(filename) {
@@ -374,35 +371,6 @@ check_pattern <- function(pattern, description, perl = FALSE)
             lines <- grep(pattern, readLines(filename), perl = perl)
             lines <- paste(lines, collapse = ", ")
             cat(lines, "\n")
-        })
-        return(TRUE)
-    }
-
-    cat("OK\n")
-    FALSE
-}
-
-##' Utility function to check for highlights in patch-files.
-##'
-##' @noRd
-check_highlight <- function()
-{
-    cat("* checking for highlights in patches ...")
-
-    ## List all patch files.
-    patch_files <- list.files("chapters", pattern = "[.]patch$",
-                              recursive = TRUE, full.names = TRUE)
-
-    l <- sapply(patch_files, function(filename) {
-        lines <- grep("[\\]hl[{]", readLines(filename))
-        length(lines) > 0
-    })
-
-    l <- patch_files[l]
-    if (length(l)) {
-        cat("ERROR\n")
-        lapply(l, function(filename) {
-            cat("   ", filename, "\n")
         })
         return(TRUE)
     }
