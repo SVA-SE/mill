@@ -32,7 +32,14 @@ check <- function() {
     result <- c(result, check_reference_format())
     result <- c(result, check_missing_figure_reference_files())
     result <- c(result, check_missing_table_reference_files())
-    result <- c(result, check_range_character())
+
+    ## Checking that the range character is '--' and not
+    ## '-'. Identify, for example, '2016-2017' but exclude
+    ## '3-19-11-N-311' or '{1-1}'.
+    result <- c(result, check_pattern("(?<!(-|\\d|{))\\d+-\\d+(?!(-|\\d|}))",
+                                      "checking range character",
+                                      perl = TRUE))
+
     result <- c(result, check_thousand_separator())
     result <- c(result, check_pattern("[.]\\s*[.]", "checking multiple dots"))
     result <- c(result, check_pattern("[,]\\s*[,]", "checking multiple commas"))
@@ -330,47 +337,6 @@ check_missing_table_reference_files <- function()
     if (length(ref)) {
         cat("ERROR\n    ")
         cat(ref, sep = "\n    ")
-        return(TRUE)
-    }
-
-    cat("OK\n")
-    FALSE
-}
-
-##' Check range character format
-##'
-##' Checking that the range character is '--' and not '-'
-##' @noRd
-check_range_character <- function()
-{
-    cat("* checking range character ... ")
-
-    ## Identify for example '2016-2017' but exclude '3-19-11-N-311' or
-    ## '{1-1}'.
-    pattern <- "(?<!(-|\\d|{))\\d+-\\d+(?!(-|\\d|}))"
-
-    ## List all tex files
-    tex_files <- list.files("chapters", pattern = "[.]tex$",
-                            recursive = TRUE, full.names = TRUE)
-
-    ## Drop 'typeset.tex'
-    tex_files <- tex_files[!(basename(tex_files) %in% "typeset.tex")]
-
-    l <- sapply(tex_files, function(filename) {
-        lines <- readLines(filename)
-        lines <- grep(pattern, lines, perl = TRUE)
-        length(lines) > 0
-    })
-
-    l <- tex_files[l]
-    if (length(l)) {
-        cat("ERROR\n")
-        lapply(l, function(filename) {
-            cat("   ", filename, "  line(s): ")
-            lines <- grep(pattern, readLines(filename), perl = TRUE)
-            lines <- paste(lines, collapse = ", ")
-            cat(lines, "\n")
-        })
         return(TRUE)
     }
 
