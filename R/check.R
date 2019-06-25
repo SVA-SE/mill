@@ -36,7 +36,7 @@ check <- function() {
     ## Checking that the range character is '--' and not
     ## '-'. Identify, for example, '2016-2017' but exclude
     ## '3-19-11-N-311' or '{1-1}'.
-    result <- c(result, check_pattern("(?<!(-|\\d|{))\\d+-\\d+(?!(-|\\d|}))",
+    result <- c(result, check_pattern("(?<!(-|\\d|{))\\d+-\\d+(?!(-|\\d|}|/|[.]\\d))",
                                       "checking range character",
                                       perl = TRUE))
 
