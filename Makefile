@@ -32,6 +32,7 @@ README.md: README.Rmd
 # Build and check package
 check:
 	cd .. && R CMD build $(PKG_NAME)
-	cd .. && _R_CHECK_CRAN_INCOMING_=FALSE R CMD check --as-cran $(PKG_TAR)
+	cd .. && _R_CHECK_CRAN_INCOMING_=FALSE R CMD check \
+          --no-stop-on-test-error --as-cran --run-dontrun $(PKG_TAR)
 
 .PHONY: install roxygen pdf check vignette
