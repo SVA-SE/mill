@@ -58,6 +58,10 @@ check <- function() {
     result <- c(result, check_pattern("(?<![a-z\\{])[tT]ab(?![l:_])",
                                       "checking for shortform of table",
                                       perl = TRUE))
+    result <- c(result, check_pattern("[\\]textit[{]\\s+",
+                                      "checking for whitespace in beginning of textit"))
+    result <- c(result, check_pattern("[\\]textbf[{]\\s+",
+                                      "checking for whitespace in beginning of textbf"))
     result <- c(result, check_highlight())
 
     invisible(any(result))
