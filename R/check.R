@@ -358,15 +358,6 @@ check_range_character <- function()
 
     l <- sapply(tex_files, function(filename) {
         lines <- readLines(filename)
-
-        ## Find the line for the reference section. Use the complete
-        ## text if the file doesn't contain a reference section.
-        i <- grep("^\\\\section[*][{]References[}]", lines)
-        if (!length(i))
-            i <- length(lines)
-        stopifnot(identical(length(i), 1L))
-        lines <- lines[seq_len(i)]
-
         lines <- grep(pattern, lines, perl = TRUE)
         length(lines) > 0
     })
