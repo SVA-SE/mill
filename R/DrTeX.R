@@ -268,8 +268,11 @@ format.docx_paragraph <- function(x, ...)
     ## replace U+00a0 with ~ '%'
     p <- gsub("\u00a0", "~", p, fixed = TRUE)
 
-    ## replace U+2013 with -- (en dash)
-    p <- gsub("\u2013", "--", p, fixed = TRUE)
+    ## replace U+25CF with \CIRCLE (A closed circle)
+    p <- gsub("\u25CF", "\\CIRCLE", p, fixed = TRUE)
+
+    ## replace U+25CB with \Circle (An open circle)
+    p <- gsub("\u25CB", "\\Circle", p, fixed = TRUE)
 
     p
 }
