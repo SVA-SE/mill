@@ -27,6 +27,7 @@ check <- function() {
         return(invisible(TRUE))
 
     result <- check_tex_to_docx_round_trip()
+    result <- c(result, check_open_track_changes())
     result <- c(result, check_apply_typeset_patch())
     result <- c(result, check_reference_format())
     result <- c(result, check_missing_figure_reference_files())
@@ -144,6 +145,42 @@ check_tex_to_docx_round_trip <- function() {
         unstaged <- unlist(status(repository())$unstaged)
         if (file.path("chapters", chapter, "text.tex") %in% unstaged)
             return(file.path("chapters", chapter, "text.tex"))
+        NULL
+    })
+
+    l <- l[!sapply(l, is.null)]
+    if (length(l)) {
+        cat("ERROR\n")
+        lapply(l, function(filename) cat("   ", filename, "\n"))
+        return(TRUE)
+    }
+
+    cat("OK\n")
+    FALSE
+}
+
+##' Check for open track changes in each chapter docx-file.
+##'
+##' @keywords internal
+check_open_track_changes <- function()
+{
+    cat("* checking for open track changes ... ")
+
+    l <- sapply(list.files("chapters"), function(chapter) {
+        filename <- paste0("workspace/chapters/", chapter, "/", chapter, ".docx")
+        if (!file.exists(filename))
+            stop("Missing file:", filename)
+
+        ## Unzip the content of the word file.
+        on.exit(unlink(file.path(tempdir(), "document.xml")), add = TRUE)
+        unzip(filename, "word/document.xml", junkpaths = TRUE, exdir = tempdir())
+
+        ## Parse the content of the word file
+        doc <- read_xml(file.path(tempdir(), "document.xml"))
+
+        ## Check for insertions.
+        if (length(xml_find_all(doc, xpath = "//w:ins")) > 0)
+            return(filename)
         NULL
     })
 
