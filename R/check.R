@@ -40,7 +40,8 @@ check <- function() {
                                       "checking range character",
                                       perl = TRUE))
 
-    result <- c(result, check_thousand_separator())
+    result <- c(result, check_pattern("[0-9]\\s+[0-9]",
+                                      "checking thousand separator"))
     result <- c(result, check_pattern("[.]\\s*[.]", "checking multiple dots"))
     result <- c(result, check_pattern("[,]\\s*[,]", "checking multiple commas"))
     result <- c(result, check_pattern("\u00b4",
@@ -337,44 +338,6 @@ check_missing_table_reference_files <- function()
     if (length(ref)) {
         cat("ERROR\n    ")
         cat(ref, sep = "\n    ")
-        return(TRUE)
-    }
-
-    cat("OK\n")
-    FALSE
-}
-
-##' Check for thousand separator
-##'
-##' @noRd
-check_thousand_separator <- function()
-{
-    cat("* checking thousand separator ... ")
-
-    pattern <- "[0-9]\\s+[0-9]"
-
-    ## List all tex files.
-    tex_files <- list.files("chapters", pattern = "[.]tex$",
-                            recursive = TRUE, full.names = TRUE)
-
-    ## Drop 'typeset.tex' and 'fig_*.tex' files.
-    tex_files <- tex_files[!(basename(tex_files) %in% "typeset.tex")]
-    tex_files <- tex_files[!startsWith(basename(tex_files), "fig_")]
-
-    l <- sapply(tex_files, function(filename) {
-        lines <- grep(pattern, readLines(filename))
-        length(lines) > 0
-    })
-
-    l <- tex_files[l]
-    if (length(l)) {
-        cat("ERROR\n")
-        lapply(l, function(filename) {
-            cat("   ", filename, "  line(s): ")
-            lines <- grep(pattern, readLines(filename))
-            lines <- paste(lines, collapse = ", ")
-            cat(lines, "\n")
-        })
         return(TRUE)
     }
 
