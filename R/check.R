@@ -71,6 +71,8 @@ check <- function() {
     result <- c(result, check_pattern("[\\][^{]*[{][^}]*(?<=\\s)[}]",
                                       "checking for whitespace at end of '\\commad{text }'",
                                       perl = TRUE))
+    result <- c(result, check_pattern("[\\][^{]*[{].[}][.]",
+                                      "checking for one character command followed by '.' e.g. '\\textit{S}.'"))
     result <- c(result, check_highlight())
 
     invisible(any(result))
