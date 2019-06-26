@@ -36,10 +36,13 @@ check <- function() {
     ## Checking that the range character is '--' and not
     ## '-'. Identify, for example, '2016-2017' but exclude
     ## '3-19-11-N-311' or '{1-1}'.
-    result <- c(result, check_pattern("(?<!(-|\\d|{))\\d+-\\d+(?!(-|\\d|}|/|[.]\\d))",
+    result <- c(result, check_pattern("(?<!(-|\\d|{|}))\\d+-\\d+(?!(-|\\d|}|/|[.]\\d))",
                                       "checking range character",
                                       perl = TRUE))
 
+    result <- c(result, check_pattern("(?<=\\s)\\d+,\\d+(?!:)",
+                                      "checking for comma as decimal separator",
+                                      perl = TRUE, patches = FALSE))
     result <- c(result, check_pattern("[0-9]\\s+[0-9]",
                                       "checking thousand separator"))
     result <- c(result, check_pattern("[.]\\s*[.]", "checking multiple dots"))
@@ -351,12 +354,18 @@ check_missing_table_reference_files <- function()
 ##' Utility function to check for a pattern in tex-files.
 ##'
 ##' @noRd
-check_pattern <- function(pattern, description, perl = FALSE)
+check_pattern <- function(pattern, description, perl = FALSE, patches = TRUE)
 {
     cat(paste("*", description, "... "))
 
     ## List files.
-    files <- list.files("chapters", pattern = "[.](tex|patch)$",
+    if (isTRUE(patches)) {
+        file_pattern <- "[.](tex|patch)$"
+    } else {
+        file_pattern <- "[.]tex$"
+    }
+
+    files <- list.files("chapters", pattern = file_pattern,
                         recursive = TRUE, full.names = TRUE)
 
     l <- sapply(files, function(filename) {
