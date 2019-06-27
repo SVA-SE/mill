@@ -21,6 +21,23 @@ do_apply_patch <- function(from, patchfile, to)
     NULL
 }
 
+apply_patch_files <- function(chapter, prefix)
+{
+    files <- list.files(pattern = paste0("^", prefix, "_[^.]+[.]tex"))
+    pattern <- paste0("^", prefix, "_", normalize_title(chapter), "_")
+    files <- files[!grepl(pattern = pattern, x = files)]
+
+    lapply(files, function(from) {
+        patch <- paste0(file_path_sans_ext(from), ".patch")
+        to <-sub(paste0("^", prefix),
+                 paste0(prefix, "_", normalize_title(chapter)),
+                 from)
+        do_apply_patch(from, patch, to)
+    })
+
+    NULL
+}
+
 ##' Apply patch
 ##'
 ##' @return invisible(NULL)
@@ -31,22 +48,16 @@ apply_patch <- function() {
 
         ## Table patching
         chapter <- basename(getwd())
-        table_files <- list.files(pattern = "^tab_[^.]+[.]tex")
-        pattern <- paste0("^tab_", normalize_title(chapter), "_")
-        i <- grepl(pattern = pattern, x = table_files)
-        table_files <- table_files[!i]
-
-        lapply(table_files, function(from) {
-            patch <- paste0(file_path_sans_ext(from), ".patch")
-            to <-sub("^tab", paste0("tab_", normalize_title(chapter)), from)
-            do_apply_patch(from, patch, to)
-        })
+        apply_patch_files(chapter, "tab")
 
         ## Infocus patching
         if (file.exists("infocus.tex")) {
             to <-paste0("infocus_", normalize_title(chapter), ".tex")
             do_apply_patch("infocus.tex", "infocus.patch", to)
         }
+
+        ## Fix to handle named infocus files.
+        apply_patch_files(chapter, "infocus")
     } else if (in_report()) {
         lapply(list.files("chapters"), function(chapter) {
             wd <- setwd(paste0("chapters/", chapter))
@@ -78,6 +89,24 @@ do_create_patch <- function(from, to, patchfile)
     NULL
 }
 
+create_patch_files <- function(chapter, prefix)
+{
+    files <- list.files(pattern = paste0("^", prefix, "_[^.]+[.]tex"))
+    pattern <- paste0("^", prefix, "_", normalize_title(chapter), "_")
+    i <- grepl(pattern = pattern, x = files)
+    files <- files[!grepl(pattern = pattern, x = files)]
+
+    lapply(files, function(from) {
+        patch <- paste0(file_path_sans_ext(from), ".patch")
+        to <-sub(paste0("^", prefix),
+                 paste0(prefix, "_", normalize_title(chapter)),
+                 from)
+        do_create_patch(from, to, patch)
+    })
+
+    NULL
+}
+
 ##' Create patch
 ##'
 ##' @return invisible(NULL)
@@ -88,16 +117,7 @@ create_patch <- function() {
 
         ## Table diff
         chapter <- basename(getwd())
-        table_files <- list.files(pattern = "^tab_[^.]+[.]tex")
-        pattern <- paste0("^tab_", normalize_title(chapter), "_")
-        i <- grepl(pattern = pattern, x = table_files)
-        table_files <- table_files[!i]
-
-        lapply(table_files, function(from) {
-            patch <- paste0(file_path_sans_ext(from), ".patch")
-            to <-sub("^tab", paste0("tab_", normalize_title(chapter)), from)
-            do_create_patch(from, to, patch)
-        })
+        create_patch_files(chapter, "tab")
 
         ## Infocus diff
         from <- paste0("infocus_", normalize_title(chapter), ".tex")
@@ -106,6 +126,9 @@ create_patch <- function() {
                             paste0("infocus_", normalize_title(chapter), ".tex"),
                             "infocus.patch")
         }
+
+        ## Fix to handle named infocus files
+        create_patch_files(chapter, "infocus")
     } else if (in_report()) {
         lapply(list.files("chapters"), function(chapter) {
             wd <- setwd(paste0("chapters/", chapter))
