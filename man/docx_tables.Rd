@@ -14,7 +14,7 @@ Load all tables in a docx file
 }
 \examples{
 ## Load tables from a bundled docx file.
-tbl <- docx_tables(system.file("extdata/table.docx", package = "doctex"))
+tbl <- docx_tables(system.file("extdata/table.docx", package = "mill"))
 
 ## View the layout of the tables
 tbl
