@@ -45,22 +45,12 @@ authors.authors <- function(x) {
 ##' solved with a hack that might have a better cross platform
 ##' solution.
 ##'
-##' @title formatted authors
 ##' @param x A report object
 ##' @param format The format of the author list you want
 ##' @return A unique sorted list of authors
 ##' @author Thomas Rosendal
 ##' @importFrom utils tail
 ##' @export
-##' @examples
-##' \dontrun{
-##' ## Update the authors list for front matter
-##' writeLines(paste(formatted_authors(load_report()),
-##'                  collapse = ",\n"),
-##'            "assets/front-matter/authors.tex")
-##' ## Or get the emails in a send list format
-##' paste(formatted_authors(load_report(), format = "email"), collapse = ";")
-##' }
 formatted_authors <- function(x, format = c("name", "email")) {
     format <- match.arg(format)
     auths <- authors(x)

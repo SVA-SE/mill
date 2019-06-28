@@ -2,7 +2,7 @@
 % Please edit documentation in R/mill.R
 \name{formatted_authors}
 \alias{formatted_authors}
-\title{formatted authors}
+\title{Formatting authors}
 \usage{
 formatted_authors(x, format = c("name", "email"))
 }
@@ -15,26 +15,14 @@ formatted_authors(x, format = c("name", "email"))
 A unique sorted list of authors
 }
 \description{
-Formatting authors
-}
-\details{
 This function gets a unique list of authors and sorts them
 alphabetically. I assume this should actually be solved as a print
 method and format method for an authors class object.
-
+}
+\details{
 We also have a lexigraphical sort problem in this function that is
 solved with a hack that might have a better cross platform
 solution.
-}
-\examples{
-\dontrun{
-## Update the authors list for front matter
-writeLines(paste(formatted_authors(load_report()),
-                 collapse = ",\\n"),
-           "assets/front-matter/authors.tex")
-## Or get the emails in a send list format
-paste(formatted_authors(load_report(), format = "email"), collapse = ";")
-}
 }
 \author{
 Thomas Rosendal
