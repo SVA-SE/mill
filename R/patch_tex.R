@@ -50,12 +50,6 @@ apply_patch <- function() {
         chapter <- basename(getwd())
         apply_patch_files(chapter, "tab")
 
-        ## Infocus patching
-        if (file.exists("infocus.tex")) {
-            to <-paste0("infocus_", normalize_title(chapter), ".tex")
-            do_apply_patch("infocus.tex", "infocus.patch", to)
-        }
-
         ## Fix to handle named infocus files.
         apply_patch_files(chapter, "infocus")
     } else if (in_report()) {
@@ -118,14 +112,6 @@ create_patch <- function() {
         ## Table diff
         chapter <- basename(getwd())
         create_patch_files(chapter, "tab")
-
-        ## Infocus diff
-        from <- paste0("infocus_", normalize_title(chapter), ".tex")
-        if (file.exists("infocus.tex")) {
-            do_create_patch("infocus.tex",
-                            paste0("infocus_", normalize_title(chapter), ".tex"),
-                            "infocus.patch")
-        }
 
         ## Fix to handle named infocus files
         create_patch_files(chapter, "infocus")
