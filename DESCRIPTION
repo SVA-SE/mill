@@ -1,7 +1,7 @@
 Package: mill
 Type: Package
 Title: Authoring Reports
-Version: 19.06.26
+Version: 19.07.07
 Authors@R: c(person("Stefan", "Widgren", role = c("aut", "cre"),
              email = "stefan.widgren@gmail.com"),
              person("Thomas", "Rosendal", role = c("aut")))
@@ -16,6 +16,8 @@ Imports:
     tools,
     utils,
     xml2
+Suggests:
+    progress
 LazyData: TRUE
 Encoding: UTF-8
 RoxygenNote: 6.1.1

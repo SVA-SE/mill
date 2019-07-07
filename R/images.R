@@ -97,10 +97,13 @@ pdf_split <- function(path, dir) {
         dir <- tempdir()
     }
     if(system2("pdftk", "-version", stdout = FALSE) != 0) {
-            stop("In order to use this tool you need to install 'pdftk'")
+        stop("In order to use this tool you need to install 'pdftk'")
     }
     path <- normalizePath(path, mustWork = TRUE)
     np <- pdf_np(path)
+    if (requireNamespace("progress", quietly = TRUE)) {
+        pb <- progress::progress_bar$new(total = np)
+    }
     files <- lapply(seq_len(np), function(i) {
         outfile <- tempfile(tmpdir = dir, fileext = ".pdf")
         arg1 <- paste("cat", i)
@@ -108,6 +111,9 @@ pdf_split <- function(path, dir) {
         system2("pdftk", args = c(path, arg1, arg2),
                 stdout = TRUE,
                 stderr = TRUE)
+        if (requireNamespace("progress", quietly = TRUE)) {
+            pb$tick()
+        }
         outfile
     })
     unlist(files)
@@ -135,13 +141,41 @@ pdf_diff <- function(reference, new, dir = NULL) {
     new <- normalizePath(new, mustWork = TRUE)
     stopifnot(pdf_np(reference) == pdf_np(new))
     np <- pdf_np(reference)
+    if (requireNamespace("progress", quietly = TRUE)) {
+        pb_outer <- progress::progress_bar$new(total = np)
+    } else {
+        message("If you want a nice progress bar for this function, install the \"progress\" package.")
+    }
+    message("Splitting the \"reference\" pdf into individual pages")
     pages_ref <- pdf_split(reference, dir)
+    message("Splitting the \"new\" PDF into individual pages")
     pages_new <- pdf_split(new, dir)
-    do.call("rbind", lapply(seq_len(np), function(i) {
+    message("Comparing individual pages")
+    df <- do.call("rbind", lapply(seq_len(np), function(i) {
         id <- image_diff(pages_ref[i], pages_new[i], dir)
+        if (requireNamespace("progress", quietly = TRUE)) {
+            pb_outer$tick()
+        }
         data.frame(page = i,
                    percent_diff = id[[1]],
                    composite = id[[2]],
+                   original = pages_ref[i],
+                   modified = pages_new[i],
                    stringsAsFactors = FALSE)
     }))
+    class(df) <- c("pdf_diff_df", class(df))
+    df
+}
+
+plot.pdf_diff_df <- function(df) {
+    plot(df$page,
+         df$percent_diff,
+         pch = 20,
+         col = "grey40",
+         type = "p",
+         ylab = "Percent difference of page pixels",
+         xlab = "Page number")
+    text(df$page, df$percent_diff, df$page, pos = 4)
+}
+
 }
