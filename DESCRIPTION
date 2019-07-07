@@ -17,7 +17,10 @@ Imports:
     utils,
     xml2
 Suggests:
-    progress
+    progress,
+    hlt
+Remotes:
+    trosendal/hlt
 LazyData: TRUE
 Encoding: UTF-8
 RoxygenNote: 6.1.1

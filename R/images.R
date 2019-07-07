@@ -191,3 +191,16 @@ plot.pdf_diff_df <- function(x, ...) {
          x$page, pos = 4,
          ...)
 }
+
+.onLoad <- function(...) {
+    s3_register("hlt::html", "pdf_diff_df")
+}
+
+##'@noRd
+html.pdf_diff_df <- function(df) {
+if (!requireNamespace("hlt", quietly = TRUE)) {
+    stop("Package \"hlt\" is needed for this function to work. Please install it.",
+         call. = FALSE)
+}
+cat("Not impletmented")
+}
