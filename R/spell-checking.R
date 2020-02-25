@@ -6,8 +6,8 @@ spell_checking <- function()
 {
     if (in_chapter()) {
         ignore <- character(0)
-        if (file.exists("../../WORDLIST")) ## Project-level
-            ignore <- c(ignore, readLines("../../WORDLIST"))
+        if (file.exists("../../assets/WORDLIST")) ## Project-level
+            ignore <- c(ignore, readLines("../../assets/WORDLIST"))
         if (file.exists("WORDLIST")) ## Chapter-level
             ignore <- c(ignore, readLines("WORDLIST"))
         ignore <- sort(unique(ignore))
