@@ -229,7 +229,7 @@ merge_font_styles <- function(x)
 ##' @export
 format.docx_paragraph <- function(x, ...)
 {
-    p <- lapply(xml_find_all(x$content, "w:r|w:ins/w:r"), function(r) {
+    p <- lapply(xml_find_all(x$content, "w:r|w:ins/w:r|w:hyperlink"), function(r) {
         n <- 0
         line <- character(0)
 
