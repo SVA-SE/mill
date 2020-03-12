@@ -15,7 +15,9 @@ Imports:
     methods,
     tools,
     utils,
-    xml2
+    xml2,
+    sp,
+    rgdal
 Suggests:
     progress,
     hlt
