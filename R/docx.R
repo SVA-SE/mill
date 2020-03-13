@@ -78,6 +78,24 @@ import <- function() {
     invisible()
 }
 
+inject_tab_and_fig <- function(tex) {
+    ## Find the references
+    pattern <- "[\\]label[{][^}]*[}]|[\\]ref[{][^}]*[}]"
+    m <- regmatches(tex, gregexpr(pattern, tex))
+    m <- unlist(lapply(m, function(y) {
+        regmatches(y, regexec(pattern, y))
+    }))
+    marker <- sub("[\\][^{]+[{]([^}]*)[}]", "\\1", m)
+    reftype <- sapply(strsplit(marker, ":"), "[", 1)
+    df <- data.frame(tex = m,
+                     marker   = marker,
+                     reftype  = reftype,
+                     stringsAsFactors = FALSE)
+    df <- df[df$reftype %in% c("fig", "tab"), ]
+    df$filename <- paste0("\\input{", gsub(":", "_", df$marker), ".tex}")
+    c(tex, unique(df$filename))
+}
+
 style_fun <- function(tex, chapter)
 {
     tex <- style_drop_section(tex, "Figures")
@@ -91,6 +109,7 @@ style_fun <- function(tex, chapter)
     tex <- style_drop_section(tex, "In focus", "infocus.tex")
     tex <- add_empty_line_between_references(tex)
     tex <- style_multicols(tex, output = "tex")
+    tex <- inject_tab_and_fig(tex)
     tex
 }
 
