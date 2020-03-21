@@ -96,8 +96,92 @@ inject_tab_and_fig <- function(tex) {
     c(tex, unique(df$filename))
 }
 
+##' Split figures
+##'
+##' Extract the tex for each figure that starts with an
+##' includegraphics.
+##' @param tex the tex for the figures section.
+##' @return a list with the tex for each figure.
+##' @noRd
+split_figures <- function(tex) {
+    figures <- grep("\\\\includegraphics", tex)
+    if (length(figures) == 0)
+        return(list())
+
+    mapply(function(from, n) {
+        to <- from + n - 1
+
+        ## Remove empty lines.
+        while (to > from &&
+               ((nchar(tex[to]) == 0) || tex[to] == "\\\\\\\\")) {
+            to <- to - 1
+        }
+
+        tex[seq(from = from, to = to)]
+    }, figures, diff(c(figures, length(tex) + 1)))
+}
+
+##' @importFrom tools file_path_sans_ext
+save_figure <- function(tex, chapter) {
+    prefix <- normalize_title(chapter)
+
+    ## Determine the filename.
+    pattern <- "^\\\\includegraphics[[][^]]+[]][{]"
+    filename <- sub(pattern, "", sub("[}]$", "", tex[1]))
+    stopifnot(file.exists(filename))
+
+    ## Remove empty lines.
+    tex <- tex[-1]
+    while (length(tex) &&
+           ((nchar(tex[1]) == 0) || tex[1] == "\\\\\\\\")) {
+               tex <- tex[-1]
+           }
+    stopifnot(length(tex) > 0)
+
+    ## Determine the label.
+    pattern <- "^Figure[[:space:]]*[{][[][}]fig:[^{]+[{][]][}]:[[:space:]]*"
+    label <- trimws(regmatches(tex[1], regexpr(pattern, tex[1])))
+    label <- sub("^Figure[[:space:]]*[{][[][}]fig:", "", label)
+    label <- sub("[{][]][}]:$", "", label)
+
+    ## Determine the caption.
+    caption <- tex
+    caption[1] <- sub(pattern, "", caption[1])
+    caption[1] <- paste0("\\caption{", caption[1])
+    caption <- c(caption, paste0("\\label{fig:", prefix, ":", label, "}"))
+    i <- seq_len(length(caption))[-1]
+    caption[i] <- paste0("  ", caption[i])
+    caption <- c(caption, "}")
+
+    ## Move and rename the figure file.
+    to <- paste0("fig_", prefix, "_", label, ".png")
+    file.copy(filename, to)
+    git2r::add(repository(), paste0("chapters/", chapter, "/", to))
+
+    ## Create the tex-file for the figure.
+    lines <- c("\\begin{figure}[H]",
+               paste0("  \\includegraphics{", file_path_sans_ext(to), "}"),
+               paste0("  ", caption),
+               "\\end{figure}")
+    filename <- paste0("fig_", prefix, "_", label, ".tex")
+    writeLines(lines, filename)
+    git2r::add(repository(), paste0("chapters/", chapter, "/", filename))
+
+    invisible(NULL)
+}
+
+extract_figures <- function(tex, chapter) {
+    tex <- style_drop_section(tex, "Tables")$tex
+    figures <- split_figures(tex)
+    lapply(figures, save_figure, chapter = chapter)
+    invisible(NULL)
+}
+
 style_fun <- function(tex, chapter) {
-    tex <- style_drop_section(tex, "Figures")$tex
+    tmp <- style_drop_section(tex, "Figures")
+    extract_figures(tmp$drop, chapter)
+    tex <- tmp$tex
+
     tex <- style_drop_section(tex, "Tables")$tex
     tex <- convert_docx_ref_to_ref(tex, chapter)
     tex <- make_labels_chapter_specific(tex, chapter)
@@ -133,6 +217,7 @@ style_fun <- function(tex, chapter) {
 ##' @export
 from_docx <- function(repo = NULL, force = FALSE) {
     if (in_chapter()) {
+        on.exit(unlink("./media", recursive = TRUE), add = TRUE)
         chapter <- basename(getwd())
 
         ## Convert the docx to a temporary tex file.
