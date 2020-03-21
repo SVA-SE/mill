@@ -362,7 +362,7 @@ vmerge_continue <- function(tbl, i, j) {
     grid_j_below <- 1
     j_below <- 1
     repeat {
-        if (j_below > ncol_below || grid_j_below > grid_j)
+        if (any(j_below > ncol_below, grid_j_below > grid_j))
             return(FALSE)
         if (grid_j_below == grid_j)
             break
@@ -386,9 +386,7 @@ vmerge_continue <- function(tbl, i, j) {
     ## vertically merged region in this table. If this attribute is
     ## 'continue' or omitted, continue the vertically merged region.
     val <- xml_attr(merge, "val")
-    if (is.na(val) || val == "continue")
-        return(TRUE)
-    FALSE
+    any(is.na(val), val == "continue")
 }
 
 format_docx_table_as_ascii <- function(tbl, output, ...) {
@@ -475,7 +473,7 @@ format_docx_table_as_tex <- function(tbl,
     lines <- c(lines, paste0(indentation, "\\begin{tabular}{"))
     indentation <- paste0("    ", indentation)
     for (i in seq_len(ncol(tbl))) {
-        align <- ifelse (i == 1, "l", "r")
+        align <- ifelse(i == 1, "l", "r")
         if (i == ncol(tbl))
             align <- paste0(align, "}")
         lines <- c(lines, paste0(indentation, align))
