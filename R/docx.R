@@ -137,7 +137,9 @@ from_docx <- function(repo = NULL) {
         f_tex <- tempfile(fileext = ".tex")
         f_docx <- "text.docx"
         pandoc(paste("--top-level-division=chapter ",
-                     shQuote(f_docx), "-o", shQuote(f_tex)))
+                     shQuote(f_docx),
+                     "--extract-media=. -o",
+                     shQuote(f_tex)))
 
         ## Tweak incoming tex file
         tex <- readLines(f_tex)
