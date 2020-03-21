@@ -125,11 +125,13 @@ style_fun <- function(tex, chapter) {
 ##' chapter 'text.tex' is added, but not commited, to the report git
 ##' repository.
 ##' @param repo the report git repository.
+##' @param force if \code{TRUE}, run even if working tree is not
+##'     clean. Default is \code{FALSE}.
 ##' @return invisible NULL.
 ##' @importFrom git2r add
 ##' @importFrom git2r repository
 ##' @export
-from_docx <- function(repo = NULL) {
+from_docx <- function(repo = NULL, force = FALSE) {
     if (in_chapter()) {
         chapter <- basename(getwd())
 
@@ -159,13 +161,15 @@ from_docx <- function(repo = NULL) {
         })
     } else if (in_report()) {
         repo <- repository()
-        s <- status(repo)
-        if (length(c(s$staged, s$unstaged)))
-            stop("Working tree is not clean")
+        if (!isTRUE(force)) {
+            s <- status(repo)
+            if (length(c(s$staged, s$unstaged)))
+                stop("Working tree is not clean")
+        }
 
         lapply(list.files("chapters"), function(chapter) {
             wd <- setwd(paste0("chapters/", chapter))
-            from_docx(repo = repo)
+            from_docx(repo = repo, force = force)
             setwd(wd)
         })
     }

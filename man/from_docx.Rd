@@ -4,10 +4,13 @@
 \alias{from_docx}
 \title{Convert from docx to tex}
 \usage{
-from_docx(repo = NULL)
+from_docx(repo = NULL, force = FALSE)
 }
 \arguments{
 \item{repo}{the report git repository.}
+
+\item{force}{if \code{TRUE}, run even if working tree is not
+clean. Default is \code{FALSE}.}
 }
 \value{
 invisible NULL.
