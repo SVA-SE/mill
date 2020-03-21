@@ -97,15 +97,21 @@ inject_tab_and_fig <- function(tex) {
 }
 
 style_fun <- function(tex, chapter) {
-    tex <- style_drop_section(tex, "Figures")
-    tex <- style_drop_section(tex, "Tables")
+    tex <- style_drop_section(tex, "Figures")$tex
+    tex <- style_drop_section(tex, "Tables")$tex
     tex <- convert_docx_ref_to_ref(tex, chapter)
     tex <- make_labels_chapter_specific(tex, chapter)
     tex <- make_hypertargets_chapter_specific(tex, chapter)
     tex <- asterisk(tex, "add")
     tex <- style_toc(tex, output = "tex")
     tex <- style_numprint(tex, output = "tex")
-    tex <- style_drop_section(tex, "In focus", "infocus.tex")
+
+    tmp <- style_drop_section(tex, "In focus")
+    tex <- tmp$tex
+    filename <- "infocus.tex"
+    writeLines(tmp$drop, filename)
+    git2r::add(repository(), filename)
+
     tex <- add_empty_line_between_references(tex)
     tex <- style_multicols(tex, output = "tex")
     tex <- inject_tab_and_fig(tex)
@@ -169,7 +175,8 @@ normalize_title <- function(title) {
     gsub("[[:space:]]+", "-", tolower(title))
 }
 
-style_drop_section <- function(tex, section, filename = NULL) {
+style_drop_section <- function(tex, section) {
+    drop <- NA_character_
     i <- grep(paste0("^[\\]section[*]?[{]", section, "[}]"), tex)
     if (length(i) && i > 2) {
         section <- normalize_title(section)
@@ -182,16 +189,12 @@ style_drop_section <- function(tex, section, filename = NULL) {
             i <- i - 1
         }
 
-        if (!is.null(filename)) {
-            j <- seq(from = i + 1, to = length(tex))
-            writeLines(tex[j], filename)
-            git2r::add(repository(), filename)
-        }
-
+        j <- seq(from = i + 1, to = length(tex))
+        drop <- tex[j]
         tex <- tex[seq_len(i)]
     }
 
-    tex
+    list(tex = tex, drop = drop)
 }
 
 ##' Convert the docx references to tex ref
