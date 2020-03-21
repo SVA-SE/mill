@@ -192,10 +192,6 @@ plot.pdf_diff_df <- function(x, ...) {
          ...)
 }
 
-.onLoad <- function(...) {
-    s3_register("hlt::html", "pdf_diff_df")
-}
-
 ##'@noRd
 html.pdf_diff_df <- function(df) {
 if (!requireNamespace("hlt", quietly = TRUE)) {

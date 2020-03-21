@@ -17,12 +17,9 @@ Imports:
     utils,
     xml2,
     sp,
-    rgdal
-Suggests:
+    rgdal,
     progress,
     hlt
-Remotes:
-    trosendal/hlt
 LazyData: TRUE
 Encoding: UTF-8
 RoxygenNote: 7.0.2
