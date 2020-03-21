@@ -18,8 +18,7 @@ Imports:
     xml2,
     sp,
     rgdal,
-    progress,
-    hlt
+    progress
 LazyData: TRUE
 Encoding: UTF-8
 RoxygenNote: 7.0.2
