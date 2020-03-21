@@ -15,8 +15,7 @@
 ##'
 ##' ## View the column widths
 ##' sapply(tbl, col_widths)
-docx_tables <- function(filename)
-{
+docx_tables <- function(filename) {
     on.exit(unlink(file.path(tempdir(), "document.xml")), add = TRUE)
 
     ## Unzip the content of the word file.
@@ -43,8 +42,7 @@ docx_tables <- function(filename)
 ##' @importFrom xml2 xml_name
 ##' @return a \code{docx_table} object.
 ##' @export
-docx_table <- function(xml)
-{
+docx_table <- function(xml) {
     stopifnot(identical(xml_name(xml), "tbl"))
     p <- xml_find_first(xml, "preceding-sibling::w:p[1]")
     structure(list(caption  = docx_caption(p),
@@ -60,15 +58,13 @@ docx_table <- function(xml)
 ##' @importFrom xml2 xml_name
 ##' @return a \code{docx_caption} object.
 ##' @export
-docx_caption <- function(xml)
-{
+docx_caption <- function(xml) {
     structure(list(content = docx_paragraph(xml)), class = "docx_caption")
 }
 
 ##' @importFrom xml2 xml_text
 ##' @export
-format.docx_caption <- function(x, output = c("ascii", "tex"), ...)
-{
+format.docx_caption <- function(x, output = c("ascii", "tex"), ...) {
     str <- trimws(format(x$content, output = output))
 
     if (match.arg(output) == "ascii")
@@ -82,8 +78,7 @@ format.docx_caption <- function(x, output = c("ascii", "tex"), ...)
 }
 
 ##' @export
-print.docx_caption <- function(x, ...)
-{
+print.docx_caption <- function(x, ...) {
     cat(format(x, ...), "\n", sep = "")
     invisible(x)
 }
@@ -94,15 +89,13 @@ print.docx_caption <- function(x, ...)
 ##' @importFrom xml2 xml_name
 ##' @return a \code{docx_label} object.
 ##' @export
-docx_label <- function(xml)
-{
+docx_label <- function(xml) {
     structure(list(content = docx_paragraph(xml)), class = "docx_label")
 }
 
 ##' @importFrom xml2 xml_text
 ##' @export
-format.docx_label <- function(x, output = c("ascii", "tex"), prefix = "", ...)
-{
+format.docx_label <- function(x, output = c("ascii", "tex"), prefix = "", ...) {
     pattern <- "^(Table|Figure)[[:space:]]*[[](tab|fig):[^]]+[]]:[[:space:]]*"
     str <- trimws(format(x$content, output = "ascii"))
     lbl <- regmatches(str, regexpr(pattern, str))
@@ -120,15 +113,13 @@ format.docx_label <- function(x, output = c("ascii", "tex"), prefix = "", ...)
 }
 
 ##' @export
-print.docx_label <- function(x, ...)
-{
+print.docx_label <- function(x, ...) {
     cat(format(x, ...), "\n", sep = "")
     invisible(x)
 }
 
 ##' @export
-length.docx_label <- function(x)
-{
+length.docx_label <- function(x) {
     nchar(format(x$content, output = "ascii"))
 }
 
@@ -138,8 +129,7 @@ length.docx_label <- function(x)
 ##' @importFrom xml2 xml_name
 ##' @return a \code{docx_footnote} object.
 ##' @export
-docx_footnote <- function(xml)
-{
+docx_footnote <- function(xml) {
     stopifnot(identical(xml_name(xml), "tbl"))
     content <- list()
     i <- 1
@@ -159,8 +149,7 @@ docx_footnote <- function(xml)
 
 ##' @importFrom xml2 xml_text
 ##' @export
-format.docx_footnote <- function(x, indentation = "", ...)
-{
+format.docx_footnote <- function(x, indentation = "", ...) {
     lines <- paste0(indentation, "\\begin{tablenotes}")
 
     ## Write items.
@@ -179,15 +168,13 @@ format.docx_footnote <- function(x, indentation = "", ...)
 }
 
 ##' @export
-print.docx_footnote <- function(x, ...)
-{
+print.docx_footnote <- function(x, ...) {
     cat(format(x, ...), "\n", sep = "")
     invisible(x)
 }
 
 ##' @export
-length.docx_footnote <- function(x)
-{
+length.docx_footnote <- function(x) {
     length(x$content)
 }
 
@@ -197,16 +184,14 @@ length.docx_footnote <- function(x)
 ##' @importFrom xml2 xml_name
 ##' @return a \code{docx_paragraph} object.
 ##' @export
-docx_paragraph <- function(xml)
-{
+docx_paragraph <- function(xml) {
     stopifnot(identical(xml_name(xml), "p"))
     structure(list(content = xml), class = "docx_paragraph")
 }
 
 ## Merge duplicated font styles, for example,
 ## \textit{A}\textit{B} -> \textit{AB}
-merge_font_styles <- function(x)
-{
+merge_font_styles <- function(x) {
     repeat {
         done <- TRUE
 
@@ -227,8 +212,7 @@ merge_font_styles <- function(x)
 }
 
 ##' @export
-format.docx_paragraph <- function(x, ...)
-{
+format.docx_paragraph <- function(x, ...) {
     p <- lapply(xml_find_all(x$content, "w:r|w:ins/w:r|w:hyperlink"), function(r) {
         n <- 0
         line <- character(0)
@@ -281,8 +265,7 @@ format.docx_paragraph <- function(x, ...)
 }
 
 ##' @export
-print.docx_paragraph <- function(x, ...)
-{
+print.docx_paragraph <- function(x, ...) {
     cat(format(x, ...), "\n", sep = "")
     invisible(x)
 }
@@ -294,8 +277,7 @@ print.docx_paragraph <- function(x, ...)
 ##' @return numeric vector with column widths.
 ##' @importFrom xml2 xml_attr
 ##' @export
-col_widths <- function(tbl)
-{
+col_widths <- function(tbl) {
     as.numeric(xml_attr(xml_children(xml_child(tbl$content, "w:tblGrid")), "w"))
 }
 
@@ -304,16 +286,14 @@ col_widths <- function(tbl)
 ##' @importFrom xml2 xml_length
 ##' @importFrom xml2 xml_name
 ##' @export
-dim.docx_table <- function(x)
-{
+dim.docx_table <- function(x) {
     c(sum(xml_name(xml_children(x$content)) == "tr"),
       xml_length(xml_child(x$content, "w:tblGrid")))
 }
 
 ##' @importFrom xml2 xml_find_all
 ##' @export
-dim.docx_w_tr <- function(x)
-{
+dim.docx_w_tr <- function(x) {
     c(1, length(xml_find_all(x$content, "w:tc")))
 }
 
@@ -325,8 +305,7 @@ dim.docx_w_tr <- function(x)
 ##' @importFrom xml2 xml_attr
 ##' @importFrom xml2 xml_find_first
 ##' @export
-dim.docx_w_tc <- function(x)
-{
+dim.docx_w_tc <- function(x) {
     ## Check if the cell is part of a vertically merged region.
     i <- xml_find_first(x$content, "w:tcPr/w:vMerge")
     if (is.na(i)) {
@@ -351,8 +330,7 @@ dim.docx_w_tc <- function(x)
 ##' @param i the index to the current row.
 ##' @param j the index to the current cell in the current row.
 ##' @noRd
-is_vmerge_region <- function(tbl, i, j)
-{
+is_vmerge_region <- function(tbl, i, j) {
     is.na(nrow(tbl[i][j]))
 }
 
@@ -364,8 +342,7 @@ is_vmerge_region <- function(tbl, i, j)
 ##' @param i the index to the current row.
 ##' @param j the index to the current cell in the current row.
 ##' @noRd
-vmerge_continue <- function(tbl, i, j)
-{
+vmerge_continue <- function(tbl, i, j) {
     ## Last row?
     if (i >= nrow(tbl))
         return(FALSE)
@@ -414,8 +391,7 @@ vmerge_continue <- function(tbl, i, j)
     FALSE
 }
 
-format_docx_table_as_ascii <- function(tbl, output, ...)
-{
+format_docx_table_as_ascii <- function(tbl, output, ...) {
     ## Line for the top and bottom borders.
     l <- paste0("+", paste0(rep("---", ncol(tbl)), collapse = "+"), "+")
 
@@ -460,8 +436,7 @@ format_docx_table_as_ascii <- function(tbl, output, ...)
     lines
 }
 
-is_midrule <- function(tbl, i)
-{
+is_midrule <- function(tbl, i) {
     ## Check if every cell in the row contains a bottom border.
     xpath <- "w:tc/w:tcPr/w:tcBorders/w:bottom"
     b <- xml_find_all(tbl[i]$content, xpath)
@@ -475,8 +450,7 @@ format_docx_table_as_tex <- function(tbl,
                                      threeparttable = FALSE,
                                      position = "[H]",
                                      addlinespace = 3,
-                                     ...)
-{
+                                     ...) {
     lines <- character(0)
 
     if (isTRUE(standalone)) {
@@ -581,8 +555,7 @@ format_docx_table_as_tex <- function(tbl,
 }
 
 ##' @export
-format.docx_table <- function(x, output = c("ascii", "tex"), ...)
-{
+format.docx_table <- function(x, output = c("ascii", "tex"), ...) {
     f <- switch(match.arg(output),
                 ascii = format_docx_table_as_ascii,
                 tex   = format_docx_table_as_tex)
@@ -591,15 +564,13 @@ format.docx_table <- function(x, output = c("ascii", "tex"), ...)
 }
 
 ##' @export
-print.docx_table <- function(x, ...)
-{
+print.docx_table <- function(x, ...) {
     cat(format(x, ...), "\n", sep = "\n")
     invisible(x)
 }
 
 ##' @export
-`[.docx_table` <- function(x, i, j, drop = TRUE)
-{
+`[.docx_table` <- function(x, i, j, drop = TRUE) {
     r <- xml_find_all(x$content, "w:tr")
 
     rows <- lapply(seq_len(length(r)), function(r_i) {
@@ -613,8 +584,7 @@ print.docx_table <- function(x, ...)
 }
 
 ##' @export
-`[.docx_w_tr` <- function(x, i, j, drop = TRUE)
-{
+`[.docx_w_tr` <- function(x, i, j, drop = TRUE) {
     tc <- xml_find_all(x$content, "w:tc")
 
     cols <- lapply(seq_len(length(tc)), function(tc_i) {
@@ -628,8 +598,7 @@ print.docx_table <- function(x, ...)
 }
 
 ##' @export
-format.docx_w_tr <- function(x, ...)
-{
+format.docx_w_tr <- function(x, ...) {
     l1 <- paste0("+", paste0(rep("---", ncol(x)), collapse = "+"), "+\n")
     l2 <- paste0("|", paste0(rep("   ", ncol(x)), collapse = "|"), "|\n")
 
@@ -637,22 +606,19 @@ format.docx_w_tr <- function(x, ...)
 }
 
 ##' @export
-print.docx_w_tr <- function(x, ...)
-{
+print.docx_w_tr <- function(x, ...) {
     cat(format(x, ...), "\n", sep = "")
     invisible(x)
 }
 
 ##' @importFrom xml2 xml_text
 ##' @export
-format.docx_w_tc <- function(x, ...)
-{
+format.docx_w_tc <- function(x, ...) {
     xml_text(x$content)
 }
 
 ##' @export
-print.docx_w_tc <- function(x, ...)
-{
+print.docx_w_tc <- function(x, ...) {
     cat(format(x, ...), "\n", sep = "")
     invisible(x)
 }

@@ -96,8 +96,7 @@ inject_tab_and_fig <- function(tex) {
     c(tex, unique(df$filename))
 }
 
-style_fun <- function(tex, chapter)
-{
+style_fun <- function(tex, chapter) {
     tex <- style_drop_section(tex, "Figures")
     tex <- style_drop_section(tex, "Tables")
     tex <- convert_docx_ref_to_ref(tex, chapter)
@@ -166,13 +165,11 @@ from_docx <- function(repo = NULL) {
     invisible()
 }
 
-normalize_title <- function(title)
-{
+normalize_title <- function(title) {
     gsub("[[:space:]]+", "-", tolower(title))
 }
 
-style_drop_section <- function(tex, section, filename = NULL)
-{
+style_drop_section <- function(tex, section, filename = NULL) {
     i <- grep(paste0("^[\\]section[*]?[{]", section, "[}]"), tex)
     if (length(i) && i > 2) {
         section <- normalize_title(section)
@@ -316,8 +313,7 @@ convert_style_of_empty_line_from_tex_to_docx <- function(tex) {
 ##' @param output The output format of the conversion.
 ##' @return tex character vector.
 ##' @noRd
-style_multicols <- function(tex, output = c("docx", "tex"))
-{
+style_multicols <- function(tex, output = c("docx", "tex")) {
     remove <- switch(match.arg(output),
                      docx = TRUE,
                      tex  = FALSE)
@@ -362,8 +358,7 @@ style_multicols <- function(tex, output = c("docx", "tex"))
 ##' @param output The output format of the conversion.
 ##' @return tex character vector.
 ##' @noRd
-style_numprint <- function(tex, output = c("docx", "tex"))
-{
+style_numprint <- function(tex, output = c("docx", "tex")) {
     remove <- switch(match.arg(output),
                      docx = TRUE,
                      tex  = FALSE)
@@ -390,8 +385,7 @@ style_numprint <- function(tex, output = c("docx", "tex"))
 ##' @param output The output format of the conversion.
 ##' @return tex character vector.
 ##' @noRd
-style_toc <- function(tex, output = c("docx", "tex"))
-{
+style_toc <- function(tex, output = c("docx", "tex")) {
     remove <- switch(match.arg(output),
                      docx = TRUE,
                      tex  = FALSE)
