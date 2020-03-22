@@ -217,11 +217,13 @@ merge_font_styles <- function(x) {
 
 ##' @export
 format.docx_paragraph <- function(x, ...) {
-    p <- lapply(xml_find_all(x$content, "w:r|w:ins/w:r|w:hyperlink"), function(r) {
+    xpath <- "w:r|w:ins/w:r|w:hyperlink"
+    p <- lapply(xml_find_all(x$content, xpath), function(r) {
         n <- 0
         line <- character(0)
 
-        if (!is.na(xml_find_first(r, "w:rPr/w:vertAlign[@w:val='superscript']"))) {
+        xpath <- "w:rPr/w:vertAlign[@w:val='superscript']"
+        if (!is.na(xml_find_first(r, xpath))) {
             line <- paste0(line, "\\textsuperscript{")
             n <- n + 1
         }
@@ -321,7 +323,8 @@ dim.docx_w_tc <- function(x) {
     }
 
     ## Check if the cell is part of a horizontically merged region.
-    j <- as.numeric(xml_attr(xml_find_first(x$content, "w:tcPr/w:gridSpan"), "val"))
+    xpath <- "w:tcPr/w:gridSpan"
+    j <- as.numeric(xml_attr(xml_find_first(x$content, xpath), "val"))
     if (is.na(j))
         j <- 1
 
