@@ -12,8 +12,7 @@ do_apply_patch <- function(from, patchfile, to) {
                        warning = function(w) w)
 
     if (!identical(output,
-                   paste0("patching file ", to, " (read from ", from, ")")))
-    {
+                   paste0("patching file ", to, " (read from ", from, ")"))) {
         stop(paste("Unable to apply patch: ", basename(getwd())))
     }
 
@@ -27,9 +26,9 @@ apply_patch_files <- function(chapter, prefix) {
 
     lapply(files, function(from) {
         patch <- paste0(file_path_sans_ext(from), ".patch")
-        to <-sub(paste0("^", prefix),
-                 paste0(prefix, "_", normalize_title(chapter)),
-                 from)
+        to <- sub(paste0("^", prefix),
+                  paste0(prefix, "_", normalize_title(chapter)),
+                  from)
         do_apply_patch(from, patch, to)
     })
 
@@ -88,9 +87,9 @@ create_patch_files <- function(chapter, prefix) {
 
     lapply(files, function(from) {
         patch <- paste0(file_path_sans_ext(from), ".patch")
-        to <-sub(paste0("^", prefix),
-                 paste0(prefix, "_", normalize_title(chapter)),
-                 from)
+        to <- sub(paste0("^", prefix),
+                  paste0(prefix, "_", normalize_title(chapter)),
+                  from)
         do_create_patch(from, to, patch)
     })
 

@@ -2,8 +2,7 @@
 ##'
 ##' @importFrom hunspell hunspell
 ##' @export
-spell_checking <- function()
-{
+spell_checking <- function() {
     if (in_chapter()) {
         ignore <- character(0)
         if (file.exists("../../assets/WORDLIST")) ## Project-level
@@ -13,7 +12,8 @@ spell_checking <- function()
         ignore <- sort(unique(ignore))
 
         lines <- readLines("text.tex")
-        bad_words <- hunspell(lines, format = "latex", dict = "en_GB", ignore = ignore)
+        bad_words <- hunspell(lines, format = "latex", dict = "en_GB",
+                              ignore = ignore)
         bad_words <- unlist(bad_words)
 
         cat("\n**********\n*\n*", basename(getwd()), "\n*\n**********\n\n")
@@ -29,7 +29,8 @@ spell_checking <- function()
 
         bad_words <- as.character(unlist(bad_words))
         bad_words <- as.data.frame(table(bad_words))
-        bad_words <- bad_words[order(bad_words$Freq, decreasing = TRUE), , drop = FALSE]
+        bad_words <- bad_words[order(bad_words$Freq, decreasing = TRUE), ,
+                               drop = FALSE]
         rownames(bad_words) <- NULL
     }
 

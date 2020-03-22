@@ -89,7 +89,7 @@ org_clock <- function(x) {
     if (length(x) > 1) {
         x <- x[-1]
     } else {
-        x = NULL
+        x <- NULL
     }
 
     list(result = clock, remainder = x)
@@ -111,7 +111,7 @@ org_list <- function(x) {
             x <- NULL
     }
 
-    list(result = structure(list(items= items), class = "org_list"),
+    list(result = structure(list(items = items), class = "org_list"),
          remainder = x)
 }
 
@@ -205,9 +205,9 @@ org_headline <- function(x) {
             org <- org_headline(x)
             if (is.null(org))
                 org <- org_drawer(x)
-            if(is.null(org))
+            if (is.null(org))
                 org <- org_dynamic_block(x)
-            if(is.null(org))
+            if (is.null(org))
                 org <- org_keyword(x)
             if (is.null(org))
                 org <- org_paragraph(x)

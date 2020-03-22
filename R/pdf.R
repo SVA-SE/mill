@@ -34,7 +34,7 @@ to_pdf_report <- function(type = c("print", "web")) {
         files <- list.files(file.path("../assets", dir), pattern = "[^auto]")
         lapply(files, function(to) {
             from <- file.path("../assets", dir, to)
-            if(startsWith(to, "img") && type == "web") {
+            if (startsWith(to, "img") && type == "web") {
                 reduce_image(from, to)
             } else {
                 file.copy(from, to)
@@ -95,7 +95,8 @@ to_pdf_chapter <- function(build = TRUE, type = c("print", "web")) {
         ## Copy the figures (.pdf, .png and .tex) and tables (.tex)
         ref <- references()
         lapply(ref[ref$reftype == "fig", "marker"], function(marker) {
-            marker <- paste0(gsub(":", "_", marker), c(".pdf", ".tex", ".png", ".eps"))
+            marker <- paste0(gsub(":", "_", marker),
+                             c(".pdf", ".tex", ".png", ".eps"))
             file.copy(marker, paste0("../../build/", marker))
         })
         lapply(ref[ref$reftype == "tab", "marker"], function(marker) {
@@ -107,7 +108,7 @@ to_pdf_chapter <- function(build = TRUE, type = c("print", "web")) {
         files <- list.files(pattern = "^img_")
         lapply(files, function(from) {
             to <- paste0("../../build/", from)
-            if(type == "web") {
+            if (type == "web") {
                 reduce_image(from, to)
             } else {
                 file.copy(from, to)

@@ -2,7 +2,6 @@
 ##'
 ##' @param cmd The command to pandoc.
 ##' @keywords internal
-pandoc <- function(cmd)
-{
+pandoc <- function(cmd) {
     system(paste0("pandoc ", cmd))
 }

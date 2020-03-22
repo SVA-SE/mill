@@ -36,10 +36,11 @@ sparkline <- function(path = ".",
     df <- work_status(path)
     nrows <- 8
     ncols <- nrow(df) %/% nrows
-    if((nrow(df) %% nrows) != 0) ncols <- ncols + 1
+    if ((nrow(df) %% nrows) != 0)
+        ncols <- ncols + 1
     par(mfrow = c(nrows, ncols),
-        mar = c(1,1,3,1))
-    for(i in seq_len(nrow(df))) {
+        mar = c(1, 1, 3, 1))
+    for (i in seq_len(nrow(df))) {
         plot_object <- df[i, "sparkline"][[1]]
         plot(x = names(plot_object),
              y = plot_object,
