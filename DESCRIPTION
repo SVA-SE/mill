@@ -13,6 +13,7 @@ Imports:
     git2r,
     hunspell,
     methods,
+    pdftools,
     tools,
     utils,
     xml2,

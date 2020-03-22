@@ -2,7 +2,7 @@
 % Please edit documentation in R/images.R
 \name{pdf_np}
 \alias{pdf_np}
-\title{pdf_np}
+\title{Number of pages in a pdf}
 \usage{
 pdf_np(path)
 }
@@ -13,10 +13,5 @@ pdf_np(path)
 numeric The number of pages
 }
 \description{
-Number of pages in a pdf
-}
-\details{
 Get the number of pages of a pdffile
-
-Requires pdftk
 }

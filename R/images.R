@@ -64,23 +64,11 @@ image_diff <- function(reference, new, dir) {
 ##' Number of pages in a pdf
 ##'
 ##' Get the number of pages of a pdffile
-##'
-##' Requires pdftk
-##'
-##' @title pdf_np
 ##' @param path the path to the pdf file
 ##' @return numeric The number of pages
+##' @importFrom pdftools pdf_info
 pdf_np <- function(path) {
-    if(system2("pdftk", "-version", stdout = FALSE) != 0) {
-        stop("In order to use this tool you need to install 'pdftk'")
-    }
-    path <- normalizePath(path, mustWork = TRUE)
-    args <- "dump_data"
-    a <- system2("pdftk", args = c(path, args),
-                 stdout = TRUE,
-                 stderr = TRUE)
-    index <- grep("NumberOfPages", a)
-    as.numeric(gsub(":", "", regmatches(a[index], regexpr(":[^$]*", a[index]))))
+    pdf_info(normalizePath(path, mustWork = TRUE))$pages
 }
 
 ##' Split up a pdf
