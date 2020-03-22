@@ -3,11 +3,11 @@
 ##' @return character string, giving the luatex command to run. On
 ##'     Windows: \code{texify --pdf --engine=luatex
 ##'     --max-iterations=50}, else \code{lualatex}.
-##' @keywords internal
+##' @noRd
 luatex_cmd <- function(options = c("--interaction=nonstopmode", "-V 7")) {
-    if(.Platform$OS.type == "windows")
+    if (.Platform$OS.type == "windows")
         return("texify --pdf --engine=luatex --max-iterations=50")
-    return(paste("lualatex", options))
+    paste("lualatex", options)
 }
 
 ##' Run LuaTeX
@@ -17,7 +17,7 @@ luatex_cmd <- function(options = c("--interaction=nonstopmode", "-V 7")) {
 ##'     out) created by LuaTeX are removed.
 ##' @importFrom tools file_path_sans_ext
 ##' @return invisible NULL.
-##' @keywords internal
+##' @noRd
 luatex <- function(texname, clean = FALSE) {
     wd <- setwd(dirname(texname))
     on.exit(setwd(wd))
@@ -34,7 +34,7 @@ luatex <- function(texname, clean = FALSE) {
         file.remove(paste0(f, ".out"))
     }
 
-    invisible()
+    invisible(NULL)
 }
 
 ##' TeX references
@@ -45,13 +45,17 @@ references <- function() {
     if (in_chapter()) {
         return(references_chapter())
     } else if (in_report()) {
-        return(do.call("rbind", lapply(list.files("chapters"), function(chapter) {
+        refs <- lapply(list.files("chapters"), function(chapter) {
             wd <- setwd(paste0("chapters/", chapter))
             ref <- references()
             setwd(wd)
             ref
-        })))
+        })
+
+        return(do.call("rbind", refs))
     }
+
+    stop("Unexpected error")
 }
 
 references_chapter <- function() {
@@ -68,13 +72,13 @@ references_chapter <- function() {
         }))
 
         if (length(m)) {
-            filename = paste0("chapters/", basename(getwd()), "/", filename)
+            filename <- paste0("chapters/", basename(getwd()), "/", filename)
             tex <- m
             cmd <- sub("[\\]([^{]+)[{][^}]*[}]", "\\1", tex)
             marker <- sub("[\\][^{]+[{]([^}]*)[}]", "\\1", tex)
             reftype <- sapply(strsplit(marker, ":"), "[", 1)
         } else {
-            filename = character(0)
+            filename <- character(0)
             tex <- character(0)
             cmd <- character(0)
             marker <- character(0)
@@ -93,9 +97,9 @@ references_chapter <- function() {
 ##' Get the chapter tex files
 ##'
 ##' @importFrom methods is
-##' @keywords internal
+##' @noRd
 chapter_tex_files <- function(type = c("all", "text", "fig", "table")) {
-    type = match.arg(type)
+    type <- match.arg(type)
 
     text_files <- NULL
     fig_files  <- NULL
