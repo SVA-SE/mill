@@ -36,48 +36,105 @@ check <- function() {
     ## Checking that the range character is '--' and not
     ## '-'. Identify, for example, '2016-2017' but exclude
     ## '3-19-11-N-311' or '{1-1}'.
-    result <- c(result, check_pattern("(?<!(-|\\d|{|}))\\d+-\\d+(?!(-|\\d|}|/|[.]\\d))",
-                                      "checking range character",
-                                      perl = TRUE))
+    result <- c(result,
+                check_pattern(
+                    "(?<!(-|\\d|{|}))\\d+-\\d+(?!(-|\\d|}|/|[.]\\d))",
+                    "checking range character",
+                    perl = TRUE))
 
-    result <- c(result, check_pattern("(?<=\\s)\\d+,\\d+(?!:)",
-                                      "checking for comma as decimal separator",
-                                      perl = TRUE, patches = FALSE))
-    result <- c(result, check_pattern("[0-9]\\s+[0-9]",
-                                      "checking thousand separator"))
-    result <- c(result, check_pattern("[.]\\s*[.]", "checking multiple dots"))
-    result <- c(result, check_pattern("[,]\\s*[,]", "checking multiple commas"))
-    result <- c(result, check_pattern("\u00b4",
-                                      "checking for incorrect apostrophe character"))
-    result <- c(result, check_pattern("[/]\\s*[\\]numprint[{]100000[}]",
-                                      "checking for incorrect 'per 100000 inhabitants'"))
-    result <- c(result, check_pattern("[0-9]\\s+[\\][%]",
-                                      "checking for space between digit and '%'"))
-    result <- c(result, check_pattern("http[:]//",
-                                      "checking for 'http://'"))
-    ## result <- c(result, check_pattern("2017",
-    ##                                   "checking for '2017'"))
-    result <- c(result, check_pattern("(?<![a-z\\{])figure(?![a-z])",
-                                      "checking for lowercase 'figure'",
-                                      perl = TRUE))
-    result <- c(result, check_pattern("(?<![a-z\\{])table(?![a-z])",
-                                      "checking for lowercase 'table'",
-                                      perl = TRUE))
-    result <- c(result, check_pattern("[fF]ig(?![u:_])",
-                                      "checking for shortform of figure",
-                                      perl = TRUE))
-    result <- c(result, check_pattern("(?<![a-z\\{])[tT]ab(?![l:_])",
-                                      "checking for shortform of table",
-                                      perl = TRUE))
-    result <- c(result, check_pattern("[\\][^{]*[{]\\s",
-                                      "checking for whitespace at beginning of '\\command{ text}'"))
-    result <- c(result, check_pattern("[\\][^{]*[{][^}]*(?<=\\s)[}]",
-                                      "checking for whitespace at end of '\\commad{text }'",
-                                      perl = TRUE))
-    result <- c(result, check_pattern("[\\][^{]*[{].[}][.]",
-                                      "checking for one character command followed by '.' e.g. '\\textit{S}.'"))
-    result <- c(result, check_pattern("[\\]hl[{]",
-                                      "checking for highlights"))
+    result <- c(result,
+                check_pattern(
+                    "(?<=\\s)\\d+,\\d+(?!:)",
+                    "checking for comma as decimal separator",
+                    perl = TRUE,
+                    patches = FALSE))
+
+    result <- c(result,
+                check_pattern(
+                    "[0-9]\\s+[0-9]",
+                    "checking thousand separator"))
+
+    result <- c(result,
+                check_pattern(
+                    "[.]\\s*[.]",
+                    "checking multiple dots"))
+
+    result <- c(result,
+                check_pattern(
+                    "[,]\\s*[,]",
+                    "checking multiple commas"))
+
+    result <- c(result,
+                check_pattern(
+                    "\u00b4",
+                    "checking for incorrect apostrophe character"))
+
+    result <- c(result,
+                check_pattern(
+                    "[/]\\s*[\\]numprint[{]100000[}]",
+                    "checking for incorrect 'per 100000 inhabitants'"))
+
+    result <- c(result,
+                check_pattern(
+                    "[0-9]\\s+[\\][%]",
+                    "checking for space between digit and '%'"))
+
+    result <- c(result,
+                check_pattern(
+                    "http[:]//",
+                    "checking for 'http://'"))
+
+    ## result <- c(result,
+    ##             check_pattern(
+    ##                 "2017",
+    ##                 "checking for '2017'"))
+
+    result <- c(result,
+                check_pattern(
+                    "(?<![a-z\\{])figure(?![a-z])",
+                    "checking for lowercase 'figure'",
+                    perl = TRUE))
+
+    result <- c(result,
+                check_pattern(
+                    "(?<![a-z\\{])table(?![a-z])",
+                    "checking for lowercase 'table'",
+                    perl = TRUE))
+
+    result <- c(result,
+                check_pattern(
+                    "[fF]ig(?![u:_])",
+                    "checking for shortform of figure",
+                    perl = TRUE))
+
+    result <- c(result,
+                check_pattern(
+                    "(?<![a-z\\{])[tT]ab(?![l:_])",
+                    "checking for shortform of table",
+                    perl = TRUE))
+
+    result <- c(result,
+                check_pattern(
+                    "[\\][^{]*[{]\\s",
+                    paste0("checking for whitespace at ",
+                           "beginning of '\\command{ text}'")))
+
+    result <- c(result,
+                check_pattern(
+                    "[\\][^{]*[{][^}]*(?<=\\s)[}]",
+                    "checking for whitespace at end of '\\commad{text }'",
+                    perl = TRUE))
+
+    result <- c(result,
+                check_pattern(
+                    "[\\][^{]*[{].[}][.]",
+                    paste0("checking for one character command ",
+                           "followed by '.' e.g. '\\textit{S}.'")))
+
+    result <- c(result,
+                check_pattern(
+                    "[\\]hl[{]",
+                    "checking for highlights"))
 
     invisible(any(result))
 }
@@ -181,8 +238,7 @@ check_tex_to_docx_round_trip <- function() {
 ##' Check for open track changes in each chapter docx-file.
 ##'
 ##' @noRd
-check_open_track_changes <- function()
-{
+check_open_track_changes <- function() {
     cat("* checking for open track changes ... ")
 
     l <- sapply(list.files("chapters"), function(chapter) {
@@ -268,8 +324,7 @@ check_reference_format <- function(x) {
 ##' Check for figure references in the 'text.tex' file that does not
 ##' have a corresponding 'figure.tex' file.
 ##' @noRd
-check_missing_figure_reference_files <- function()
-{
+check_missing_figure_reference_files <- function() {
     cat("* checking missing figure reference files ... ")
 
     chapters <- list.files("chapters", full.names = TRUE)
@@ -312,8 +367,7 @@ check_missing_figure_reference_files <- function()
 ##' Check for table references in the 'text.tex' file that does not
 ##' have a corresponding 'table.tex' file.
 ##' @noRd
-check_missing_table_reference_files <- function()
-{
+check_missing_table_reference_files <- function() {
     cat("* checking missing table reference files ... ")
 
     chapters <- list.files("chapters", full.names = TRUE)
@@ -354,8 +408,7 @@ check_missing_table_reference_files <- function()
 ##' Utility function to check for a pattern in tex-files.
 ##'
 ##' @noRd
-check_pattern <- function(pattern, description, perl = FALSE, patches = TRUE)
-{
+check_pattern <- function(pattern, description, perl = FALSE, patches = TRUE) {
     cat(paste("*", description, "... "))
 
     ## List files.
