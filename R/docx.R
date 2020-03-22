@@ -185,7 +185,7 @@ style_fun <- function(tex, chapter) {
     tex <- style_drop_section(tex, "Tables")$tex
     tex <- convert_docx_ref_to_ref(tex, chapter)
     tex <- make_labels_chapter_specific(tex, chapter)
-    tex <- make_hypertargets_chapter_specific(tex, chapter)
+    tex <- hypertargets_chapter_specific(tex, chapter)
     tex <- asterisk(tex, "add")
     tex <- style_toc(tex, output = "tex")
     tex <- style_numprint(tex, output = "tex")
@@ -196,7 +196,7 @@ style_fun <- function(tex, chapter) {
     writeLines(tmp$drop, filename)
     git2r::add(repository(), filename)
 
-    tex <- add_empty_line_between_references(tex)
+    tex <- add_line_between_references(tex)
     tex <- style_multicols(tex, output = "tex")
     tex <- inject_tab_and_fig(tex)
     tex
@@ -321,7 +321,7 @@ convert_ref_to_docx_ref <- function(tex) {
 ##' @param title The chapter title
 ##' @return tex character vector
 ##' @noRd
-make_hypertargets_chapter_specific <- function(tex, title) {
+hypertargets_chapter_specific <- function(tex, title) {
     title <- normalize_title(title)
     pattern <- "[\\]hypertarget[{]([^}]*)[}]"
     replacement <- paste0("\\\\hypertarget{sec:", title, ":", "\\1}")
@@ -367,7 +367,7 @@ asterisk <- function(tex, direction = c("add", "remove")) {
 ##' @param tex The tex character vector
 ##' @return tex character vector
 ##' @noRd
-add_empty_line_between_references <- function(tex) {
+add_line_between_references <- function(tex) {
     ## Find the line for the reference section.
     i <- grep("^\\\\section[*][{]References[}]", tex)
     if (!length(i))
@@ -397,7 +397,7 @@ add_empty_line_between_references <- function(tex) {
 ##' @param tex The tex character vector
 ##' @return tex character vector
 ##' @noRd
-convert_style_of_empty_line_from_tex_to_docx <- function(tex) {
+empty_line_from_tex_to_docx <- function(tex) {
     gsub("\\\\\\\\", "", tex)
 }
 
@@ -534,7 +534,7 @@ to_docx <- function(repo = NULL) {
         tex <- readLines("text.tex")
         tex <- asterisk(tex, "remove")
         tex <- convert_ref_to_docx_ref(tex)
-        tex <- convert_style_of_empty_line_from_tex_to_docx(tex)
+        tex <- empty_line_from_tex_to_docx(tex)
         tex <- style_toc(tex, output = "docx")
         tex <- style_multicols(tex, output = "docx")
         tex <- style_numprint(tex, output = "docx")
