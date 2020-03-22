@@ -263,7 +263,3 @@ chapter_path <- function(x) {
     stopifnot(identical(length(i), 1L))
     chapters(x)$section[[i]]
 }
-
-##' @importFrom sp plot
-##' @importFrom sp spTransform
-NULL

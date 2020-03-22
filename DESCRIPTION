@@ -16,8 +16,6 @@ Imports:
     tools,
     utils,
     xml2,
-    sp,
-    rgdal,
     progress
 LazyData: TRUE
 Encoding: UTF-8
