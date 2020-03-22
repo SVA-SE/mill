@@ -54,8 +54,10 @@ authors.authors <- function(x) {
 formatted_authors <- function(x, format = c("name", "email")) {
     format <- match.arg(format)
     auths <- authors(x)
-    names <- unlist(lapply(regmatches(auths, regexec('- (.*) \\(', auths)), "[", 2))
-    names <- do.call("rbind", lapply(names, function(y){
+
+    names <- lapply(regmatches(auths, regexec('- (.*) \\(', auths)), "[", 2)
+    names <- unlist(names)
+    names <- do.call("rbind", lapply(names, function(y) {
         lastname <- tail(strsplit(y, " ")[[1]], 1)
         ## Sorting of non-ASCII characters is system dependant and we
         ## expect the text in the report to be UTF-8. Therefore we can
@@ -66,11 +68,14 @@ formatted_authors <- function(x, format = c("name", "email")) {
         lastname <- gsub(paste0("^", rawToChar(as.raw(c(0xc3, 0x96)))), "ZZZZZC", lastname)
         c(lastname, y)
     }))
+
     if(format == "name") {
-        return(names[,2][order(names[,1])])
+        return(names[, 2][order(names[, 1])])
     }
-    mails <- unlist(lapply(regmatches(auths, regexec('^- (.*)', auths)), "[", 2))
-    return(mails[order(names[,1])])
+
+    mails <- lapply(regmatches(auths, regexec("^- (.*)", auths)), "[", 2)
+    mails <- unlist(mails)
+    mails[order(names[, 1])]
 }
 
 ##' @noRd

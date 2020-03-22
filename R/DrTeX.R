@@ -461,9 +461,14 @@ format_docx_table_as_tex <- function(tbl,
     if (isTRUE(standalone)) {
         lines <- c(lines, paste0(indentation, "\\documentclass{article}"))
         lines <- c(lines, paste0(indentation, "\\usepackage{booktabs}"))
-        lines <- c(lines, paste0(indentation, "\\usepackage[margin=1in]{geometry}"))
-        if (length(tbl$footnote) || isTRUE(threeparttable))
-            lines <- c(lines, paste0(indentation, "\\usepackage{threeparttable}"))
+        lines <- c(lines,
+                   paste0(indentation, "\\usepackage[margin=1in]{geometry}"))
+
+        if (length(tbl$footnote) || isTRUE(threeparttable)) {
+            lines <- c(lines,
+                       paste0(indentation, "\\usepackage{threeparttable}"))
+        }
+
         lines <- c(lines, paste0(indentation, "\\begin{document}"))
     }
 
@@ -488,7 +493,7 @@ format_docx_table_as_tex <- function(tbl,
     lines <- c(lines, "")
 
     indentation <- substr(indentation, 3, nchar(indentation))
-    lines <- c(lines, paste0(indentation,"\\toprule"), "")
+    lines <- c(lines, paste0(indentation, "\\toprule"), "")
 
     ## Keep track of the line number for the last '\midrule'.
     midrule <- NA
@@ -522,8 +527,7 @@ format_docx_table_as_tex <- function(tbl,
             midrule <- i
         } else if (!is.na(midrule) &&
                    ((i - midrule) %% addlinespace) == 0 &&
-                   i < nrow(tbl))
-        {
+                   i < nrow(tbl)) {
             lines <- c(lines, paste0(indentation, "\\addlinespace"))
             lines <- c(lines, "")
         }
@@ -539,8 +543,10 @@ format_docx_table_as_tex <- function(tbl,
         if (length(tbl$footnote))
             lines <- c(lines, format(tbl$footnote, indentation))
 
-        if (length(tbl$label))
-            lines <- c(lines, paste0(indentation, format(tbl$label, output, ...)))
+        if (length(tbl$label)) {
+            lines <- c(lines,
+                       paste0(indentation, format(tbl$label, output, ...)))
+        }
 
         indentation <- substr(indentation, 3, nchar(indentation))
         lines <- c(lines, paste0(indentation, "\\end{threeparttable}"))
