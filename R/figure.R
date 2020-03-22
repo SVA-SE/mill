@@ -1,6 +1,6 @@
-##' @keywords internal
-figure_pattern <- function(fileext = c("all", "R", "tex", "xlsx", "pdf", "jpg")) {
-    fileext <- switch(match.arg(fileext),
+##' @noRd
+figure_pattern <- function(ext = c("all", "R", "tex", "xlsx", "pdf", "jpg")) {
+    ext <- switch(match.arg(ext),
                       all  = "((tex)|(R)|(xlsx)|(pdf)|(jpg)|(png)|(eps))$",
                       R    = "R$",
                       xlsx = "xlsx$",
@@ -8,7 +8,7 @@ figure_pattern <- function(fileext = c("all", "R", "tex", "xlsx", "pdf", "jpg"))
                       png  = "png$",
                       pdf  = "pdf$")
 
-    paste0("^fig_[^.]+[.]", fileext)
+    paste0("^fig_[^.]+[.]", ext)
 }
 
 ##' List figure files
@@ -23,7 +23,7 @@ figure_files <- function(fileext = "all") {
     stop("Not implemented")
 }
 
-##' @keywords internal
+##' @noRd
 preview_pattern <- function(items = c("all", "figure", "table")) {
     items <- switch(match.arg(items),
                     all    = "((tab)|(fig))",
@@ -33,7 +33,7 @@ preview_pattern <- function(items = c("all", "figure", "table")) {
     paste0("^preview-", items, "_[^.]*[.]pdf$")
 }
 
-##' @keywords internal
+##' @noRd
 preview_files <- function(items = "all") {
     stopifnot(in_chapter())
     list.files(pattern = preview_pattern(items))
@@ -124,7 +124,9 @@ preview_figure <- function(figure) {
     ## Copy the pdf preview to 'preview-figure.pdf'
     from <- paste0(file_path_sans_ext(preview), ".pdf")
     to <- file.path(dirname(figure),
-                    paste0("preview-", file_path_sans_ext(basename(figure)), ".pdf"))
+                    paste0("preview-",
+                           file_path_sans_ext(basename(figure)),
+                           ".pdf"))
     if (file.exists(to))
         file.remove(to)
     file.rename(from, to)
@@ -132,18 +134,22 @@ preview_figure <- function(figure) {
 
 ##' Get the label from a figure path
 ##'
-##' @keywords internal
+##' @noRd
 get_label <- function(figure, format = c("latex", "word")) {
     format <- match.arg(format)
     tex <- readLines(figure)
     m <- regmatches(tex, regexec("[\\]label[{]([^}]*)", tex))
-    labels <- unlist(lapply(m, function(x) {if (length(x)) x[2] else x}))
+    labels <- unlist(lapply(m, function(x) {
+        if (length(x))
+            return(x[2])
+        x
+    }))
     format_labels(labels, format)
 }
 
 ##' Format the label from a figure path
 ##'
-##' @keywords internal
+##' @noRd
 format_labels <- function(labels, format = c("latex", "word")) {
     format <- match.arg(format)
     if (identical(format, "word")) {
@@ -155,7 +161,7 @@ format_labels <- function(labels, format = c("latex", "word")) {
 
 ##'Explain the labeling
 ##'
-##' @keywords internal
+##' @noRd
 explain_labeling <- function() {
     paste("\\noindent To reference this figure or table in the word document",
           "you need to insert the following \\textbf{label(s)} into",
