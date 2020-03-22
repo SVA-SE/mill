@@ -55,7 +55,7 @@ formatted_authors <- function(x, format = c("name", "email")) {
     format <- match.arg(format)
     auths <- authors(x)
 
-    names <- lapply(regmatches(auths, regexec('- (.*) \\(', auths)), "[", 2)
+    names <- lapply(regmatches(auths, regexec("- (.*) \\(", auths)), "[", 2)
     names <- unlist(names)
     names <- do.call("rbind", lapply(names, function(y) {
         lastname <- tail(strsplit(y, " ")[[1]], 1)
@@ -165,7 +165,9 @@ print.report <- function(x, ...) {
 ##' @export
 print.chapters <- function(x, ...) {
     cat("Chapters: ", length(x$section), "\n", sep = "")
-    lapply(x$section, function(y) {print(y, ..., indent = "  ")})
+    lapply(x$section, function(y) {
+        print(y, ..., indent = "  ")
+    })
     invisible()
 }
 

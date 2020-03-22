@@ -580,7 +580,8 @@ roundtrip <- function() {
 
         ## The roundtrip is clean if the tex-file is unchanged
         unstaged <- unlist(status(repo)$unstaged)
-        if (!(paste0("chapters/", basename(getwd()), "/text.tex") %in% unstaged))
+        tex_file <- paste0("chapters/", basename(getwd()), "/text.tex")
+        if (!(tex_file %in% unstaged))
             reset(commits(repo, n = 1)[[1]], "hard")
     } else if (in_report()) {
         lapply(list.files("chapters"), function(chapter) {
