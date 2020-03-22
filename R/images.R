@@ -98,11 +98,6 @@ pdf_diff <- function(reference, new, dir = tempdir()) {
     new <- normalizePath(new, mustWork = TRUE)
     stopifnot(pdf_np(reference) == pdf_np(new))
     np <- pdf_np(reference)
-    if (requireNamespace("progress", quietly = TRUE)) {
-        pb_outer <- progress::progress_bar$new(total = np)
-    } else {
-        message("If you want a nice progress bar for this function, install the \"progress\" package.")
-    }
     message("Splitting the \"reference\" pdf into individual pages")
     pages_ref <- pdf_split(reference, dir)
     message("Splitting the \"new\" PDF into individual pages")
@@ -110,9 +105,6 @@ pdf_diff <- function(reference, new, dir = tempdir()) {
     message("Comparing individual pages")
     df <- do.call("rbind", lapply(seq_len(np), function(i) {
         id <- image_diff(pages_ref[i], pages_new[i], dir)
-        if (requireNamespace("progress", quietly = TRUE)) {
-            pb_outer$tick()
-        }
         data.frame(page = i,
                    percent_diff = id[[1]],
                    composite = id[[2]],
