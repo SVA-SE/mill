@@ -14,6 +14,7 @@ Imports:
     hunspell,
     methods,
     pdftools,
+    qpdf,
     tools,
     utils,
     xml2,

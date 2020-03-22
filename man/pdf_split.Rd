@@ -2,22 +2,20 @@
 % Please edit documentation in R/images.R
 \name{pdf_split}
 \alias{pdf_split}
-\title{pdf_split}
+\title{Split up a pdf}
 \usage{
-pdf_split(path, dir)
+pdf_split(path, dir = tempdir())
 }
 \arguments{
-\item{path}{The path to the pdffile}
+\item{path}{The path to the pdf file to split.}
 
-\item{dir}{directory to perform the comparison inside}
+\item{dir}{directory for output. Default is to use a temporary
+directory.}
 }
 \value{
-list A list of the filenames of the resultant 1 page pdfs
+A vector of the filenames of the resultant 1 page pdfs.
 }
 \description{
-Split up a pdf
-}
-\details{
-Split a pdf into it's component pages and return a list of
+Split a pdf into it's component pages and return a vector of
 filenames.
 }

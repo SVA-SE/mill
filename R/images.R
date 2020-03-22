@@ -73,38 +73,16 @@ pdf_np <- function(path) {
 
 ##' Split up a pdf
 ##'
-##' Split a pdf into it's component pages and return a list of
+##' Split a pdf into it's component pages and return a vector of
 ##' filenames.
-##'
-##' @title pdf_split
-##' @param path The path to the pdffile
-##' @param dir directory to perform the comparison inside
-##' @return list A list of the filenames of the resultant 1 page pdfs
-pdf_split <- function(path, dir) {
-    if(is.null(dir)){
-        dir <- tempdir()
-    }
-    if(system2("pdftk", "-version", stdout = FALSE) != 0) {
-        stop("In order to use this tool you need to install 'pdftk'")
-    }
-    path <- normalizePath(path, mustWork = TRUE)
-    np <- pdf_np(path)
-    if (requireNamespace("progress", quietly = TRUE)) {
-        pb <- progress::progress_bar$new(total = np)
-    }
-    files <- lapply(seq_len(np), function(i) {
-        outfile <- tempfile(tmpdir = dir, fileext = ".pdf")
-        arg1 <- paste("cat", i)
-        arg2 <- paste("output", outfile)
-        system2("pdftk", args = c(path, arg1, arg2),
-                stdout = TRUE,
-                stderr = TRUE)
-        if (requireNamespace("progress", quietly = TRUE)) {
-            pb$tick()
-        }
-        outfile
-    })
-    unlist(files)
+##' @param path The path to the pdf file to split.
+##' @param dir directory for output. Default is to use a temporary
+##'     directory.
+##' @return A vector of the filenames of the resultant 1 page pdfs.
+##' @importFrom qpdf pdf_split
+pdf_split <- function(path, dir = tempdir()) {
+    pdf_split(normalizePath(path, mustWork = TRUE),
+              paste0(normalizePath(dir, mustWork = TRUE), "/"))
 }
 
 ##' Difference of two pdf:s
