@@ -4,7 +4,7 @@
 \alias{pdf_diff}
 \title{pdf_diff}
 \usage{
-pdf_diff(reference, new, dir = NULL)
+pdf_diff(reference, new, dir = tempdir())
 }
 \arguments{
 \item{reference}{Path to a pdf file}
