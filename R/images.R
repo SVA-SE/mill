@@ -26,25 +26,19 @@ reduce_image <- function(from, to) {
 ##' percent difference in all colour channels.
 ##'
 ##' Requires imagemagick
-##' Requires pdftk
-##'
-##' @title image_diff
 ##' @param reference Path to a reference image
 ##' @param new Path to an image to compare to the reference image
 ##' @param dir directory to perform the comparison inside
 ##' @return numeric The percent difference between the two images
 ##' @importFrom tools file_ext
-image_diff <- function(reference, new, dir) {
-    if(is.null(dir)){
-        dir <- tempdir()
-    }
-    if(system2("convert", "-version", stdout = FALSE) != 0) {
+image_diff <- function(reference, new, dir = tempdir()) {
+    if (system2("convert", "-version", stdout = FALSE) != 0) {
         stop("In order to use this tool you need to install 'imagemagick'")
     }
     fileext1 <- file_ext(reference)
     fileext2 <- file_ext(new)
     stopifnot(fileext1 == fileext2)
-    if(fileext1 == "pdf") {
+    if (fileext1 == "pdf") {
         stopifnot(pdf_np(reference) == 1)
         stopifnot(pdf_np(new) == 1)
     }
@@ -99,10 +93,7 @@ pdf_split <- function(path, dir = tempdir()) {
 ##' @return data.frame A data.frame with 3 columns: page,
 ##'     percent_diff, composite.
 ##' @export
-pdf_diff <- function(reference, new, dir = NULL) {
-    if(is.null(dir)){
-        dir <- tempdir()
-    }
+pdf_diff <- function(reference, new, dir = tempdir()) {
     reference <- normalizePath(reference, mustWork = TRUE)
     new <- normalizePath(new, mustWork = TRUE)
     stopifnot(pdf_np(reference) == pdf_np(new))

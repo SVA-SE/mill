@@ -133,10 +133,10 @@ docx_footnote <- function(xml) {
     stopifnot(identical(xml_name(xml), "tbl"))
     content <- list()
     i <- 1
+    xp1 <- "following-sibling::w:p["
+    xp2 <- "][./w:pPr/w:pStyle[@w:val='FootnoteText' or @w:val='Fotnotstext']]"
     repeat {
-        xpath <- paste0("following-sibling::w:p[",
-                        i,
-                        "][./w:pPr/w:pStyle[@w:val='FootnoteText' or @w:val='Fotnotstext']]")
+        xpath <- paste0(xp1, i, xp2)
         footnote <- xml_find_first(xml, xpath)
         if (is.na(footnote))
             break
@@ -196,7 +196,11 @@ merge_font_styles <- function(x) {
         done <- TRUE
 
         for (style in c("textit", "textbf", "textsuperscript")) {
-            pattern <- paste0("[\\]", style, "[{]([^}]*)[}](\\s*)[\\]", style, "[{]")
+            pattern <- paste0("[\\]",
+                              style,
+                              "[{]([^}]*)[}](\\s*)[\\]",
+                              style,
+                              "[{]")
             if (length(grep(pattern, x))) {
                 done <- FALSE
                 replacement <- paste0("\\\\", style, "{\\1\\2")
@@ -349,11 +353,11 @@ vmerge_continue <- function(tbl, i, j) {
 
     ## Current and next row.
     row <- tbl[i]
-    next_row <- tbl[i+1]
+    next_row <- tbl[i + 1]
 
     ## Determine the grid column for where the current cell in the
     ## current row starts.
-    grid_j <- 1 + sum(vapply(seq_len(j-1), function(jj) {
+    grid_j <- 1 + sum(vapply(seq_len(j - 1), function(jj) {
         ncol(row[jj])
     }, numeric(1)))
 

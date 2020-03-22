@@ -1,5 +1,4 @@
-do_apply_patch <- function(from, patchfile, to)
-{
+do_apply_patch <- function(from, patchfile, to) {
     if (!file.exists(patchfile)) {
         file.copy(from = from, to = to, overwrite = TRUE)
         return(NULL)
@@ -21,8 +20,7 @@ do_apply_patch <- function(from, patchfile, to)
     NULL
 }
 
-apply_patch_files <- function(chapter, prefix)
-{
+apply_patch_files <- function(chapter, prefix) {
     files <- list.files(pattern = paste0("^", prefix, "_[^.]+[.]tex"))
     pattern <- paste0("^", prefix, "_", normalize_title(chapter), "_")
     files <- files[!grepl(pattern = pattern, x = files)]
@@ -63,8 +61,7 @@ apply_patch <- function() {
     invisible(NULL)
 }
 
-do_create_patch <- function(from, to, patchfile)
-{
+do_create_patch <- function(from, to, patchfile) {
     if (!file.exists(to))
         stop(paste0("Missing file '", to, "'"))
 
@@ -83,8 +80,7 @@ do_create_patch <- function(from, to, patchfile)
     NULL
 }
 
-create_patch_files <- function(chapter, prefix)
-{
+create_patch_files <- function(chapter, prefix) {
     files <- list.files(pattern = paste0("^", prefix, "_[^.]+[.]tex"))
     pattern <- paste0("^", prefix, "_", normalize_title(chapter), "_")
     i <- grepl(pattern = pattern, x = files)
