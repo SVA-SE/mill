@@ -10,7 +10,8 @@ create_Makefile <- function() {
                    "\tRscript -e \"mill::to_pdf()\"",
                    "",
                    "import:",
-                   "\tRscript -e \"mill::import(); mill::from_docx(git2r::repository())\"",
+                   paste0("\tRscript -e \"mill::import(); ",
+                          "mill::from_docx(git2r::repository())\""),
                    "",
                    "diff:",
                    "\tRscript -e \"mill::create_patch()\"",
@@ -32,11 +33,13 @@ create_Makefile <- function() {
                    "clean:",
                    "\tRscript -e \"mill::cleanup()\"",
                    "",
-                   "PHONY: pdf import diff patch roundtrip build_figures rpd export clean",
+                   paste0("PHONY: pdf import diff patch roundtrip ",
+                          "build_figures rpd export clean"),
                    "")
 
         writeLines(lines, "Makefile")
-        add(repository("../.."), paste0("chapters/", basename(getwd()), "/Makefile"))
+        add(repository("../.."),
+            paste0("chapters/", basename(getwd()), "/Makefile"))
     } else if (in_report()) {
         lines <- c("all:",
                    "\tRscript -e 'mill::to_pdf()'",
