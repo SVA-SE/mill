@@ -9,9 +9,9 @@ check <- function() {
     cat("* using 'mill' version",
         as.character(packageVersion("mill")), "\n")
 
-    if (check_expect_pandoc_is_installed())
+    if (check_pandoc_is_installed())
         return(invisible(TRUE))
-    if (check_expect_patch_is_installed())
+    if (check_patch_is_installed())
         return(invisible(TRUE))
 
     cat("* loading report ... ")
@@ -30,8 +30,8 @@ check <- function() {
     result <- c(result, check_open_track_changes())
     result <- c(result, check_apply_typeset_patch())
     result <- c(result, check_reference_format())
-    result <- c(result, check_missing_figure_reference_files())
-    result <- c(result, check_missing_table_reference_files())
+    result <- c(result, check_figure_reference_files())
+    result <- c(result, check_table_reference_files())
 
     ## Checking that the range character is '--' and not
     ## '-'. Identify, for example, '2016-2017' but exclude
@@ -165,7 +165,7 @@ check_expect_clean_repository <- function() {
 ##' pandoc is required to check for example 'tex' to 'docx' round
 ##' trip.
 ##' @noRd
-check_expect_pandoc_is_installed <- function() {
+check_pandoc_is_installed <- function() {
     cat("* checking that 'pandoc' is installed ... ")
 
     output <- tryCatch(system("pandoc --version", intern = TRUE,
@@ -185,7 +185,7 @@ check_expect_pandoc_is_installed <- function() {
 ##'
 ##' patch is required to check that applying patches work.
 ##' @noRd
-check_expect_patch_is_installed <- function() {
+check_patch_is_installed <- function() {
     cat("* checking that 'patch' is installed ... ")
 
     output <- tryCatch(system("patch --version", intern = TRUE,
@@ -242,13 +242,15 @@ check_open_track_changes <- function() {
     cat("* checking for open track changes ... ")
 
     l <- sapply(list.files("chapters"), function(chapter) {
-        filename <- paste0("workspace/chapters/", chapter, "/", chapter, ".docx")
+        filename <- paste0("workspace/chapters/", chapter,
+                           "/", chapter, ".docx")
         if (!file.exists(filename))
             stop("Missing file:", filename)
 
         ## Unzip the content of the word file.
         on.exit(unlink(file.path(tempdir(), "document.xml")), add = TRUE)
-        unzip(filename, "word/document.xml", junkpaths = TRUE, exdir = tempdir())
+        unzip(filename, "word/document.xml",
+              junkpaths = TRUE, exdir = tempdir())
 
         ## Parse the content of the word file
         doc <- read_xml(file.path(tempdir(), "document.xml"))
@@ -324,7 +326,7 @@ check_reference_format <- function(x) {
 ##' Check for figure references in the 'text.tex' file that does not
 ##' have a corresponding 'figure.tex' file.
 ##' @noRd
-check_missing_figure_reference_files <- function() {
+check_figure_reference_files <- function() {
     cat("* checking missing figure reference files ... ")
 
     chapters <- list.files("chapters", full.names = TRUE)
@@ -338,7 +340,9 @@ check_missing_figure_reference_files <- function() {
         ## Expected files from figure references: 'fig:chapter:id'
         if (nrow(ref)) {
             id <- sapply(strsplit(ref$marker, ":"), "[", 3)
-            filename <- paste0(chapter, "/fig_", normalize_title(basename(chapter)), "_", id, ".tex")
+            filename <- paste0(chapter, "/fig_",
+                               normalize_title(basename(chapter)),
+                               "_", id, ".tex")
             ref_fig_files <- filename
         } else {
             ref_fig_files <- character(0)
@@ -367,7 +371,7 @@ check_missing_figure_reference_files <- function() {
 ##' Check for table references in the 'text.tex' file that does not
 ##' have a corresponding 'table.tex' file.
 ##' @noRd
-check_missing_table_reference_files <- function() {
+check_table_reference_files <- function() {
     cat("* checking missing table reference files ... ")
 
     chapters <- list.files("chapters", full.names = TRUE)
