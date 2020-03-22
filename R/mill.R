@@ -63,13 +63,16 @@ formatted_authors <- function(x, format = c("name", "email")) {
         ## expect the text in the report to be UTF-8. Therefore we can
         ## fix the sorting by replacing the last three letter of the
         ## Swedish alphabet with sortable ASCII strings:
-        lastname <- gsub(paste0("^", rawToChar(as.raw(c(0xc3, 0x85)))), "ZZZZZA", lastname)
-        lastname <- gsub(paste0("^", rawToChar(as.raw(c(0xc3, 0x84)))), "ZZZZZB", lastname)
-        lastname <- gsub(paste0("^", rawToChar(as.raw(c(0xc3, 0x96)))), "ZZZZZC", lastname)
+        lastname <- gsub(paste0("^", rawToChar(as.raw(c(0xc3, 0x85)))),
+                         "ZZZZZA", lastname)
+        lastname <- gsub(paste0("^", rawToChar(as.raw(c(0xc3, 0x84)))),
+                         "ZZZZZB", lastname)
+        lastname <- gsub(paste0("^", rawToChar(as.raw(c(0xc3, 0x96)))),
+                         "ZZZZZC", lastname)
         c(lastname, y)
     }))
 
-    if(format == "name") {
+    if (format == "name") {
         return(names[, 2][order(names[, 1])])
     }
 
@@ -116,7 +119,7 @@ load_report <- function(path = ".") {
                     kk <- length(org$contents[[i]]$section[[j]]$section)
                     for (k in seq_len(kk)) {
                         d <- org$contents[[i]]$section[[j]]$section[[k]]
-                        if (inherits(d, "org_drawer") && d$name == "AUTHORS") {
+                        if (all(inherits(d, "org_drawer"), d$name == "AUTHORS")) {
                             cl <- c("authors", "org_drawer")
                             class(org$contents[[i]]$section[[j]]$section[[k]]) <- cl
 
@@ -189,13 +192,15 @@ report_keyword <- function(x, key) {
     ii <- length(x$contents)
     for (i in seq_len(ii)) {
         if (inherits(x$contents[[i]], "org_headline")) {
-            if (identical(grep("Org-mode configuration", x$contents[[i]]$headline), 1L)) {
+            if (identical(grep("Org-mode configuration",
+                               x$contents[[i]]$headline), 1L)) {
                 jj <- length(x$contents[[i]]$section)
                 for (j in seq_len(jj)) {
-                    if (inherits(x$contents[[i]]$section[[j]], "org_keyword")) {
-                        if (identical(x$contents[[i]]$section[[j]]$key, key)) {
+                    if (all(inherits(x$contents[[i]]$section[[j]],
+                                     "org_keyword"),
+                            identical(x$contents[[i]]$section[[j]]$key,
+                                      key))) {
                             return(x$contents[[i]]$section[[j]]$value)
-                        }
                     }
                 }
             }
