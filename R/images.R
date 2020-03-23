@@ -47,12 +47,16 @@ image_diff <- function(reference, new, dir = tempdir()) {
     new <- normalizePath(new, mustWork = TRUE)
     args <- c("-verbose", "-metric MAE")
     a <- system2("compare",
-                 args = c(args, shQuote(new), shQuote(reference), shQuote(output)),
+                 args = c(args, shQuote(new), shQuote(reference),
+                          shQuote(output)),
                  stdout = TRUE,
                  stderr = TRUE)
     index <- grep("all: ", a)
-    list(as.numeric(gsub("\\(", "", regmatches(a[index], regexpr("\\([^\\)]*", a[index])))),
-         output)
+    list(as.numeric(
+        gsub("\\(",
+             "",
+             regmatches(a[index], regexpr("\\([^\\)]*", a[index])))),
+        output)
 }
 
 ##' Number of pages in a pdf

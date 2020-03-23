@@ -119,7 +119,8 @@ load_report <- function(path = ".") {
                     kk <- length(org$contents[[i]]$section[[j]]$section)
                     for (k in seq_len(kk)) {
                         d <- org$contents[[i]]$section[[j]]$section[[k]]
-                        if (all(inherits(d, "org_drawer"), d$name == "AUTHORS")) {
+                        if (all(inherits(d, "org_drawer"),
+                                d$name == "AUTHORS")) {
                             cl <- c("authors", "org_drawer")
                             class(org$contents[[i]]$section[[j]]$section[[k]]) <- cl
 
