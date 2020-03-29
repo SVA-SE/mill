@@ -32,7 +32,6 @@ steps:
     sudo dnf -y install \
       R-git2r \
       R-hunspell \
-      R-lintr \
       R-pdftools \
       R-qpdf \
       R-xml2
@@ -62,5 +61,6 @@ steps:
 
 # Run static code analysis
 - bash: |
+    sudo dnf -y install R-lintr
     Rscript -e "lintr::lint_package(linters = lintr::with_defaults(object_name_linter = NULL, object_usage_linter = NULL))"
   displayName: 'Static code analysis'
