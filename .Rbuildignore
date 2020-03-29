@@ -6,5 +6,4 @@ vignettes/mill.log
 vignettes/mill.out
 vignettes/mill.pdf
 vignettes/mill.tex
-^\.travis\.yml$
-^appveyor.yml$
+^azure-pipelines.yml$
