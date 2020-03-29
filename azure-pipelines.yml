@@ -62,6 +62,5 @@ steps:
 
 # Run static code analysis
 - bash: |
-    cd ..
     Rscript -e "lintr::lint_package(linters = lintr::with_defaults(object_name_linter = NULL, object_usage_linter = NULL))"
   displayName: 'Static code analysis'
