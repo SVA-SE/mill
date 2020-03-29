@@ -32,6 +32,7 @@ steps:
     sudo dnf -y install \
       R-git2r \
       R-hunspell \
+      R-lintr \
       R-pdftools \
       R-qpdf \
       R-xml2
@@ -59,10 +60,8 @@ steps:
   condition: always()
   displayName: 'Output the package check log'
 
-# This doesn't work yet...
-#- bash: |
-#    cd ..
-#    Rscript -e "remotes::install_github('jimhester/lintr')"
-#    sudo dnf -y install R-lintr
-#    Rscript -e "lintr::lint_package(linters = lintr::with_defaults(object_name_linter = NULL, object_usage_linter = NULL))"
-#  displayName: 'Static code analysis'
+# Run static code analysis
+- bash: |
+    cd ..
+    Rscript -e "lintr::lint_package(linters = lintr::with_defaults(object_name_linter = NULL, object_usage_linter = NULL))"
+  displayName: 'Static code analysis'
