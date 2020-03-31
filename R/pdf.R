@@ -73,10 +73,20 @@ to_pdf_chapter <- function(build = TRUE, type = c("print", "web")) {
 
     if (isTRUE(build)) {
         ## read in the pieces of the chapter
-        presnippet <- readLines("../../assets/latex/pre-snippet.tex")
+
+        svaclass <- system.file("assets/SVAchapter.cls", package = "mill")
+
+        if (svaclass == "")
+            stop(
+                "Could not find SVAchapter.cls in mill package. Ensure that you have the latest version of mill (from Azure)"
+            )
+
+        file.copy(svaclass, ".")
+
+        # presnippet <- readLines("../../assets/latex/pre-snippet.tex")
 
         ## Stitch together the chapter
-        tex <- c(presnippet,
+        tex <- c("\\documentclass{SVAchapter}",
                  "\\begin{document}",
                  readLines("typeset.tex"),
                  "\\end{document}")
