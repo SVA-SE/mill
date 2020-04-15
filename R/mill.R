@@ -92,63 +92,6 @@ chapters <- function(x) {
     stop("Unable to find 'Chapters'")
 }
 
-##' Load configuration for the report
-##'
-##' @param path The path to the root folder of the project.
-##' @export
-load_report <- function(path = ".") {
-    path <- normalizePath(path, mustWork = TRUE)
-    filename <- file.path(path, "README.org")
-    org <- org_doc(readLines(filename))
-    class(org) <- c("report", class(org))
-
-    ii <- length(org$contents)
-    for (i in seq_len(ii)) {
-        if (inherits(org$contents[[i]], "org_headline")) {
-            if (identical(grep("Chapters", org$contents[[i]]$headline), 1L)) {
-                cl <- c("chapters", "org_headline")
-                class(org$contents[[i]]) <- cl
-
-                jj <- length(org$contents[[i]]$section)
-                for (j in seq_len(jj)) {
-                    stopifnot(inherits(org$contents[[i]]$section[[j]],
-                                       "org_headline"))
-                    cl <- c("chapter", "org_headline")
-                    class(org$contents[[i]]$section[[j]]) <- cl
-
-                    kk <- length(org$contents[[i]]$section[[j]]$section)
-                    for (k in seq_len(kk)) {
-                        d <- org$contents[[i]]$section[[j]]$section[[k]]
-                        if (all(inherits(d, "org_drawer"),
-                                d$name == "AUTHORS")) {
-                            cl <- c("authors", "org_drawer")
-                            class(org$contents[[i]]$section[[j]]$section[[k]]) <- cl
-
-                            ll <- length(org$contents[[i]]$section[[j]]$section[[k]]$contents[[1]]$items)
-                            for (l in seq_len(ll)) {
-                                cl <- c("author", "org_item")
-                                class(org$contents[[i]]$section[[j]]$section[[k]]$contents[[1]]$items[[l]]) <- cl
-                            }
-
-                            break;
-                        }
-
-                        if (identical(k, kk))
-                            stop("Unable to find 'Authors'")
-                    }
-                }
-
-                break
-            }
-        }
-
-        if (identical(i, ii))
-            stop("Unable to find 'Chapters'")
-    }
-
-    org
-}
-
 ##' @method summary report
 ##' @export
 summary.report <- function(object, ...) {
