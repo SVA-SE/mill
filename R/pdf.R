@@ -83,8 +83,6 @@ to_pdf_chapter <- function(build = TRUE, type = c("print", "web")) {
 
         file.copy(svaclass, ".")
 
-        # presnippet <- readLines("../../assets/latex/pre-snippet.tex")
-
         ## Stitch together the chapter
         tex <- c("\\documentclass{SVAchapter}",
                  "\\begin{document}",
