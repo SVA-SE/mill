@@ -14,15 +14,7 @@ check <- function() {
     if (check_patch_is_installed())
         return(invisible(TRUE))
 
-    cat("* loading report ... ")
-    report <- tryCatch(load_report(), error = function(e) NULL)
-    if (is.null(report)) {
-        cat("ERROR\n")
-        return(invisible(TRUE))
-    }
-    cat("OK\n    ")
-    cat(capture.output(report)[1:4], sep = "\n    ")
-
+    cat("* checking report ... ")
     if (check_expect_clean_repository())
         return(invisible(TRUE))
 
