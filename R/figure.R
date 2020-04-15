@@ -90,48 +90,6 @@ preview_figures.chapter <- function(x) {
     invisible()
 }
 
-##' Preview a figure
-##'
-##' @param figure The path to the figure tex file
-##' @importFrom tools file_path_sans_ext
-##' @export
-preview_figure <- function(figure) {
-    preview <- tempfile(tmpdir = dirname(figure), fileext = ".tex")
-    on.exit(unlink(preview))
-
-    ## Read in the pieces of the figure
-    text <- readLines(figure)
-    presnippet <- readLines("../../assets/latex/pre-snippet.tex")
-
-    ## Create a tex file with the context to create a preview.
-    tex <- c(presnippet,
-             "\\captionsetup{labelformat = empty}",
-             "\\begin{document}",
-             "\\begin{LARGE}",
-             explain_labeling(),
-             "\\newline\\newline",
-             "\\hl{",
-             get_label(figure, "word"),
-             "}",
-             "\\end{LARGE}",
-             text,
-             "\\end{document}")
-    writeLines(tex, preview)
-
-    ## Build the preview pdf file.
-    luatex(preview)
-
-    ## Copy the pdf preview to 'preview-figure.pdf'
-    from <- paste0(file_path_sans_ext(preview), ".pdf")
-    to <- file.path(dirname(figure),
-                    paste0("preview-",
-                           file_path_sans_ext(basename(figure)),
-                           ".pdf"))
-    if (file.exists(to))
-        file.remove(to)
-    file.rename(from, to)
-}
-
 ##' Get the label from a figure path
 ##'
 ##' @noRd
@@ -157,13 +115,4 @@ format_labels <- function(labels, format = c("latex", "word")) {
         return(labels)
     }
     return(labels)
-}
-
-##'Explain the labeling
-##'
-##' @noRd
-explain_labeling <- function() {
-    paste("\\noindent To reference this figure or table in the word document",
-          "you need to insert the following \\textbf{label(s)} into",
-          "the text:")
 }
