@@ -66,30 +66,6 @@ build_figures <- function() {
     invisible(NULL)
 }
 
-##' Preview figures
-##'
-##' @param x The report object or chapter object
-##' @return invisible NULL
-##' @export
-preview_figures <- function(x) UseMethod("preview_figures")
-
-##' @export
-preview_figures.report <- function(x) {
-    preview_figures(x$chapters)
-}
-
-##' @export
-preview_figures.chapters <- function(x) {
-    lapply(x, function(y) preview_figures(y))
-    invisible()
-}
-
-##' @export
-preview_figures.chapter <- function(x) {
-    lapply(figure_files("tex"), preview_figure)
-    invisible()
-}
-
 ##' Get the label from a figure path
 ##'
 ##' @noRd
