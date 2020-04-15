@@ -2,9 +2,9 @@
 % Please edit documentation in R/images.R
 \name{image_diff}
 \alias{image_diff}
-\title{image_diff}
+\title{Compare Images}
 \usage{
-image_diff(reference, new, dir)
+image_diff(reference, new, dir = tempdir())
 }
 \arguments{
 \item{reference}{Path to a reference image}
@@ -17,12 +17,9 @@ image_diff(reference, new, dir)
 numeric The percent difference between the two images
 }
 \description{
-Compare Images
-}
-\details{
 Submit an a reference image and a new image and get back the
 percent difference in all colour channels.
-
+}
+\details{
 Requires imagemagick
-Requires pdftk
 }
