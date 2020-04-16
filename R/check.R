@@ -76,10 +76,10 @@ check <- function() {
                     "http[:]//",
                     "checking for 'http://'"))
 
-    ## result <- c(result,
-    ##             check_pattern(
-    ##                 "2017",
-    ##                 "checking for '2017'"))
+    result <- c(result,
+                check_pattern(
+                    "2018",
+                    "checking for '2018'"))
 
     result <- c(result,
                 check_pattern(
