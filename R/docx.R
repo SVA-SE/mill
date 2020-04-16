@@ -91,9 +91,14 @@ inject_tab_and_fig <- function(tex) {
                      marker   = marker,
                      reftype  = reftype,
                      stringsAsFactors = FALSE)
+
     df <- df[df$reftype %in% c("fig", "tab"), ]
-    df$filename <- paste0("\\input{", gsub(":", "_", df$marker), ".tex}")
-    c(tex, unique(df$filename))
+    if (nrow(df)) {
+        df$filename <- paste0("\\input{", gsub(":", "_", df$marker), ".tex}")
+        tex <- c(tex, unique(df$filename))
+    }
+
+    tex
 }
 
 ##' Split figures
@@ -171,9 +176,12 @@ save_figure <- function(tex, chapter) {
 }
 
 extract_figures <- function(tex, chapter) {
-    tex <- style_drop_section(tex, "Tables")$tex
-    figures <- split_figures(tex)
-    lapply(figures, save_figure, chapter = chapter)
+    if (!is.na(tex)) {
+        tex <- style_drop_section(tex, "Tables")$tex
+        figures <- split_figures(tex)
+        lapply(figures, save_figure, chapter = chapter)
+    }
+
     invisible(NULL)
 }
 
@@ -192,9 +200,11 @@ style_fun <- function(tex, chapter) {
 
     tmp <- style_drop_section(tex, "In focus")
     tex <- tmp$tex
-    filename <- "infocus.tex"
-    writeLines(tmp$drop, filename)
-    git2r::add(repository(), filename)
+    if (!is.na(tmp$drop)) {
+        filename <- "infocus.tex"
+        writeLines(tmp$drop, filename)
+        git2r::add(repository(), filename)
+    }
 
     tex <- add_line_between_references(tex)
     tex <- style_multicols(tex, output = "tex")
