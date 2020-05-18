@@ -11,7 +11,7 @@
 \RequirePackage{color}
 \RequirePackage{graphics}
 \RequirePackage{graphicx}
-\RequirePackage{threepartable}
+\RequirePackage{threeparttable}
 
 \RequirePackage[hidelinks,
   pdftitle={Surveillance of infectious diseases in animals
