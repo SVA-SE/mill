@@ -123,7 +123,7 @@ split_figures <- function(tex) {
         }
 
         tex[seq(from = from, to = to)]
-    }, figures, diff(c(figures, length(tex) + 1)))
+    }, figures, diff(c(figures, length(tex) + 1)), SIMPLIFY = FALSE)
 }
 
 ##' @importFrom tools file_path_sans_ext
@@ -176,7 +176,7 @@ save_figure <- function(tex, chapter) {
 }
 
 extract_figures <- function(tex, chapter) {
-    if (!is.na(tex)) {
+    if (!is.null(tex)) {
         tex <- style_drop_section(tex, "Tables")$tex
         figures <- split_figures(tex)
         lapply(figures, save_figure, chapter = chapter)
@@ -200,7 +200,7 @@ style_fun <- function(tex, chapter) {
 
     tmp <- style_drop_section(tex, "In focus")
     tex <- tmp$tex
-    if (!is.na(tmp$drop)) {
+    if (!is.null(tmp$drop)) {
         filename <- "infocus.tex"
         writeLines(tmp$drop, filename)
         git2r::add(repository(), filename)
@@ -277,7 +277,7 @@ normalize_title <- function(title) {
 }
 
 style_drop_section <- function(tex, section) {
-    drop <- NA_character_
+    drop <- NULL
     i <- grep(paste0("^[\\]section[*]?[{]", section, "[}]"), tex)
     if (length(i) && i > 2) {
         section <- normalize_title(section)
