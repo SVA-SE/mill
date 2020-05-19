@@ -448,14 +448,13 @@ is_midrule <- function(tbl, i) {
     length(b) == ncol(tbl) && i < nrow(tbl)
 }
 
-format_docx_table_as_tex <- function(tbl,
-                                     output,
-                                     indentation = "",
-                                     standalone = FALSE,
-                                     threeparttable = FALSE,
-                                     position = "[H]",
-                                     addlinespace = 3,
-                                     ...) {
+format_tex_table_preamble <- function(tbl,
+                                      output,
+                                      indentation,
+                                      standalone,
+                                      threeparttable,
+                                      position,
+                                      ...) {
     lines <- character(0)
 
     if (isTRUE(standalone)) {
@@ -481,6 +480,55 @@ format_docx_table_as_tex <- function(tbl,
 
     indentation <- paste0("  ", indentation)
     lines <- c(lines, paste0(indentation, format(tbl$caption, output, ...)))
+
+    list(indentation = indentation, lines = lines)
+}
+
+format_tex_table_epilogue <- function(lines,
+                                      tbl,
+                                      output,
+                                      indentation,
+                                      standalone,
+                                      threeparttable,
+                                      ...) {
+    if (length(tbl$footnote) || isTRUE(threeparttable)) {
+        if (length(tbl$footnote))
+            lines <- c(lines, format(tbl$footnote, indentation))
+
+        if (length(tbl$label)) {
+            lines <- c(lines,
+                       paste0(indentation, format(tbl$label, output, ...)))
+        }
+
+        indentation <- substr(indentation, 3, nchar(indentation))
+        lines <- c(lines, paste0(indentation, "\\end{threeparttable}"))
+    } else if (length(tbl$label)) {
+        lines <- c(lines, paste0(indentation, format(tbl$label, output, ...)))
+    }
+
+    indentation <- substr(indentation, 3, nchar(indentation))
+    lines <- c(lines, paste0(indentation, "\\end{table}"))
+
+    if (isTRUE(standalone)) {
+        indentation <- substr(indentation, 3, nchar(indentation))
+        lines <- c(lines, paste0(indentation, "\\end{document}"))
+    }
+
+    lines
+}
+
+format_docx_table_as_tex <- function(tbl,
+                                     output,
+                                     indentation = "",
+                                     standalone = FALSE,
+                                     threeparttable = FALSE,
+                                     position = "[H]",
+                                     addlinespace = 3,
+                                     ...) {
+    preamble <- format_tex_table_preamble(tbl, output, indentation, standalone,
+                                          threeparttable, position, ...)
+    lines <- preamble$lines
+    indentation <- preamble$indentation
 
     lines <- c(lines, paste0(indentation, "\\begin{tabular}{"))
     indentation <- paste0("    ", indentation)
@@ -525,9 +573,9 @@ format_docx_table_as_tex <- function(tbl,
         if (is_midrule(tbl, i)) {
             lines <- c(lines, paste0(indentation, "\\midrule"), "")
             midrule <- i
-        } else if (!is.na(midrule) &&
-                   ((i - midrule) %% addlinespace) == 0 &&
-                   i < nrow(tbl)) {
+        } else if (all(!is.na(midrule),
+                       ((i - midrule) %% addlinespace) == 0,
+                       i < nrow(tbl))) {
             lines <- c(lines, paste0(indentation, "\\addlinespace"))
             lines <- c(lines, "")
         }
@@ -539,30 +587,8 @@ format_docx_table_as_tex <- function(tbl,
     indentation <- substr(indentation, 3, nchar(indentation))
     lines <- c(lines, paste0(indentation, "\\end{tabular}"))
 
-    if (length(tbl$footnote) || isTRUE(threeparttable)) {
-        if (length(tbl$footnote))
-            lines <- c(lines, format(tbl$footnote, indentation))
-
-        if (length(tbl$label)) {
-            lines <- c(lines,
-                       paste0(indentation, format(tbl$label, output, ...)))
-        }
-
-        indentation <- substr(indentation, 3, nchar(indentation))
-        lines <- c(lines, paste0(indentation, "\\end{threeparttable}"))
-    } else if (length(tbl$label)) {
-        lines <- c(lines, paste0(indentation, format(tbl$label, output, ...)))
-    }
-
-    indentation <- substr(indentation, 3, nchar(indentation))
-    lines <- c(lines, paste0(indentation, "\\end{table}"))
-
-    if (isTRUE(standalone)) {
-        indentation <- substr(indentation, 3, nchar(indentation))
-        lines <- c(lines, paste0(indentation, "\\end{document}"))
-    }
-
-    lines
+    format_tex_table_epilogue(lines, tbl, output, indentation,
+                              standalone, threeparttable, ...)
 }
 
 ##' @export
