@@ -96,5 +96,26 @@
 %setfont for captions See the \setsansfont above from fontspec
 \captionsetup{font = {sf, footnotesize}, format = hang}
 
+%% formatting of tables:
+%%
+%% Define a new column type in tables so that you can avoind the
+%% distributed text in a 'p' type column typically used for paragraph
+%% text.
+\RequirePackage{array}
+\newcolumntype{L}[1]
+    {>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}p{#1}}
+
+%% Define the 'D' column type to align numbers by their decimal place
+%% use like this: D{.}{.}{-1}
+\RequirePackage{dcolumn}
+% increase the default row spacing in tables
+\renewcommand{\arraystretch}{1.0}
+
+% Change the font size in all tables and the footnotes note the call
+% to sf with is related to the definition of the sansfont
+\RequirePackage{floatrow}
+\DeclareFloatFont{footnotesize}{\footnotesize}
+\floatsetup[table]{font= {sf, footnotesize}, capposition=top}
+
 %%Separated the columns by a 6 mm
 \setlength{\columnsep}{0.6cm}
