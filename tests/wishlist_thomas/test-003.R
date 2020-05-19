@@ -8,7 +8,9 @@ observed <- format(docx_tables("text-001.docx")[[1]], output = "tex")
 
 expected <- c("\\begin{table}[H]",
 "  \\begin{threeparttable}",
-"    \\caption{Number of  foetuses (herds\\textsuperscript{A}) investigated by species from 2010--2019 through the aborted foetus examination programme.}",
+paste("    \\caption{Number of  foetuses (herds\\textsuperscript{A})",
+      "investigated by species from 2010--2019 through the aborted",
+      "foetus examination programme.}"),
 "    \\begin{tabular}{",
 "        l",
 "        r",
