@@ -78,7 +78,9 @@ to_pdf_chapter <- function(build = TRUE, type = c("print", "web")) {
 
         if (svaclass == "")
             stop(
-                "Could not find SVAchapter.cls in mill package. Ensure that you have the latest version of mill (from Azure)"
+                paste("Could not find SVAchapter.cls in mill package.",
+                      "Ensure that you have the latest version of mill",
+                      "(from Azure)")
             )
 
         file.copy(svaclass, ".")
