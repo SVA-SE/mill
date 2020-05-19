@@ -573,9 +573,9 @@ format_docx_table_as_tex <- function(tbl,
         if (is_midrule(tbl, i)) {
             lines <- c(lines, paste0(indentation, "\\midrule"), "")
             midrule <- i
-        } else if (!is.na(midrule) &&
-                   ((i - midrule) %% addlinespace) == 0 &&
-                   i < nrow(tbl)) {
+        } else if (all(!is.na(midrule),
+                       ((i - midrule) %% addlinespace) == 0,
+                       i < nrow(tbl))) {
             lines <- c(lines, paste0(indentation, "\\addlinespace"))
             lines <- c(lines, "")
         }
