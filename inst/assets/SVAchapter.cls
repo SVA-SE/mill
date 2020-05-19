@@ -10,9 +10,10 @@
                 right=12mm,
                 bindingoffset=15mm]{geometry}
 \RequirePackage{wasysym}
+\RequirePackage{fancyhdr}
 
 %% Set the fonts
-\usepackage{fontspec}
+\RequirePackage{fontspec}
 \setmainfont{TeX Gyre Termes}
 \setsansfont{Lato}
 
