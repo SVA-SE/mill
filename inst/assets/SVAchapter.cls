@@ -78,7 +78,7 @@
 
 \RequirePackage{booktabs}
 \RequirePackage{multirow}
-\RequirePackage{tubularx}
+\RequirePackage{tabularx}
 \RequirePackage{threeparttable}
 \RequirePackage{float}
 \RequirePackage{multicol}
