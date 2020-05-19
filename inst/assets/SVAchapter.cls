@@ -85,5 +85,10 @@
 \RequirePackage{numprint}
 \RequirePackage{url}
 
+%% Set up the font for captions
+\RequirePackage[singlelinecheck=false]{caption}
+%setfont for captions See the \setsansfont above from fontspec
+\captionsetup{font = {sf, footnotesize}, format = hang}
+
 %%Separated the columns by a 6 mm
 \setlength{\columnsep}{0.6cm}
