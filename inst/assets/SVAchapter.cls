@@ -4,7 +4,11 @@
 %%A two sided book that has space for binding on the left side:
 \LoadClass[a4paper, twoside]{report}
 
-\RequirePackage[top=18mm, bottom=18mm, left=10mm, right=12mm, bindingoffset=15mm]{geometry}
+\RequirePackage[top=18mm,
+                bottom=18mm,
+                left=10mm,
+                right=12mm,
+                bindingoffset=15mm]{geometry}
 \RequirePackage{wasysym}
 
 %% Set the fonts
@@ -23,7 +27,8 @@
 \usepackage[compact]{titlesec}
 
 \titleformat{\part}[display]
-  {\fontspec{Lato Bold}[Scale = 1.5]\centering}{\chaptertitlename\ \thechapter}{100pt}{\Huge}
+    {\fontspec{Lato Bold}[Scale = 1.5]\centering}
+    {\chaptertitlename\ \thechapter}{100pt}{\Huge}
 
 \titleformat{\chapter}[display]
   {\fontspec{Lato}\huge}{\chaptertitlename\ \thechapter}{40pt}{\Huge\textbf}
