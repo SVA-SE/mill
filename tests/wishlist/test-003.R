@@ -4,7 +4,7 @@ library(mill)
 ## document and the subsequent addlinespace additions are then also
 ## misaligned
 
-observed <- format(docx_tables("text-001.docx")[[1]], output = "tex")
+observed <- format(docx_tables("text-003.docx")[[1]], output = "tex")
 
 expected <- c("\\begin{table}[H]",
 "  \\begin{threeparttable}",
@@ -175,28 +175,5 @@ paste("    \\caption{Number of  foetuses (herds\\textsuperscript{A})",
 "    \\label{tab:abortion-by-species}",
 "  \\end{threeparttable}",
 "\\end{table}")
-expected
-
-stopifnot(identical(
-    format(docx_tables("text.docx")[[1]], output = "tex"),
-    c("\\begin{table}[H]",
-      "  \\begin{threeparttable}",
-      "    \\caption{This is a simple table.}",
-      "    \\begin{tabular}{", "        l",
-      "        r}",
-      "",
-      "      \\toprule",
-      "", "      \\textbf{Total} &",
-      "      \\textbf{1}\\textsuperscript{\\textbf{A}} \\\\",
-      "",
-      "      \\bottomrule",
-      "",
-      "    \\end{tabular}",
-      "    \\begin{tablenotes}",
-      "      \\item \\textsuperscript{A}Footnote.",
-      "    \\end{tablenotes}",
-      "    \\label{tab:test}",
-      "  \\end{threeparttable}",
-      "\\end{table}")))
 
 stopifnot(identical(observed, expected))
