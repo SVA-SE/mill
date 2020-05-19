@@ -86,7 +86,6 @@
 \RequirePackage{multirow}
 \RequirePackage{tabularx}
 \RequirePackage{threeparttable}
-\RequirePackage{float}
 \RequirePackage{multicol}
 \RequirePackage{numprint}
 \RequirePackage{url}
