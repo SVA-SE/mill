@@ -13,16 +13,23 @@ container: fedora:latest
 
 steps:
 - bash: |
-    sudo dnf -y install langpacks-en R
+    sudo dnf -y install devscripts-checkbashisms langpacks-en R
   displayName: "Install R"
 
 - bash: |
-    cd ..
-    echo 'options(repos = "$(CRAN)")' > .Rprofile
-    echo 'R_LIBS_SITE="$(R_LIBS_SITE)"' > .Renviron
-    echo 'R_LIBS_USER="$(R_LIBS_USER)"' >> .Renviron
-    mkdir -p $(R_LIBS_USER)
-  displayName: "Setting up R library"
+    cd
+    echo 'options(repos = "https://cloud.r-project.org")' > .Rprofile
+    echo 'invisible(Sys.setlocale("LC_CTYPE", "en_US.UTF-8"))' >> .Rprofile
+    echo 'invisible(Sys.setlocale("LC_TIME", "en_US.UTF-8"))' >> .Rprofile
+    echo 'invisible(Sys.setlocale("LC_COLLATE", "en_US.UTF-8"))' >> .Rprofile
+    echo 'invisible(Sys.setlocale("LC_MONETARY", "en_US.UTF-8"))' >> .Rprofile
+    echo 'invisible(Sys.setlocale("LC_MESSAGES", "en_US.UTF-8"))' >> .Rprofile
+    echo 'invisible(Sys.setlocale("LC_PAPER", "en_US.UTF-8"))' >> .Rprofile
+    echo 'invisible(Sys.setlocale("LC_MEASUREMENT", "en_US.UTF-8"))' >> .Rprofile
+    echo 'R_LIBS_SITE="/usr/share/R/library"' > .Renviron
+    echo 'R_LIBS_USER="$(Agent.BuildDirectory)/R/library"' >> .Renviron
+    mkdir -p $(Agent.BuildDirectory)/R/library
+  displayName: "Customize R startup"
 
 - bash: |
     Rscript -e "R.version"
