@@ -77,13 +77,13 @@ steps:
   displayName: 'Code coverage'
 
 - task: DotNetCoreInstaller@0
-    inputs:
-      packageType: sdk
-      version: 2.2.207
-      installationPath: $(Agent.ToolsDirectory)/dotnet
-    displayName: "Install dotnet core"
+  inputs:
+    packageType: sdk
+    version: 2.2.207
+    installationPath: $(Agent.ToolsDirectory)/dotnet
+  displayName: "Install dotnet core"
 
 - task: PublishCodeCoverageResults@1
-    inputs:
-      codeCoverageTool: 'Cobertura'
-      summaryFileLocation: 'coverage.xml'
+  inputs:
+    codeCoverageTool: 'Cobertura'
+    summaryFileLocation: 'coverage.xml'
