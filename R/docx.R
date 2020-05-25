@@ -57,6 +57,7 @@ in_report <- function() {
 import <- function() {
     if (in_chapter()) {
         chapter <- basename(getwd())
+        cat(sprintf("Importing: %s\n", chapter))
         from <- paste0("../../workspace/chapters/", chapter)
         if (!dir.exists(from))
             stop("Invalid directory:", from)
@@ -229,6 +230,7 @@ from_docx <- function(repo = NULL, force = FALSE) {
     if (in_chapter()) {
         on.exit(unlink("./media", recursive = TRUE), add = TRUE)
         chapter <- basename(getwd())
+        cat(sprintf("From docx: %s\n", chapter))
 
         ## Convert the docx to a temporary tex file.
         f_tex <- tempfile(fileext = ".tex")
@@ -258,8 +260,10 @@ from_docx <- function(repo = NULL, force = FALSE) {
         repo <- repository()
         if (!isTRUE(force)) {
             s <- status(repo)
-            if (length(c(s$staged, s$unstaged)))
-                stop("Working tree is not clean")
+            if (length(c(s$staged, s$unstaged))) {
+                stop(paste("Cannot run 'from_docx' since working tree",
+                           "is not clean. You can use 'force = TRUE'."))
+            }
         }
 
         lapply(list.files("chapters"), function(chapter) {
