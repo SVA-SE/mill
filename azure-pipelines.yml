@@ -68,3 +68,22 @@ steps:
       -e "print(l)" \
       -e "quit(save = 'no', status = length(l) > 0)"
   displayName: 'Static code analysis'
+
+# Run code coverage. To publish the code coverage, the two tasks below are also required.
+- bash: |
+    Rscript \
+      -e "install.packages('covr')" \
+      -e "covr::azure()"
+  displayName: 'Code coverage'
+
+- task: DotNetCoreInstaller@0
+    inputs:
+      packageType: sdk
+      version: 2.2.207
+      installationPath: $(Agent.ToolsDirectory)/dotnet
+    displayName: "Install dotnet core"
+
+- task: PublishCodeCoverageResults@1
+    inputs:
+      codeCoverageTool: 'Cobertura'
+      summaryFileLocation: 'coverage.xml'
