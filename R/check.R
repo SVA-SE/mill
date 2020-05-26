@@ -18,8 +18,8 @@ check <- function() {
     if (check_expect_clean_repository())
         return(invisible(TRUE))
 
-    result <- check_tex_to_docx_round_trip()
-    result <- c(result, check_open_track_changes())
+    ## result <- check_tex_to_docx_round_trip()
+    result <- check_open_track_changes()
     result <- c(result, check_apply_typeset_patch())
     result <- c(result, check_reference_format())
     result <- c(result, check_figure_reference_files())
