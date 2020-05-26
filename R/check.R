@@ -131,6 +131,12 @@ check <- function() {
     invisible(any(result))
 }
 
+check_chapters <- function() {
+    if (in_chapter())
+        return(".")
+    list.files("chapters", full.names = TRUE)
+}
+
 ##' Check that repository is clean
 ##'
 ##' To protect against overwriting un-committed changes.
@@ -205,14 +211,14 @@ check_tex_to_docx_round_trip <- function() {
     on.exit(reset(commits(repository(), n = 1)[[1]], "hard"))
     cat("* checking 'tex' to 'docx' round trip ... ")
 
-    l <- sapply(list.files("chapters"), function(chapter) {
-        wd <- setwd(paste0("chapters/", chapter))
+    l <- sapply(check_chapters(), function(chapter) {
+        wd <- setwd(chapter)
         to_docx()
         from_docx()
         setwd(wd)
         unstaged <- unlist(status(repository())$unstaged)
-        if (file.path("chapters", chapter, "text.tex") %in% unstaged)
-            return(file.path("chapters", chapter, "text.tex"))
+        if (file.path(chapter, "text.tex") %in% unstaged)
+            return(file.path(chapter, "text.tex"))
         NULL
     })
 
@@ -233,9 +239,17 @@ check_tex_to_docx_round_trip <- function() {
 check_open_track_changes <- function() {
     cat("* checking for open track changes ... ")
 
-    l <- sapply(list.files("chapters"), function(chapter) {
-        filename <- paste0("workspace/chapters/", chapter,
-                           "/", chapter, ".docx")
+    l <- sapply(check_chapters(), function(chapter) {
+        if (in_chapter()) {
+            filename <- paste0("../../workspace/chapters/",
+                               basename(getwd()), "/",
+                               basename(getwd()), ".docx")
+        } else {
+            filename <- paste0("workspace/chapters/",
+                               basename(chapter), "/",
+                               basename(chapter), ".docx")
+        }
+
         if (!file.exists(filename))
             stop("Missing file:", filename)
 
@@ -272,8 +286,8 @@ check_open_track_changes <- function() {
 check_apply_typeset_patch <- function() {
     cat("* checking apply typeset patch ... ")
 
-    l <- sapply(list.files("chapters"), function(chapter) {
-        wd <- setwd(paste0("chapters/", chapter))
+    l <- sapply(check_chapters(), function(chapter) {
+        wd <- setwd(chapter)
         result <- tryCatch(apply_patch(), error = function(e) chapter)
         setwd(wd)
         result
@@ -321,8 +335,7 @@ check_reference_format <- function(x) {
 check_figure_reference_files <- function() {
     cat("* checking missing figure reference files ... ")
 
-    chapters <- list.files("chapters", full.names = TRUE)
-    ref <- unlist(lapply(chapters, function(chapter) {
+    ref <- unlist(lapply(check_chapters(), function(chapter) {
         wd <- setwd(chapter)
 
         ## Get references for figure files
@@ -366,8 +379,7 @@ check_figure_reference_files <- function() {
 check_table_reference_files <- function() {
     cat("* checking missing table reference files ... ")
 
-    chapters <- list.files("chapters", full.names = TRUE)
-    ref <- unlist(lapply(chapters, function(chapter) {
+    ref <- unlist(lapply(check_chapters(), function(chapter) {
         wd <- setwd(chapter)
 
         ## Get references for table files
@@ -414,8 +426,12 @@ check_pattern <- function(pattern, description, perl = FALSE, patches = TRUE) {
         file_pattern <- "[.]tex$"
     }
 
-    files <- list.files("chapters", pattern = file_pattern,
-                        recursive = TRUE, full.names = TRUE)
+    if (in_chapter()) {
+        files <- list.files(pattern = file_pattern)
+    } else {
+        files <- list.files("chapters", pattern = file_pattern,
+                            recursive = TRUE, full.names = TRUE)
+    }
 
     l <- sapply(files, function(filename) {
         lines <- grep(pattern, readLines(filename), perl = perl)
