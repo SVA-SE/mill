@@ -346,7 +346,7 @@ check_figure_reference_files <- function() {
         if (nrow(ref)) {
             id <- sapply(strsplit(ref$marker, ":"), "[", 3)
             filename <- paste0(chapter, "/fig_",
-                               normalize_title(basename(chapter)),
+                               normalize_title(basename(getwd())),
                                "_", id, ".tex")
             ref_fig_files <- filename
         } else {
