@@ -169,7 +169,7 @@ check_pandoc_is_installed <- function() {
     output <- tryCatch(system("pandoc --version", intern = TRUE,
                               ignore.stderr = TRUE),
                        error = function(e) character(0))
-    ver <- grep("^pandoc[[:space:]]+[.0-9]*", output)
+    ver <- grep("^pandoc(\\.exe)*[[:space:]]+[.0-9]*", output)
     if (!length(ver)) {
         cat("ERROR\n")
         return(TRUE)
