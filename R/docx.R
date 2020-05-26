@@ -232,6 +232,10 @@ from_docx <- function(repo = NULL, force = FALSE) {
         chapter <- basename(getwd())
         cat(sprintf("From docx: %s\n", chapter))
 
+        ## First, delete all tex-files in order to detect tex-files
+        ## that don't have origin in the docx-file.
+        unlink(list.files(pattern = "[.]tex$"))
+
         ## Convert the docx to a temporary tex file.
         f_tex <- tempfile(fileext = ".tex")
         f_docx <- "text.docx"
