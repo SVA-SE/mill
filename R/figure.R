@@ -29,6 +29,9 @@ figure_files <- function(fileext = "all") {
 ##' @export
 build_figures <- function() {
     if (in_chapter()) {
+        chapter <- basename(getwd())
+        cat(sprintf("Build figures: %s\n", chapter))
+
         lapply(figure_files("R"), function(figure) {
             source(figure, local = TRUE, chdir = TRUE)
         })
