@@ -4,7 +4,10 @@ variables:
   CRAN: 'https://cloud.r-project.org'
 
 trigger:
-- master
+  branches:
+    include:
+      - master
+  batch: true
 
 pool:
   vmImage: 'Ubuntu-latest'
