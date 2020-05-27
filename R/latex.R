@@ -22,6 +22,7 @@ luatex <- function(texname, clean = FALSE) {
     wd <- setwd(dirname(texname))
     on.exit(setwd(wd))
 
+    cat("Build the pdf\n\n")
     texname <- basename(texname)
     stopifnot(file.exists(texname))
     system(paste(luatex_cmd(), shQuote(texname)))
