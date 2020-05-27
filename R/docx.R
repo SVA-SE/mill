@@ -512,40 +512,6 @@ style_toc <- function(tex, output = c("docx", "tex")) {
     c(tex_a, toc, tex_b)
 }
 
-##' Roundtrip tex to docx
-##'
-##' @return invisible NULL.
-##' @importFrom git2r repository
-##' @importFrom git2r reset
-##' @importFrom git2r status
-##' @export
-roundtrip <- function() {
-    if (in_chapter()) {
-        ## Check if the working tree is clean
-        repo <- repository("../..")
-        s <- status(repo)
-        if (length(c(s$staged, s$unstaged)))
-            stop("Working tree is not clean")
-
-        to_docx(repo = NULL)
-        from_docx(repo = NULL)
-
-        ## The roundtrip is clean if the tex-file is unchanged
-        unstaged <- unlist(status(repo)$unstaged)
-        tex_file <- paste0("chapters/", basename(getwd()), "/text.tex")
-        if (!(tex_file %in% unstaged))
-            reset(commits(repo, n = 1)[[1]], "hard")
-    } else if (in_report()) {
-        lapply(list.files("chapters"), function(chapter) {
-            wd <- setwd(paste0("chapters/", chapter))
-            roundtrip()
-            setwd(wd)
-        })
-    }
-
-    invisible()
-}
-
 ##' Cleanup temporary files
 ##'
 ##' @return invisible NULL.
