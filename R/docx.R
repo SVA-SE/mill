@@ -43,7 +43,7 @@ import <- function() {
     invisible()
 }
 
-inject_tab_and_fig <- function(tex) {
+inject_tab_fig_infocus <- function(tex, infocus) {
     ## Find the references
     pattern <- "[\\]label[{][^}]*[}]|[\\]ref[{][^}]*[}]"
     m <- regmatches(tex, gregexpr(pattern, tex))
@@ -62,6 +62,10 @@ inject_tab_and_fig <- function(tex) {
         df$filename <- paste0("\\input{", gsub(":", "_", df$marker), ".tex}")
         tex <- c(tex, unique(df$filename))
     }
+
+    ## Append infocus
+    if (infocus[1] > 0)
+        tex <- c(tex, paste0("\\input{infocus_", seq_len(infocus), ".tex}"))
 
     tex
 }
@@ -150,6 +154,56 @@ extract_figures <- function(tex, chapter) {
     invisible(NULL)
 }
 
+##' Split infocus
+##'
+##' Extract the tex for each infocus that starts with a subsection.
+##' We know that all infocus sections starts with a 'section' so drop
+##' that and split on all subsections. Before returning, any infocus
+##' subsections are bumped to sections.
+##' @param tex the tex for the infocus sections.
+##' @return a list with the tex for each subsection in the infocus.
+##' @noRd
+split_infocus <- function(tex) {
+    ## First, remove the section.
+    i <- grep("\\\\section", tex)
+    stopifnot(length(i) == 1)
+    tex <- tex[-seq_len(i)]
+
+    ## Bump subsection.
+    tex <- gsub("subsection*{", "section*{", tex, fixed = TRUE)
+    infocus <- grep("\\\\section", tex)
+    if (length(infocus) == 0)
+        return(list())
+
+    mapply(function(from, n) {
+        to <- from + n - 1
+
+        ## Remove empty lines.
+        while (to > from &&
+               ((nchar(tex[to]) == 0) || tex[to] == "\\\\\\\\")) {
+            to <- to - 1
+        }
+
+        tex[seq(from = from, to = to)]
+    }, infocus, diff(c(infocus, length(tex) + 1)), SIMPLIFY = FALSE)
+}
+
+##' Extract any infocus sections.
+##' @return the number of infocus sections that were found.
+extract_infocus <- function(tex, chapter) {
+    if (is.null(tex))
+        return(0)
+
+    infocus <- split_infocus(tex)
+    for (i in seq_len(length(infocus))) {
+        filename <- sprintf("infocus_%i.tex", i)
+        writeLines(infocus[[i]], filename)
+        git2r::add(repository(), paste0("chapters/", chapter, "/", filename))
+    }
+
+    length(infocus)
+}
+
 style_fun <- function(tex, chapter) {
     tmp <- style_drop_section(tex, "Figures")
     extract_figures(tmp$drop, chapter)
@@ -164,28 +218,12 @@ style_fun <- function(tex, chapter) {
     tex <- style_numprint(tex, output = "tex")
 
     tmp <- style_drop_section(tex, "In focus")
+    infocus <- extract_infocus(tmp$drop, chapter)
     tex <- tmp$tex
-    if (!is.null(tmp$drop)) {
-        filename <- paste0("infocus_",
-                           parse_infocus_title(tmp$drop),
-                           ".tex")
-        writeLines(tmp$drop, filename)
-        git2r::add(repository(), filename)
-    }
-
     tex <- add_line_between_references(tex)
     tex <- style_multicols(tex, output = "tex")
-    tex <- inject_tab_and_fig(tex)
+    tex <- inject_tab_fig_infocus(tex, infocus)
     tex
-}
-
-parse_infocus_title <- function(tex) {
-    pattern <- "\\\\subsection\\*\\{"
-    ln <- grep(pattern, tex)
-    stopifnot(length(ln) == 1)
-    title <- sub("}", "", sub(pattern, "", tex[ln]))
-    title <- trimws(tolower(substr(start = 1, stop = 50, title)))
-    gsub(" ", "-", title)
 }
 
 ##' Convert from docx to tex
