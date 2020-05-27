@@ -4,7 +4,10 @@
 \alias{apply_patch}
 \title{Apply patch}
 \usage{
-apply_patch()
+apply_patch(verbose = TRUE)
+}
+\arguments{
+\item{verbose}{give information about the process.}
 }
 \value{
 invisible(NULL)
