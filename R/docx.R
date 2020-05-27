@@ -548,47 +548,6 @@ style_toc <- function(tex, output = c("docx", "tex")) {
     c(tex_a, toc, tex_b)
 }
 
-##' Convert from tex to docx
-##'
-##' Use pandoc (http://pandoc.org/) to convert from 'tex' to
-##' 'docx'. The chapter 'text.tex' is converted to 'text.docx'. Each
-##' chapter 'text.docx' is added, but not commited, to the report git
-##' repository.
-##' @param repo the report git repository.
-##' @return invisible NULL.
-##' @export
-to_docx <- function(repo = NULL) {
-    if (in_chapter()) {
-        ## Clean up changes made in from_docx_chapter()
-        tex <- readLines("text.tex")
-        tex <- asterisk(tex, "remove")
-        tex <- convert_ref_to_docx_ref(tex)
-        tex <- empty_line_from_tex_to_docx(tex)
-        tex <- style_toc(tex, output = "docx")
-        tex <- style_multicols(tex, output = "docx")
-        tex <- style_numprint(tex, output = "docx")
-        f_tex <- tempfile(fileext = ".tex")
-        writeLines(tex, f_tex)
-        f_docx <- "text.docx"
-        unlink(f_docx)
-
-        ## Convert to docx
-        pandoc(paste("--top-level-division=chapter ",
-                     shQuote(f_tex), "-o", shQuote(f_docx)))
-        if (!is.null(repo))
-            add(repo, paste0("chapters/", basename(getwd()), "/text.docx"))
-    } else if (in_report()) {
-        repo <- repository()
-        lapply(list.files("chapters"), function(chapter) {
-            wd <- setwd(paste0("chapters/", chapter))
-            to_docx(repo = repo)
-            setwd(wd)
-        })
-    }
-
-    invisible()
-}
-
 ##' Roundtrip tex to docx
 ##'
 ##' @return invisible NULL.
