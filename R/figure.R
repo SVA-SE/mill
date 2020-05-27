@@ -33,12 +33,6 @@ preview_pattern <- function(items = c("all", "figure", "table")) {
     paste0("^preview-", items, "_[^.]*[.]pdf$")
 }
 
-##' @noRd
-preview_files <- function(items = "all") {
-    stopifnot(in_chapter())
-    list.files(pattern = preview_pattern(items))
-}
-
 ##' Build figures
 ##'
 ##' @return invisible NULL
