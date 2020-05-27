@@ -4,6 +4,8 @@ do_apply_patch <- function(from, patchfile, to) {
         return(NULL)
     }
 
+    cat(sprintf("  - %s\n", patchfile))
+
     output <- tryCatch(system2("patch",
                                args = c(from,
                                         "-i", patchfile,
@@ -41,10 +43,10 @@ apply_patch_files <- function(chapter, prefix) {
 ##' @export
 apply_patch <- function() {
     if (in_chapter()) {
-        do_apply_patch("text.tex", "typeset.patch", "typeset.tex")
-
-        ## Patching
         chapter <- basename(getwd())
+        cat(sprintf("Apply patches: %s\n", chapter))
+
+        do_apply_patch("text.tex", "typeset.patch", "typeset.tex")
         apply_patch_files(chapter, "tab")
         apply_patch_files(chapter, "fig")
         apply_patch_files(chapter, "infocus")

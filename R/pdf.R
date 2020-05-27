@@ -16,7 +16,7 @@ to_pdf <- function(type = c("print", "web")) {
 ##' @noRd
 to_pdf_report <- function(type = c("print", "web")) {
     type <- match.arg(type)
-    ## Nuke previous build
+    cat("Nuke previous build\n")
     unlink("build", recursive = TRUE)
     dir.create("build")
 
@@ -34,6 +34,7 @@ to_pdf_report <- function(type = c("print", "web")) {
         files <- list.files(file.path("../assets", dir), pattern = "[^auto]")
         lapply(files, function(to) {
             from <- file.path("../assets", dir, to)
+            cat(sprintf("Copy file: %s\n", from))
             if (startsWith(to, "img") && type == "web") {
                 reduce_image(from, to)
             } else {
@@ -107,10 +108,12 @@ to_pdf_chapter <- function(build = TRUE, type = c("print", "web")) {
         lapply(ref[ref$reftype == "fig", "marker"], function(marker) {
             marker <- paste0(gsub(":", "_", marker),
                              c(".pdf", ".tex", ".png", ".eps"))
+            cat(sprintf("Copy file: %s\n", marker))
             file.copy(marker, paste0("../../build/", marker))
         })
         lapply(ref[ref$reftype == "tab", "marker"], function(marker) {
             marker <- paste0(gsub(":", "_", marker), ".tex")
+            cat(sprintf("Copy file: %s\n", marker))
             file.copy(marker, paste0("../../build/", marker))
         })
 
@@ -121,6 +124,7 @@ to_pdf_chapter <- function(build = TRUE, type = c("print", "web")) {
             if (type == "web") {
                 reduce_image(from, to)
             } else {
+                cat(sprintf("Copy file: %s\n", from))
                 file.copy(from, to)
             }
         })
@@ -130,6 +134,7 @@ to_pdf_chapter <- function(build = TRUE, type = c("print", "web")) {
         files <- list.files(pattern = pattern)
         lapply(files, function(from) {
             to <- paste0("../../build/", from)
+            cat(sprintf("Copy file: %s\n", from))
             file.copy(from, to)
         })
     }
