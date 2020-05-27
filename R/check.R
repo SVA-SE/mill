@@ -254,7 +254,8 @@ check_apply_typeset_patch <- function() {
 
     l <- sapply(check_chapters(), function(chapter) {
         wd <- setwd(chapter)
-        result <- tryCatch(apply_patch(), error = function(e) chapter)
+        result <- tryCatch(apply_patch(verbose = FALSE),
+                           error = function(e) chapter)
         setwd(wd)
         result
     })

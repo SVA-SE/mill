@@ -1,10 +1,11 @@
-do_apply_patch <- function(from, patchfile, to) {
+do_apply_patch <- function(from, patchfile, to, verbose) {
     if (!file.exists(patchfile)) {
         file.copy(from = from, to = to, overwrite = TRUE)
         return(NULL)
     }
 
-    cat(sprintf("  - %s\n", patchfile))
+    if (isTRUE(verbose))
+        cat(sprintf("  - %s\n", patchfile))
 
     output <- tryCatch(system2("patch",
                                args = c(from,
@@ -21,7 +22,7 @@ do_apply_patch <- function(from, patchfile, to) {
     NULL
 }
 
-apply_patch_files <- function(chapter, prefix) {
+apply_patch_files <- function(chapter, prefix, verbose) {
     files <- list.files(pattern = paste0("^", prefix, "_[^.]+[.]tex"))
     pattern <- paste0("^", prefix, "_", normalize_title(chapter), "_")
     files <- files[!grepl(pattern = pattern, x = files)]
@@ -31,7 +32,7 @@ apply_patch_files <- function(chapter, prefix) {
         to <- sub(paste0("^", prefix),
                   paste0(prefix, "_", normalize_title(chapter)),
                   from)
-        do_apply_patch(from, patch, to)
+        do_apply_patch(from, patch, to, verbose)
     })
 
     NULL
@@ -39,17 +40,19 @@ apply_patch_files <- function(chapter, prefix) {
 
 ##' Apply patch
 ##'
+##' @verbose give information about the process.
 ##' @return invisible(NULL)
 ##' @export
-apply_patch <- function() {
+apply_patch <- function(verbose = TRUE) {
     if (in_chapter()) {
         chapter <- basename(getwd())
-        cat(sprintf("Apply patches: %s\n", chapter))
+        if (isTRUE(verbose))
+            cat(sprintf("Apply patches: %s\n", chapter))
 
-        do_apply_patch("text.tex", "typeset.patch", "typeset.tex")
-        apply_patch_files(chapter, "tab")
-        apply_patch_files(chapter, "fig")
-        apply_patch_files(chapter, "infocus")
+        do_apply_patch("text.tex", "typeset.patch", "typeset.tex", verbose)
+        apply_patch_files(chapter, "tab", verbose)
+        apply_patch_files(chapter, "fig", verbose)
+        apply_patch_files(chapter, "infocus", verbose)
     } else if (in_report()) {
         lapply(list.files("chapters"), function(chapter) {
             wd <- setwd(paste0("chapters/", chapter))
