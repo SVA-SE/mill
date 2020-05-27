@@ -96,7 +96,8 @@ to_pdf_chapter <- function(build = TRUE, type = c("print", "web")) {
                  "\\fancyhead{} % clear all header fields",
                  "\\fancyfoot{}",
                  "\\fancyfoot[LO,RE]{\\fontspec{Lato",
-                 "Light}\\textcolor{svared}{\\uppercase{Disease Surveillance 2019}}}",
+                 paste0("Light}\\textcolor{svared}{\\uppercase{",
+                        "Disease Surveillance 2019}}}"),
                  "\\fancyfoot[LE,RO]{\\thepage}",
                  readLines("typeset.tex"),
                  "\\end{document}")
