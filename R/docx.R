@@ -141,7 +141,7 @@ save_figure <- function(tex, chapter) {
                paste0("  \\includegraphics{", file_path_sans_ext(to), "}"),
                paste0("  ", caption),
                "\\end{figure}")
-    filename <- paste0("fig_", prefix, "_", label, ".tex")
+    filename <- paste0("fig_", label, ".tex")
     writeLines(lines, filename)
     git2r::add(repository(), paste0("chapters/", chapter, "/", filename))
 

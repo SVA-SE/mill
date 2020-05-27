@@ -43,11 +43,10 @@ apply_patch <- function() {
     if (in_chapter()) {
         do_apply_patch("text.tex", "typeset.patch", "typeset.tex")
 
-        ## Table patching
+        ## Patching
         chapter <- basename(getwd())
         apply_patch_files(chapter, "tab")
-
-        ## Fix to handle named infocus files.
+        apply_patch_files(chapter, "fig")
         apply_patch_files(chapter, "infocus")
     } else if (in_report()) {
         lapply(list.files("chapters"), function(chapter) {
