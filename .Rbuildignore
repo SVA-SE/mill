@@ -7,3 +7,5 @@ vignettes/mill.out
 vignettes/mill.pdf
 vignettes/mill.tex
 ^azure-pipelines.yml$
+^.*\.Rproj$
+^\.Rproj\.user$

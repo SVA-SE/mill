@@ -141,6 +141,7 @@ check_chapters <- function() {
 ##' To protect against overwriting un-committed changes.
 ##' @importFrom git2r diff
 ##' @importFrom git2r repository
+##' @importFrom git2r status
 ##' @noRd
 check_expect_clean_repository <- function() {
     cat("* checking that repository is clean ... ")
