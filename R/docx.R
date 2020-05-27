@@ -202,7 +202,9 @@ style_fun <- function(tex, chapter) {
     tmp <- style_drop_section(tex, "In focus")
     tex <- tmp$tex
     if (!is.null(tmp$drop)) {
-        filename <- "infocus.tex"
+        filename <- paste0("infocus",
+                           parse_infocus_title(tmp$drop),
+                           ".tex")
         writeLines(tmp$drop, filename)
         git2r::add(repository(), filename)
     }
@@ -211,6 +213,15 @@ style_fun <- function(tex, chapter) {
     tex <- style_multicols(tex, output = "tex")
     tex <- inject_tab_and_fig(tex)
     tex
+}
+
+parse_infocus_title <- (tex) {
+    pattern <- "\\\\subsection\*\{"
+    ln <- grep(pattern, tex)
+    stopifnot(length(ln) == 1)
+    title <- sub("}", "", sub(pattern, "", tex[ln]))
+    title <- gsub(" ", "-", title)
+    substr(start = 1, stop = 50, title)
 }
 
 ##' Convert from docx to tex
