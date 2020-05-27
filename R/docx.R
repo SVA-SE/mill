@@ -43,7 +43,7 @@ import <- function() {
     invisible()
 }
 
-inject_tab_fig_infocus <- function(tex, infocus) {
+inject_tab_fig_infocus <- function(tex, infocus, chapter) {
     ## Find the references
     pattern <- "[\\]label[{][^}]*[}]|[\\]ref[{][^}]*[}]"
     m <- regmatches(tex, gregexpr(pattern, tex))
@@ -64,8 +64,12 @@ inject_tab_fig_infocus <- function(tex, infocus) {
     }
 
     ## Append infocus
-    if (infocus[1] > 0)
-        tex <- c(tex, paste0("\\input{infocus_", seq_len(infocus), ".tex}"))
+    if (infocus[1] > 0) {
+        chapter <- normalize_title(chapter)
+        infocus <- paste0("\\input{infocus_", chapter,
+                          "_", seq_len(infocus), ".tex}")
+        tex <- c(tex, infocus)
+    }
 
     tex
 }
@@ -222,7 +226,7 @@ style_fun <- function(tex, chapter) {
     tex <- tmp$tex
     tex <- add_line_between_references(tex)
     tex <- style_multicols(tex, output = "tex")
-    tex <- inject_tab_fig_infocus(tex, infocus)
+    tex <- inject_tab_fig_infocus(tex, infocus, chapter)
     tex
 }
 
