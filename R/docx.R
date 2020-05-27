@@ -1,39 +1,3 @@
-##' Export files to workspace
-##'
-##' Authors make contributions to chapters in the workspace. The docx
-##' files are exported to workspace/chapters/title.
-##' @return invisible NULL.
-##' @export
-export <- function() {
-    if (in_chapter()) {
-        chapter <- basename(getwd())
-
-        to <- paste0("../../workspace/chapters/", chapter)
-        if (!dir.exists(to))
-            dir.create(to, recursive = TRUE)
-
-        ## Export text.docx to renamed title.docx
-        from <- "text.docx"
-        if (!file.exists(from))
-            to_docx()
-        file.copy(from, paste0(to, "/", chapter, ".docx"), overwrite = TRUE)
-
-        ## Export data and preview files
-        files <- c(figure_files("xlsx"), figure_files("pdf"), preview_files())
-        lapply(files, function(from) {
-            file.copy(from, file.path(to, basename(from)), overwrite = TRUE)
-        })
-    } else if (in_report()) {
-        lapply(list.files("chapters"), function(chapter) {
-            wd <- setwd(paste0("chapters/", chapter))
-            export()
-            setwd(wd)
-        })
-    }
-
-    invisible()
-}
-
 ##' Check if current working directory is in a chapter
 ##' @noRd
 in_chapter <- function() {
