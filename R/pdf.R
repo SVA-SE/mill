@@ -88,8 +88,21 @@ to_pdf_chapter <- function(build = TRUE, type = c("print", "web")) {
         ## Stitch together the chapter
         tex <- c("\\documentclass{SVAchapter}",
                  "\\begin{document}",
+                 "\\renewcommand\\headrulewidth{0pt}",
+                 "\\renewcommand\\footrulewidth{0.5pt}",
+                 "\\restoregeometry",
+                 "\\pagestyle{fancy}",
+                 "\\fancyhead{} % clear all header fields",
+                 "\\fancyfoot{}",
+                 "\\fancyfoot[LO,RE]{\\fontspec{Lato",
+                 "Light}\\textcolor{svared}{\\uppercase{Disease Surveillance 2019}}}",
+                 "\\fancyfoot[LE,RO]{\\thepage}",
                  readLines("typeset.tex"),
                  "\\end{document}")
+        placement <- grep("\\\\begin\\{multi", tex)[1]
+        tex <- c(tex[seq_len(placement - 1)],
+                 "\\thispagestyle{fancy}",
+                 tex[seq(placement, length(tex))])
         writeLines(tex, filename)
 
         ## copy in the missing-image file
