@@ -118,3 +118,13 @@
 
 %%Separated the columns by a 6 mm
 \setlength{\columnsep}{0.6cm}
+
+\RequirePackage{tikz}
+\newcommand{\includepicture}[4][H]{
+\begin{figure}[#1]
+  \begin{tikzpicture}
+    \node [inner sep=0pt,outer sep=0pt,clip,rounded corners=0.0cm] (pict) at (0,0) {\includegraphics[width=\textwidth, trim = #4, clip]{#2}};
+  \end{tikzpicture}
+  \caption*{\scriptsize{#3}}
+\end{figure}
+}
