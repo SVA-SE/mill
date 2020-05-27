@@ -202,7 +202,7 @@ style_fun <- function(tex, chapter) {
     tmp <- style_drop_section(tex, "In focus")
     tex <- tmp$tex
     if (!is.null(tmp$drop)) {
-        filename <- paste0("infocus",
+        filename <- paste0("infocus_",
                            parse_infocus_title(tmp$drop),
                            ".tex")
         writeLines(tmp$drop, filename)
@@ -221,7 +221,7 @@ parse_infocus_title <- function(tex) {
     stopifnot(length(ln) == 1)
     title <- sub("}", "", sub(pattern, "", tex[ln]))
     title <- gsub(" ", "-", title)
-    substr(start = 1, stop = 50, title)
+    tolower(substr(start = 1, stop = 50, title))
 }
 
 ##' Convert from docx to tex
