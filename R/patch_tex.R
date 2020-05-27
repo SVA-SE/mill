@@ -40,7 +40,7 @@ apply_patch_files <- function(chapter, prefix, verbose) {
 
 ##' Apply patch
 ##'
-##' @verbose give information about the process.
+##' @param verbose give information about the process.
 ##' @return invisible(NULL)
 ##' @export
 apply_patch <- function(verbose = TRUE) {
