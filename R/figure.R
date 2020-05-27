@@ -23,16 +23,6 @@ figure_files <- function(fileext = "all") {
     stop("Not implemented")
 }
 
-##' @noRd
-preview_pattern <- function(items = c("all", "figure", "table")) {
-    items <- switch(match.arg(items),
-                    all    = "((tab)|(fig))",
-                    figure = "fig",
-                    table  = "tab")
-
-    paste0("^preview-", items, "_[^.]*[.]pdf$")
-}
-
 ##' Build figures
 ##'
 ##' @return invisible NULL
