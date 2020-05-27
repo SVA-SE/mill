@@ -18,7 +18,6 @@ check <- function() {
     if (check_expect_clean_repository())
         return(invisible(TRUE))
 
-    ## result <- check_tex_to_docx_round_trip()
     result <- check_open_track_changes()
     result <- c(result, check_apply_typeset_patch())
     result <- c(result, check_reference_format())
@@ -196,40 +195,6 @@ check_patch_is_installed <- function() {
     }
 
     cat("OK\n   ", output[ver], "\n")
-    FALSE
-}
-
-##' Check conversion between 'tex' and 'docx'
-##'
-##' Checking that converting to 'docx' from 'tex' and converting back
-##' to 'tex' doesn't generate changes.
-##' @importFrom git2r commits
-##' @importFrom git2r reset
-##' @importFrom git2r status
-##' @noRd
-check_tex_to_docx_round_trip <- function() {
-    on.exit(reset(commits(repository(), n = 1)[[1]], "hard"))
-    cat("* checking 'tex' to 'docx' round trip ... ")
-
-    l <- sapply(check_chapters(), function(chapter) {
-        wd <- setwd(chapter)
-        to_docx()
-        from_docx()
-        setwd(wd)
-        unstaged <- unlist(status(repository())$unstaged)
-        if (file.path(chapter, "text.tex") %in% unstaged)
-            return(file.path(chapter, "text.tex"))
-        NULL
-    })
-
-    l <- l[!sapply(l, is.null)]
-    if (length(l)) {
-        cat("ERROR\n")
-        lapply(l, function(filename) cat("   ", filename, "\n"))
-        return(TRUE)
-    }
-
-    cat("OK\n")
     FALSE
 }
 
