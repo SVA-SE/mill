@@ -215,7 +215,7 @@ style_fun <- function(tex, chapter) {
     tex
 }
 
-parse_infocus_title <- (tex) {
+parse_infocus_title <- function(tex) {
     pattern <- "\\\\subsection\*\{"
     ln <- grep(pattern, tex)
     stopifnot(length(ln) == 1)
