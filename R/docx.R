@@ -220,7 +220,7 @@ parse_infocus_title <- function(tex) {
     ln <- grep(pattern, tex)
     stopifnot(length(ln) == 1)
     title <- sub("}", "", sub(pattern, "", tex[ln]))
-    title <- tolower(substr(start = 1, stop = 50, title))
+    title <- trimws(tolower(substr(start = 1, stop = 50, title)))
     gsub(" ", "-", title)
 }
 
