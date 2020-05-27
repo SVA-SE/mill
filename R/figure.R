@@ -33,6 +33,7 @@ build_figures <- function() {
         cat(sprintf("Build figures: %s\n", chapter))
 
         lapply(figure_files("R"), function(figure) {
+            cat(sprintf("  - Run script: %s\n", figure))
             source(figure, local = TRUE, chdir = TRUE)
         })
 
