@@ -10,11 +10,14 @@ License: EUPL
 Depends:
     R(>= 3.2)
 Imports:
+    ggplot2,
     git2r,
+    grid,
     hunspell,
     methods,
     pdftools,
     qpdf,
+    RColorBrewer,
     tools,
     utils,
     xml2

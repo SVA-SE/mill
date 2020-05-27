@@ -1,12 +1,15 @@
 ##' A ggplot2 theme for plotting in the report
 ##'
-##' @param None
-##' @return None
+##' @return A theme for ggplot2
+##' @importFrom ggplot2 element_blank
+##' @importFrom ggplot2 element_line
+##' @importFrom ggplot2 element_rect
+##' @importFrom ggplot2 element_text
+##' @importFrom ggplot2 theme
+##' @importFrom ggplot2 theme_bw
+##' @importFrom grid unit
+##' @importFrom RColorBrewer brewer.pal
 ##' @export
-##'
-##' @import RColorBrewer
-##' @import grid
-##' @import ggplot2
 sva_theme <- function() {
     ## Generate the colors for the chart
     palette <- brewer.pal("Greys", n = 9)
