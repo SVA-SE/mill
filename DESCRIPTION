@@ -14,6 +14,7 @@ Imports:
     git2r,
     grid,
     hunspell,
+    magick,
     methods,
     pdftools,
     qpdf,
