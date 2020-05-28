@@ -27,7 +27,7 @@ sva_theme <- function() {
                                           color = color.background)) +
     theme(plot.background = element_rect(fill = color.background,
                                          color = color.background)) +
-    theme(panel.border = element_rect(color=color.background)) +
+    theme(panel.border = element_rect(color = color.background)) +
 
     ## Format the grid
     theme(panel.grid.major = element_line(color = color.grid.major,
