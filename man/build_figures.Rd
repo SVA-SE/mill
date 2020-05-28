@@ -4,7 +4,7 @@
 \alias{build_figures}
 \title{Build figures}
 \usage{
-build_figures(png = TRUE)
+build_figures(png = FALSE)
 }
 \arguments{
 \item{png}{Convert figure to png?}

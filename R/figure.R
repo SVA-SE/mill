@@ -27,9 +27,6 @@ figure_files <- function(fileext = "all") {
 ##'
 ##' @param png Convert figure to png?
 ##' @return invisible NULL
-##' @importFrom magick image_convert
-##' @importFrom magick image_read_pdf
-##' @importFrom magick image_write
 ##' @export
 build_figures <- function(png = FALSE) {
     if (in_chapter()) {
@@ -48,12 +45,17 @@ build_figures <- function(png = FALSE) {
 
         if (isTRUE(png)) {
             ## Convert figure files to png
-            lapply(figure_files("pdf"), function(from) {
+            files <- figure_files("pdf")
+
+            if (length(files) && !requireNamespace("magick"))
+                stop("Package 'magick' is required to convert pdf-files.")
+
+            lapply(files, function(from) {
                 to <- paste0(file_path_sans_ext(from), ".png")
                 cat(sprintf("  - Convert: %s -> %s\n", from, to))
-                fig <- image_read_pdf(from)
-                fig <- image_convert(fig, "png")
-                fig <- image_write(fig, to, flatten = TRUE)
+                fig <- magick::image_read_pdf(from)
+                fig <- magick::image_convert(fig, "png")
+                fig <- magick::image_write(fig, to, flatten = TRUE)
             })
         }
     } else if (in_report()) {
