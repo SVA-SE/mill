@@ -26,7 +26,8 @@ luatex <- function(texname, clean = FALSE) {
     texname <- basename(texname)
     stopifnot(file.exists(texname))
     system(paste(luatex_cmd(), shQuote(texname)))
-    system(paste(luatex_cmd(), shQuote(texname)))
+    if (.Platform$OS.type != "windows")
+        system(paste(luatex_cmd(), shQuote(texname)))
 
     if (identical(clean, TRUE)) {
         f <- file_path_sans_ext(texname)
