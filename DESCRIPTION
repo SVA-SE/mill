@@ -8,7 +8,7 @@ Authors@R: c(person("Stefan", "Widgren", role = c("aut", "cre"),
 Description: Utilities for authoring reports.
 License: EUPL
 Depends:
-    R(>= 3.2)
+    R(>= 3.5)
 Imports:
     ggplot2,
     git2r,
@@ -18,6 +18,7 @@ Imports:
     pdftools,
     qpdf,
     RColorBrewer,
+    sp,
     tools,
     utils,
     xml2
