@@ -25,31 +25,37 @@ figure_files <- function(fileext = "all") {
 
 ##' Build figures
 ##'
+##' @param png Convert figure to png?
 ##' @return invisible NULL
 ##' @export
-build_figures <- function() {
+build_figures <- function(png = TRUE) {
     if (in_chapter()) {
         chapter <- basename(getwd())
         cat(sprintf("Build figures: %s\n", chapter))
 
         lapply(figure_files("R"), function(figure) {
             cat(sprintf("  - Run script: %s\n", figure))
-            tryCatch(source(figure, local = TRUE, chdir = TRUE),
-                     error = function(e) {
-                         cat("   *** ERROR ***\n")
-                     })
+            tryCatch(
+                source(figure, local = TRUE, chdir = TRUE),
+                error = function(e) {
+                    cat("   *** ERROR ***\n")
+                }
+            )
         })
 
-        ## Convert figure files to png
-        lapply(figure_files("pdf"), function(from) {
-            to <- paste0(file_path_sans_ext(from), ".png")
-            system(paste("convert", from, "-flatten", to))
-        })
+        if (png) {
+            ## Convert figure files to png
+            lapply(figure_files("pdf"), function(from) {
+                to <- paste0(file_path_sans_ext(from), ".png")
+                system(paste("convert", from, "-flatten", to))
+            })
+        }
+
 
     } else if (in_report()) {
         lapply(list.files("chapters"), function(chapter) {
             wd <- setwd(paste0("chapters/", chapter))
-            build_figures()
+            build_figures(png = png)
             setwd(wd)
         })
     }

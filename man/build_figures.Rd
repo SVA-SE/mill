@@ -4,7 +4,10 @@
 \alias{build_figures}
 \title{Build figures}
 \usage{
-build_figures()
+build_figures(png = TRUE)
+}
+\arguments{
+\item{png}{Convert figure to png?}
 }
 \value{
 invisible NULL
