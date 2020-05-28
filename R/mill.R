@@ -228,7 +228,9 @@ chapter_path <- function(x) {
 ##' @name NUTS_10M
 ##' @docType data
 ##' @source
-##' \url{http://epp.eurostat.ec.europa.eu/portal/page/portal/gisco_Geographical_information_maps/popups/references/administrative_units_statistical_units_1}
+##' \url{http://epp.eurostat.ec.europa.eu/portal/page/portal/gisco_Geographical
+##' _information_maps/popups/references/administrative_units
+##' _statistical_units_1}
 ##' @keywords datasets
 ##' @import sp
 NULL
@@ -243,7 +245,9 @@ NULL
 ##' @name NUTS_20M
 ##' @docType data
 ##' @source
-##' \url{http://epp.eurostat.ec.europa.eu/portal/page/portal/gisco_Geographical_information_maps/popups/references/administrative_units_statistical_units_1}
+##' \url{http://epp.eurostat.ec.europa.eu/portal/page/portal/gisco_Geographical
+##' _information_maps/popups/references/administrative_units
+##' _statistical_units_1}
 ##' @keywords datasets
 ##' @import sp
 NULL
@@ -257,7 +261,8 @@ NULL
 ##' @name kommuner
 ##' @docType data
 ##' @source
-##' \url{http://www.scb.se/Grupp/Produkter_Tjanster/Verktyg/_Dokument/Shape-svenska.zip}
+##' \url{http://www.scb.se/Grupp/Produkter_Tjanster/Verktyg/
+##' _Dokument/Shape-svenska.zip}
 ##' @import sp
 ##' @keywords datasets
 NULL

@@ -132,7 +132,8 @@ save_figure <- function(tex, chapter) {
 
     ## Move and rename the figure file.
     filename <- paste0("fig_", label, ".png")
-    cat(sprintf("  - Write file: %s (Only for info, not added to repo.)\n", filename))
+    cat(sprintf("  - Write file: %s (Only for info, not added to repo.)\n",
+                filename))
     file.copy(filename, filename)
 
     ## Create the tex-file for the figure.
@@ -529,7 +530,7 @@ style_numprint <- function(tex, output = c("docx", "tex")) {
 
     tex_mod <- mapply(function(x, y) {
         ## if there is no match on this line just return the line
-        if(identical(y, integer(0))) return(x)
+        if (identical(y, integer(0))) return(x)
 
         ## Remove the matches if they are followed by a single hyphen
         ## but not two hyphens
@@ -537,7 +538,9 @@ style_numprint <- function(tex, output = c("docx", "tex")) {
                   substr(x[y + 1], 1, 2) != "--"
 
         ## Check that a single hyphen does not preceed the numbers
-        rev_x <- lapply(strsplit(x, NULL), function(x) paste(rev(x), collapse = ""))
+        rev_x <- lapply(strsplit(x, NULL), function(x) {
+            paste(rev(x), collapse = "")
+        })
         remove2 <- substr(rev_x[y - 1], 1, 1) == "-" &
                    substr(rev_x[y - 1], 1, 2) != "--"
 

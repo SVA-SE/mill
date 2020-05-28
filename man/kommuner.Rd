@@ -5,7 +5,8 @@
 \alias{kommuner}
 \title{Administrative units in Sweden (Kommun)}
 \source{
-\url{http://www.scb.se/Grupp/Produkter_Tjanster/Verktyg/_Dokument/Shape-svenska.zip}
+\url{http://www.scb.se/Grupp/Produkter_Tjanster/Verktyg/
+_Dokument/Shape-svenska.zip}
 }
 \description{
 The dataset contains boundaries of kommun in Sweden
