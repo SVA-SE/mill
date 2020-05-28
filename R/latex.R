@@ -62,11 +62,9 @@ references <- function() {
 
 references_chapter <- function() {
     pattern <- "[\\]label[{][^}]*[}]|[\\]ref[{][^}]*[}]"
-    files <- chapter_tex_files()
+    files <- list.files(pattern = "[.]tex$")
 
-    do.call("rbind", (lapply(files, function(filename) {
-        if (!file.exists(filename))
-            stop("Missing file:", paste0(getwd(), "/", filename))
+    refs <- lapply(files, function(filename) {
         tex <- readLines(filename)
         m <- regmatches(tex, gregexpr(pattern, tex))
         m <- unlist(lapply(m, function(y) {
@@ -74,45 +72,27 @@ references_chapter <- function() {
         }))
 
         if (length(m)) {
-            filename <- paste0("chapters/", basename(getwd()), "/", filename)
+            chapter <- basename(getwd())
             tex <- m
             cmd <- sub("[\\]([^{]+)[{][^}]*[}]", "\\1", tex)
             marker <- sub("[\\][^{]+[{]([^}]*)[}]", "\\1", tex)
             reftype <- sapply(strsplit(marker, ":"), "[", 1)
         } else {
-            filename <- character(0)
+            chapter <- character(0)
             tex <- character(0)
             cmd <- character(0)
             marker <- character(0)
             reftype <- character(0)
         }
 
-        data.frame(filename = filename,
+        data.frame(chapter  = chapter,
                    tex      = tex,
                    cmd      = cmd,
                    marker   = marker,
                    reftype  = reftype,
                    stringsAsFactors = FALSE)
-    })))
-}
+    })
 
-##' Get the chapter tex files
-##'
-##' @importFrom methods is
-##' @noRd
-chapter_tex_files <- function(type = c("all", "text", "fig", "table")) {
-    type <- match.arg(type)
-
-    text_files <- NULL
-    fig_files  <- NULL
-    tab_files  <- NULL
-
-    if (type %in% c("all", "text"))
-        text_files <- "text.tex"
-    if (type %in% c("all", "fig"))
-        fig_files <- figure_files("tex")
-    if (type %in% c("all", "table"))
-        tab_files <- table_files("tex")
-
-    c(text_files, fig_files, tab_files)
+    refs <- do.call("rbind", refs)
+    unique(refs)
 }
