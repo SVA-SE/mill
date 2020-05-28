@@ -75,7 +75,8 @@ do_create_patch <- function(from, to, patchfile) {
     system2("diff",
             args = c("-c", "--label=text",
                      "--label=typeset",
-                     from, to, ">", patchfile))
+                     from, to),
+            stdout = patchfile)
 
     ## Drop empty patch
     if (!file.size(patchfile))
