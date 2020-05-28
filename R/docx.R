@@ -99,7 +99,6 @@ split_figures <- function(tex) {
     }, figures, diff(c(figures, length(tex) + 1)), SIMPLIFY = FALSE)
 }
 
-##' @importFrom tools file_path_sans_ext
 save_figure <- function(tex, chapter) {
     prefix <- normalize_title(chapter)
 
@@ -132,13 +131,14 @@ save_figure <- function(tex, chapter) {
     caption <- c(caption, "}")
 
     ## Move and rename the figure file.
-    to <- paste0("fig_", prefix, "_", label, ".png")
-    file.copy(filename, to)
-    git2r::add(repository(), paste0("chapters/", chapter, "/", to))
+    filename <- paste0("fig_", label, ".png")
+    cat(sprintf("  - Write file: %s (Only for info, not added to repo.)\n", filename))
+    file.copy(filename, filename)
 
     ## Create the tex-file for the figure.
+    fig <- paste0("fig_", prefix, "_", label)
     lines <- c("\\begin{figure}[H]",
-               paste0("  \\includegraphics{", file_path_sans_ext(to), "}"),
+               paste0("  \\includegraphics{", fig, "}"),
                paste0("  ", caption),
                "\\end{figure}")
     filename <- paste0("fig_", label, ".tex")
