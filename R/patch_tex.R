@@ -9,6 +9,7 @@ do_apply_patch <- function(from, patchfile, to, verbose) {
 
     output <- tryCatch(system2("patch",
                                args = c(from,
+                                        "--binary",
                                         "-i", patchfile,
                                         "-o", to),
                                stdout = TRUE, stderr = TRUE),
