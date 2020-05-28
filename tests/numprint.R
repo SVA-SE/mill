@@ -16,3 +16,13 @@ stopifnot(identical(ob, ex))
 ob <- mill:::style_numprint("34653-3", output = "tex")
 ex <-"34653-3"
 stopifnot(identical(ob, ex))
+
+## An iso number
+ob <- mill:::style_numprint("ISO-10272", output = "tex")
+ex <-"ISO-10272"
+stopifnot(identical(ob, ex))
+
+## A report number
+ob <- mill:::style_numprint("dnr 6.2.18-14271/2018", output = "tex")
+ex <-"dnr 6.2.18-14271/2018"
+stopifnot(identical(ob, ex))

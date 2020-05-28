@@ -535,6 +535,13 @@ style_numprint <- function(tex, output = c("docx", "tex")) {
         ## but not two hyphens
         remove <- substr(x[y + 1], 1, 1) == "-" &
                   substr(x[y + 1], 1, 2) != "--"
+
+        ## Check that a single hyphen does not preceed the numbers
+        rev_x <- lapply(strsplit(x, NULL), function(x) paste(rev(x), collapse = ""))
+        remove2 <- substr(rev_x[y - 1], 1, 1) == "-" &
+                   substr(rev_x[y - 1], 1, 2) != "--"
+
+        remove <- remove | remove2
         y <- y[!remove]
 
         ## replace those we want to replace with numprint
