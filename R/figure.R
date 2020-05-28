@@ -27,8 +27,11 @@ figure_files <- function(fileext = "all") {
 ##'
 ##' @param png Convert figure to png?
 ##' @return invisible NULL
+##' @importFrom magick image_convert
+##' @importFrom magick image_read_pdf
+##' @importFrom magick image_write
 ##' @export
-build_figures <- function(png = TRUE) {
+build_figures <- function(png = FALSE) {
     if (in_chapter()) {
         chapter <- basename(getwd())
         cat(sprintf("Build figures: %s\n", chapter))
@@ -43,15 +46,16 @@ build_figures <- function(png = TRUE) {
             )
         })
 
-        if (png) {
+        if (isTRUE(png)) {
             ## Convert figure files to png
             lapply(figure_files("pdf"), function(from) {
                 to <- paste0(file_path_sans_ext(from), ".png")
-                system(paste("convert", from, "-flatten", to))
+                cat(sprintf("  - Convert: %s -> %s\n", from, to))
+                fig <- image_read_pdf(from)
+                fig <- image_convert(fig, "png")
+                fig <- image_write(fig, to, flatten = TRUE)
             })
         }
-
-
     } else if (in_report()) {
         lapply(list.files("chapters"), function(chapter) {
             wd <- setwd(paste0("chapters/", chapter))
