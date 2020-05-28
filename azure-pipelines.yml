@@ -20,6 +20,8 @@ steps:
 
 - bash: |
     cd
+    echo 'R_LIBS_SITE="$(R_LIBS_SITE)"' > .Renviron
+    echo 'R_LIBS_USER="$(R_LIBS_USER)"' >> .Renviron
     echo 'options(repos = "https://cloud.r-project.org")' > .Rprofile
     echo 'invisible(Sys.setlocale("LC_CTYPE", "en_US.UTF-8"))' >> .Rprofile
     echo 'invisible(Sys.setlocale("LC_TIME", "en_US.UTF-8"))' >> .Rprofile
@@ -28,9 +30,9 @@ steps:
     echo 'invisible(Sys.setlocale("LC_MESSAGES", "en_US.UTF-8"))' >> .Rprofile
     echo 'invisible(Sys.setlocale("LC_PAPER", "en_US.UTF-8"))' >> .Rprofile
     echo 'invisible(Sys.setlocale("LC_MEASUREMENT", "en_US.UTF-8"))' >> .Rprofile
-    echo 'R_LIBS_SITE="/usr/share/R/library"' > .Renviron
-    echo 'R_LIBS_USER="$(Agent.BuildDirectory)/R/library"' >> .Renviron
-    mkdir -p $(Agent.BuildDirectory)/R/library
+    mkdir -p $(R_LIBS_USER)
+    sudo mkdir -p /usr/share/doc/R/html
+    sudo cp /usr/lib64/R/library/stats/html/R.css /usr/share/doc/R/html/
   displayName: "Customize R startup"
 
 - bash: |
@@ -40,6 +42,7 @@ steps:
 - bash: |
     sudo dnf -y install \
       ImageMagick-c++-devel \
+      libcurl-devel \
       R-git2r \
       R-ggplot2 \
       R-hunspell \
