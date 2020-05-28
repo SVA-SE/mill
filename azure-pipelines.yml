@@ -1,7 +1,6 @@
 variables:
   R_LIBS_SITE: '/usr/share/R/library'
   R_LIBS_USER: '$(Agent.BuildDirectory)/R/library'
-  CRAN: 'https://cloud.r-project.org'
 
 trigger:
   branches:
@@ -40,13 +39,16 @@ steps:
 
 - bash: |
     sudo dnf -y install \
+      ImageMagick-c++-devel \
       R-git2r \
       R-ggplot2 \
       R-hunspell \
       R-pdftools \
       R-qpdf \
       R-RColorBrewer \
+      R-sp \
       R-xml2
+    Rscript -e "install.packages('magick')"
   displayName: 'Install package dependencies'
 
 # This builds the package. The package is checked out to the 's' folder,
