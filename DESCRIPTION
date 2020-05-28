@@ -14,7 +14,6 @@ Imports:
     git2r,
     grid,
     hunspell,
-    magick,
     methods,
     pdftools,
     qpdf,
@@ -23,6 +22,8 @@ Imports:
     tools,
     utils,
     xml2
+Suggests:
+    magick
 LazyData: TRUE
 Encoding: UTF-8
 RoxygenNote: 7.1.0
