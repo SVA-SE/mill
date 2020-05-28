@@ -142,6 +142,7 @@ save_figure <- function(tex, chapter) {
                paste0("  ", caption),
                "\\end{figure}")
     filename <- paste0("fig_", label, ".tex")
+    cat(sprintf("  - Write file: %s\n", filename))
     writeLines(lines, filename)
     git2r::add(repository(), paste0("chapters/", chapter, "/", filename))
 
@@ -206,6 +207,7 @@ extract_infocus <- function(tex, chapter) {
     infocus <- split_infocus(tex)
     for (i in seq_len(length(infocus))) {
         filename <- sprintf("infocus_%i.tex", i)
+        cat(sprintf("  - Write file: %s\n", filename))
         writeLines(infocus[[i]], filename)
         git2r::add(repository(), paste0("chapters/", chapter, "/", filename))
     }
@@ -270,6 +272,7 @@ from_docx <- function(repo = NULL, force = FALSE) {
         tex <- readLines(f_tex)
         file.remove(f_tex)
         tex <- style_fun(tex, chapter)
+        cat(sprintf("  - Write file: %s\n", "text.tex"))
         writeLines(tex, "text.tex")
         if (!is.null(repo))
             add(repo, paste0("chapters/", chapter, "/text.tex"))
@@ -278,6 +281,7 @@ from_docx <- function(repo = NULL, force = FALSE) {
         lapply(docx_tables(f_docx), function(tbl) {
             prefix <- normalize_title(chapter)
             filename <- paste0(gsub(":", "_", format(tbl$label)), ".tex")
+            cat(sprintf("  - Write file: %s\n", filename))
             writeLines(format(tbl, output = "tex", prefix = prefix), filename)
             if (!is.null(repo))
                 add(repo, paste0("chapters/", chapter, "/", filename))
