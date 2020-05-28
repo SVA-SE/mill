@@ -46,6 +46,7 @@ steps:
       R-pdftools \
       R-qpdf \
       R-RColorBrewer \
+      R-Rcpp \
       R-sp \
       R-xml2
     Rscript -e "install.packages('magick')"
