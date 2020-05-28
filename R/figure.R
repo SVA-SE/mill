@@ -34,7 +34,10 @@ build_figures <- function() {
 
         lapply(figure_files("R"), function(figure) {
             cat(sprintf("  - Run script: %s\n", figure))
-            source(figure, local = TRUE, chdir = TRUE)
+            tryCatch(source(figure, local = TRUE, chdir = TRUE),
+                     error = function(e) {
+                         cat("   *** ERROR ***\n")
+                     })
         })
 
         ## Convert figure files to png
