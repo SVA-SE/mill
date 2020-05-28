@@ -193,7 +193,12 @@ split_infocus <- function(tex) {
 }
 
 ##' Extract any infocus sections.
+##'
+##' @param tex character vector that contains zero- or more infocus
+##'     sections.
+##' @param chapter name of the chapter.
 ##' @return the number of infocus sections that were found.
+##' @noRd
 extract_infocus <- function(tex, chapter) {
     if (is.null(tex))
         return(0)

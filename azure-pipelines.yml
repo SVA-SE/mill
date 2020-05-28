@@ -41,9 +41,11 @@ steps:
 - bash: |
     sudo dnf -y install \
       R-git2r \
+      R-ggplot2 \
       R-hunspell \
       R-pdftools \
       R-qpdf \
+      R-RColorBrewer \
       R-xml2
   displayName: 'Install package dependencies'
 

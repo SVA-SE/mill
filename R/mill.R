@@ -219,3 +219,16 @@ chapter_path <- function(x) {
     stopifnot(identical(length(i), 1L))
     chapters(x)$section[[i]]
 }
+
+##' Administrative (NUTS) units in Sweden (1 : 10 Million)
+##'
+##' The dataset contains administrative units (NUTS) in Sweden in
+##' European terminology in scale 1 : 10 Million.
+##'
+##' @name NUTS_10M
+##' @docType data
+##' @source
+##' \url{http://epp.eurostat.ec.europa.eu/portal/page/portal/gisco_Geographical_information_maps/popups/references/administrative_units_statistical_units_1}
+##' @keywords datasets
+##' @import sp
+NULL

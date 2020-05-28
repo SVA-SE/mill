@@ -23,29 +23,17 @@ figure_files <- function(fileext = "all") {
     stop("Not implemented")
 }
 
-##' @noRd
-preview_pattern <- function(items = c("all", "figure", "table")) {
-    items <- switch(match.arg(items),
-                    all    = "((tab)|(fig))",
-                    figure = "fig",
-                    table  = "tab")
-
-    paste0("^preview-", items, "_[^.]*[.]pdf$")
-}
-
-##' @noRd
-preview_files <- function(items = "all") {
-    stopifnot(in_chapter())
-    list.files(pattern = preview_pattern(items))
-}
-
 ##' Build figures
 ##'
 ##' @return invisible NULL
 ##' @export
 build_figures <- function() {
     if (in_chapter()) {
+        chapter <- basename(getwd())
+        cat(sprintf("Build figures: %s\n", chapter))
+
         lapply(figure_files("R"), function(figure) {
+            cat(sprintf("  - Run script: %s\n", figure))
             source(figure, local = TRUE, chdir = TRUE)
         })
 

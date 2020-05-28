@@ -90,6 +90,9 @@
 \RequirePackage{numprint}
 \RequirePackage{url}
 
+%Font of urls
+\urlstyle{rm}
+
 %% Set up the font for captions
 \RequirePackage[singlelinecheck=false]{caption}
 %setfont for captions See the \setsansfont above from fontspec
@@ -128,3 +131,8 @@
   \caption*{\scriptsize{#3}}
 \end{figure}
 }
+
+%Line stretch (space between lines as a function of character height)
+\renewcommand{\baselinestretch}{1.06}
+\brokenpenalty = 10000
+\raggedcolumns
