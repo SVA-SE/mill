@@ -34,7 +34,7 @@ to_pdf_report <- function(type = c("print", "web")) {
         files <- list.files(file.path("../assets", dir), pattern = "[^auto]")
         lapply(files, function(to) {
             from <- file.path("../assets", dir, to)
-            cat(sprintf("Copy file: %s\n", from))
+            cat(sprintf("Add to build dir: %s\n", to))
             if (startsWith(to, "img") && type == "web") {
                 reduce_image(from, to)
             } else {
@@ -44,6 +44,7 @@ to_pdf_report <- function(type = c("print", "web")) {
     })
 
     ## We need to build report...
+    cat(sprintf("Add to build dir: %s\n", "report.tex"))
     presnippet <- readLines("../assets/latex/pre-snippet.tex")
     text <- readLines("../assets/latex/report.tex")
     ## Stitch together the chapter
@@ -71,6 +72,52 @@ to_pdf_chapter <- function(build = TRUE, type = c("print", "web")) {
 
     ## Create typeset.tex
     apply_patch()
+
+    ## Ectract all references in the chapter.
+    ref <- references()
+
+    ## Specify the build directory.
+    if (isTRUE(build)) {
+        build_dir <- "./"
+    } else {
+        build_dir <- "../../build/"
+    }
+
+    ## Copy all figure files to the build directory.
+    markers <- unique(ref[ref$reftype == "fig", "marker"])
+    lapply(markers, function(marker) {
+        ## The marker has the format 'fig:chapter:identifier'. Split
+        ## the string to determine the identifier.
+        identifier <- unlist(strsplit(marker, ":"))[3]
+
+        ## Copy figure tex-file. If we are building a chapter, then
+        ## the file already exists because of the patching.
+        from <- paste0("fig_", normalize_title(chapter),
+                       "_", identifier, ".tex")
+        to <- paste0(build_dir, from)
+        if (!file.exists(to)) {
+            cat(sprintf("Add to build dir: %s\n", to))
+            file.copy(from, to)
+        }
+
+        ## Search for files that fits the pattern
+        ## 'fig_identifier.ext'.
+        pattern <- paste0("^fig_", identifier, "[.](eps|pdf|png)")
+        files <- list.files(pattern = pattern)
+        if (!length(files)) {
+            cat(sprintf("WARNING missing ref file: %s\n", marker))
+            return(NULL)
+        }
+
+        ## Copy the files to the build directory after injecting the
+        ## chapter name into the filename.
+        lapply(files, function(from) {
+            to <- paste0(build_dir, "fig_", normalize_title(chapter),
+                         "_", identifier, ".", file_ext(from))
+            cat(sprintf("Add to build dir: %s\n", to))
+            file.copy(from, to)
+        })
+    })
 
     if (isTRUE(build)) {
         ## read in the pieces of the chapter
@@ -114,31 +161,27 @@ to_pdf_chapter <- function(build = TRUE, type = c("print", "web")) {
         ## Build the filename pdf file.
         luatex(filename)
     } else {
-        file.copy("typeset.tex",
-                  paste0("../../build/", normalize_title(chapter), ".tex"))
+        from <- "typeset.tex"
+        to <- paste0(build_dir, normalize_title(chapter), ".tex")
+        cat(sprintf("Add to build dir: %s\n", to))
+        file.copy(from, to)
 
-        ## Copy the figures (.pdf, .png and .tex) and tables (.tex)
-        ref <- references()
-        lapply(ref[ref$reftype == "fig", "marker"], function(marker) {
-            marker <- paste0(gsub(":", "_", marker),
-                             c(".pdf", ".tex", ".png", ".eps"))
-            cat(sprintf("Copy file: %s\n", marker))
-            file.copy(marker, paste0("../../build/", marker))
-        })
+        ## Copy the tables (.tex)
         lapply(ref[ref$reftype == "tab", "marker"], function(marker) {
-            marker <- paste0(gsub(":", "_", marker), ".tex")
-            cat(sprintf("Copy file: %s\n", marker))
-            file.copy(marker, paste0("../../build/", marker))
+            from <- paste0(gsub(":", "_", marker), ".tex")
+            to <- paste0(build_dir, from)
+            cat(sprintf("Add to build dir: %s\n", to))
+            file.copy(from, to)
         })
 
         ## Copy any images in the chapter
         files <- list.files(pattern = "^img_")
         lapply(files, function(from) {
-            to <- paste0("../../build/", from)
+            to <- paste0(build_dir, from)
+            cat(sprintf("Add to build dir: %s\n", to))
             if (type == "web") {
                 reduce_image(from, to)
             } else {
-                cat(sprintf("Copy file: %s\n", from))
                 file.copy(from, to)
             }
         })
@@ -147,8 +190,8 @@ to_pdf_chapter <- function(build = TRUE, type = c("print", "web")) {
         pattern <- paste0("^infocus_", normalize_title(chapter), "[^.]*[.]tex$")
         files <- list.files(pattern = pattern)
         lapply(files, function(from) {
-            to <- paste0("../../build/", from)
-            cat(sprintf("Copy file: %s\n", from))
+            to <- paste0(build_dir, from)
+            cat(sprintf("Add to build dir: %s\n", to))
             file.copy(from, to)
         })
     }
