@@ -513,7 +513,37 @@ style_numprint <- function(tex, output = c("docx", "tex")) {
     stopifnot(identical(length(i), 1L))
     i <- seq_len(i)
 
-    c(gsub("([[:digit:]]{5,}(?!-))", "\\\\numprint{\\1}", tex[i], perl = TRUE),
+    ## Pattern to find 5 digits or more
+    pattern <- "[[:digit:]]{5,}"
+
+    ## Break apart text into pieces where some are matches to the
+    ## pattern
+    tex_mod <- regmatches(tex[i],
+                          gregexpr(pattern, tex[i], perl = TRUE),
+                          invert = NA)
+
+    ## Which of these are that numbers
+    positive <- lapply(tex_mod, function(x) {
+        grep(pattern, x, perl = TRUE)
+    })
+
+    tex_mod <- mapply(function(x, y) {
+        ## if there is no match on this line just return the line
+        if(identical(y, integer(0))) return(x)
+
+        ## Remove the matches if they are followed by a single hyphen
+        ## but not two hyphens
+        remove <- substr(x[y + 1], 1, 1) == "-" &
+                  substr(x[y + 1], 1, 2) != "--"
+        y <- y[!remove]
+
+        ## replace those we want to replace with numprint
+        x[y] <- paste0("\\numprint{", x[y], "}")
+
+        paste(x, collapse = "")
+    }, tex_mod, positive)
+
+    c(tex_mod,
       tex[-i])
 }
 
