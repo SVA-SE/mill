@@ -181,6 +181,14 @@ split_infocus <- function(tex) {
     if (length(infocus) == 0)
         return(list())
 
+    ## Make sure that we also include any hypertargets that might come
+    ## one line before each subsection.
+    infocus <- vapply(infocus, function(i) {
+        if (startsWith(tex[i - 1], paste0("\\hypertarget{")))
+            i <- i - 1L
+        i
+    }, integer(1))
+
     mapply(function(from, n) {
         to <- from + n - 1
 
