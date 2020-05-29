@@ -14,27 +14,31 @@ check <- function() {
     if (check_patch_is_installed())
         return(invisible(TRUE))
 
-    cat("* checking report ... ")
+    cat("* checking report ... \n    ")
+    cat(capture.output(repository()), sep = "\n    ")
+
     if (check_expect_clean_repository())
         return(invisible(TRUE))
 
-    result <- check_open_track_changes()
-    result <- c(result, check_apply_typeset_patch())
-    result <- c(result, check_reference_format())
-    result <- c(result, check_figure_reference_files())
-    result <- c(result, check_table_reference_files())
+    result <- check_open_track_changes(1)
+    result <- c(result, check_apply_typeset_patch(2))
+    result <- c(result, check_reference_format(3))
+    result <- c(result, check_figure_reference_files(4))
+    result <- c(result, check_table_reference_files(5))
 
     ## Checking that the range character is '--' and not
     ## '-'. Identify, for example, '2016-2017' but exclude
     ## '3-19-11-N-311' or '{1-1}'.
     result <- c(result,
                 check_pattern(
+                    6,
                     "(?<!(-|\\d|{|}))\\d+-\\d+(?!(-|\\d|}|/|[.]\\d))",
                     "checking range character",
                     perl = TRUE))
 
     result <- c(result,
                 check_pattern(
+                    7,
                     "(?<=\\s)\\d+,\\d+(?!:)",
                     "checking for comma as decimal separator",
                     perl = TRUE,
@@ -42,93 +46,110 @@ check <- function() {
 
     result <- c(result,
                 check_pattern(
+                    8,
                     "[0-9]\\s+[0-9]",
                     "checking thousand separator"))
 
     result <- c(result,
                 check_pattern(
+                    9,
                     "[.]\\s*[.]",
                     "checking multiple dots"))
 
     result <- c(result,
                 check_pattern(
+                    10,
                     "[,]\\s*[,]",
                     "checking multiple commas"))
 
     result <- c(result,
                 check_pattern(
+                    11,
                     "\u00b4",
                     "checking for incorrect apostrophe character"))
 
     result <- c(result,
                 check_pattern(
+                    12,
                     "[/]\\s*[\\]numprint[{]100000[}]",
                     "checking for incorrect 'per 100000 inhabitants'"))
 
     result <- c(result,
                 check_pattern(
+                    13,
                     "[0-9]\\s+[\\][%]",
                     "checking for space between digit and '%'"))
 
     result <- c(result,
                 check_pattern(
+                    14,
                     "http[:]//",
                     "checking for 'http://'"))
 
     result <- c(result,
                 check_pattern(
+                    15,
                     "2018",
                     "checking for '2018'"))
 
     result <- c(result,
                 check_pattern(
+                    16,
                     "(?<![a-z\\{])figure(?![a-z])",
                     "checking for lowercase 'figure'",
                     perl = TRUE))
 
     result <- c(result,
                 check_pattern(
+                    17,
                     "(?<![a-z\\{])table(?![a-z])",
                     "checking for lowercase 'table'",
                     perl = TRUE))
 
     result <- c(result,
                 check_pattern(
+                    18,
                     "[fF]ig(?![u:_])",
                     "checking for shortform of figure",
                     perl = TRUE))
 
     result <- c(result,
                 check_pattern(
+                    19,
                     "(?<![a-z\\{])[tT]ab(?![l:_])",
                     "checking for shortform of table",
                     perl = TRUE))
 
     result <- c(result,
                 check_pattern(
+                    20,
                     "[\\][^{]*[{]\\s",
                     paste0("checking for whitespace at ",
                            "beginning of '\\command{ text}'")))
 
     result <- c(result,
                 check_pattern(
+                    21,
                     "[\\][^{]*[{][^}]*(?<=\\s)[}]",
                     "checking for whitespace at end of '\\commad{text }'",
                     perl = TRUE))
 
     result <- c(result,
                 check_pattern(
+                    22,
                     "[\\][^{]*[{].[}][.]",
                     paste0("checking for one character command ",
                            "followed by '.' e.g. '\\textit{S}.'")))
 
     result <- c(result,
                 check_pattern(
+                    23,
                     "[\\]hl[{]",
                     "checking for highlights"))
 
     result <- c(result,
                 check_pattern(
+                    24,
                     "\\scounty\\s[^o]",
                     "checking usage of county e.g. 'Uppsala county' (use 'county of')"))
 
@@ -158,8 +179,7 @@ check_expect_clean_repository <- function() {
         return(TRUE)
     }
 
-    cat("OK\n    ")
-    cat(capture.output(repository()), sep = "\n    ")
+    cat("OK\n")
     FALSE
 }
 
@@ -207,8 +227,8 @@ check_patch_is_installed <- function() {
 ##' Check for open track changes in each chapter docx-file.
 ##'
 ##' @noRd
-check_open_track_changes <- function() {
-    cat("* checking for open track changes ... ")
+check_open_track_changes <- function(id) {
+    cat(sprintf("[%02i] checking for open track changes ... ", id))
 
     l <- sapply(check_chapters(), function(chapter) {
         if (in_chapter()) {
@@ -254,8 +274,8 @@ check_open_track_changes <- function() {
 ##' Checking that applying patches doesn't generate warnings or
 ##' errors.
 ##' @noRd
-check_apply_typeset_patch <- function() {
-    cat("* checking apply typeset patch ... ")
+check_apply_typeset_patch <- function(id) {
+    cat(sprintf("[%02i] checking apply typeset patch ... ", id))
 
     l <- sapply(check_chapters(), function(chapter) {
         wd <- setwd(chapter)
@@ -279,8 +299,8 @@ check_apply_typeset_patch <- function() {
 ##' Check reference format
 ##'
 ##' @noRd
-check_reference_format <- function(x) {
-    cat("* checking reference format ... ")
+check_reference_format <- function(id, x) {
+    cat(sprintf("[%02i] checking reference format ... ", id))
 
     ref <- references()
     ref <- ref[ref$cmd == "ref", ]
@@ -304,8 +324,8 @@ check_reference_format <- function(x) {
 ##' Check for figure references in the 'text.tex' file that does not
 ##' have a corresponding 'figure.tex' file.
 ##' @noRd
-check_figure_reference_files <- function() {
-    cat("* checking missing figure reference files ... ")
+check_figure_reference_files <- function(id) {
+    cat(sprintf("[%02i] checking missing figure reference files ... ", id))
 
     ref <- unlist(lapply(check_chapters(), function(chapter) {
         wd <- setwd(chapter)
@@ -347,8 +367,8 @@ check_figure_reference_files <- function() {
 ##' Check for table references in the 'text.tex' file that does not
 ##' have a corresponding 'table.tex' file.
 ##' @noRd
-check_table_reference_files <- function() {
-    cat("* checking missing table reference files ... ")
+check_table_reference_files <- function(id) {
+    cat(sprintf("[%02i] checking missing table reference files ... ", id))
 
     ref <- unlist(lapply(check_chapters(), function(chapter) {
         wd <- setwd(chapter)
@@ -387,8 +407,12 @@ check_table_reference_files <- function() {
 ##' Utility function to check for a pattern in tex-files.
 ##'
 ##' @noRd
-check_pattern <- function(pattern, description, perl = FALSE, patches = TRUE) {
-    cat(paste("*", description, "... "))
+check_pattern <- function(id,
+                          pattern,
+                          description,
+                          perl = FALSE,
+                          patches = TRUE) {
+    cat(sprintf("[%02i] %s ...", id, description))
 
     ## List files.
     if (isTRUE(patches)) {
@@ -413,7 +437,7 @@ check_pattern <- function(pattern, description, perl = FALSE, patches = TRUE) {
     if (length(l)) {
         cat("ERROR\n")
         lapply(l, function(filename) {
-            cat("   ", filename, "  line(s): ")
+            cat("     -", filename, "  line(s): ")
             lines <- grep(pattern, readLines(filename), perl = perl)
             lines <- paste(lines, collapse = ", ")
             cat(lines, "\n")
