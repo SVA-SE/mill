@@ -131,10 +131,10 @@ save_figure <- function(tex, chapter) {
     caption <- c(caption, "}")
 
     ## Move and rename the figure file.
-    filename <- paste0("fig_", label, ".png")
+    to <- paste0("docx_fig_", label, ".png")
     cat(sprintf("  - Write file: %s (Only for info, not added to repo.)\n",
-                filename))
-    file.copy(filename, filename)
+                to))
+    file.copy(filename, to)
 
     ## Create the tex-file for the figure.
     fig <- paste0("fig_", prefix, "_", label)
