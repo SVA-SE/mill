@@ -127,6 +127,11 @@ check <- function() {
                     "[\\]hl[{]",
                     "checking for highlights"))
 
+    result <- c(result,
+                check_pattern(
+                    "\\scounty\\s[^o]",
+                    "checking usage of county e.g. 'Uppsala county' (use 'county of')"))
+
     invisible(any(result))
 }
 
