@@ -1,3 +1,23 @@
+##' Clear checks
+##'
+##' Write a new CHECKLIST file to each chapter.
+##' @export
+##' @noRd
+clear_checks <- function() {
+    if (!in_report())
+        stop("Must be in the report root folder to clear checks.")
+
+    ## Make sure to add a CHECKLIST file in each chapter.
+    lapply(list.files("chapters", full.names = TRUE), function(filename) {
+        filename <- paste0(filename, "/CHECKLIST")
+        unlink(filename)
+        file.create(filename)
+        git2r::add(repository(), filename)
+    })
+
+    invisible(NULL)
+}
+
 ##' Check report
 ##'
 ##' @return invisible \code{FALSE} if OK, else invisible \code{TRUE}.
