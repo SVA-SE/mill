@@ -34,13 +34,23 @@ build_figures <- function(png = FALSE) {
         cat(sprintf("Build figures: %s\n", chapter))
 
         lapply(figure_files("R"), function(figure) {
-            cat(sprintf("  - Run script: %s\n", figure))
+            cat(sprintf("  - Run script: %s", figure))
             tryCatch(
                 source(figure, local = TRUE, chdir = TRUE),
                 error = function(e) {
-                    cat("   *** ERROR ***\n")
+                    cat(" *** ERROR ***")
+
+                    ## Also turn the error into a warning to be able
+                    ## to display the problem after completing all
+                    ## figures.
+                    warning("Error when running script.", call. = FALSE)
+                },
+                warning = function(w) {
+                    msg <- sprintf(" (%s/%s)", chapter, figure)
+                    warning(w, msg, call. = FALSE)
                 }
             )
+            cat("\n")
         })
 
         if (isTRUE(png)) {
