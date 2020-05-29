@@ -4,10 +4,12 @@
 \alias{apply_patch}
 \title{Apply patch}
 \usage{
-apply_patch(verbose = TRUE)
+apply_patch(verbose = TRUE, force = FALSE)
 }
 \arguments{
 \item{verbose}{give information about the process.}
+
+\item{force}{return NULL from function even if patch doesn't apply cleanly}
 }
 \value{
 invisible(NULL)
