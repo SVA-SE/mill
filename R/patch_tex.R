@@ -1,4 +1,4 @@
-do_apply_patch <- function(from, patchfile, to, verbose) {
+do_apply_patch <- function(from, patchfile, to, verbose, force) {
     if (!file.exists(patchfile)) {
         file.copy(from = from, to = to, overwrite = TRUE)
         return(NULL)
@@ -15,15 +15,20 @@ do_apply_patch <- function(from, patchfile, to, verbose) {
                                stdout = TRUE, stderr = TRUE),
                        warning = function(w) w)
 
-    if (!identical(output,
-                   paste0("patching file ", to, " (read from ", from, ")"))) {
+    t1 <- identical(output,
+                    paste0("patching file ", to, " (read from ", from, ")"))
+    if (!t1 & !force) {
         stop(paste("Unable to apply patch: ", basename(getwd())))
+    }
+
+    if (!t1 & force) {
+        warning(paste("Unable to apply patch: ", basename(getwd())))
     }
 
     NULL
 }
 
-apply_patch_files <- function(chapter, prefix, verbose) {
+apply_patch_files <- function(chapter, prefix, verbose, force) {
     files <- list.files(pattern = paste0("^", prefix, "_[^.]+[.]tex"))
     pattern <- paste0("^", prefix, "_", normalize_title(chapter), "_")
     files <- files[!grepl(pattern = pattern, x = files)]
@@ -33,7 +38,7 @@ apply_patch_files <- function(chapter, prefix, verbose) {
         to <- sub(paste0("^", prefix),
                   paste0(prefix, "_", normalize_title(chapter)),
                   from)
-        do_apply_patch(from, patch, to, verbose)
+        do_apply_patch(from, patch, to, verbose, force)
     })
 
     NULL
@@ -42,18 +47,24 @@ apply_patch_files <- function(chapter, prefix, verbose) {
 ##' Apply patch
 ##'
 ##' @param verbose give information about the process.
+##' @param force return NULL from function even if patch doesn't apply cleanly
 ##' @return invisible(NULL)
 ##' @export
-apply_patch <- function(verbose = TRUE) {
+apply_patch <- function(verbose = TRUE,
+                        force = FALSE) {
     if (in_chapter()) {
         chapter <- basename(getwd())
         if (isTRUE(verbose))
             cat(sprintf("Apply patches: %s\n", chapter))
 
-        do_apply_patch("text.tex", "typeset.patch", "typeset.tex", verbose)
-        apply_patch_files(chapter, "tab", verbose)
-        apply_patch_files(chapter, "fig", verbose)
-        apply_patch_files(chapter, "infocus", verbose)
+        do_apply_patch("text.tex",
+                       "typeset.patch",
+                       "typeset.tex",
+                       verbose,
+                       force)
+        apply_patch_files(chapter, "tab", verbose, force)
+        apply_patch_files(chapter, "fig", verbose, force)
+        apply_patch_files(chapter, "infocus", verbose, force)
     } else if (in_report()) {
         lapply(list.files("chapters"), function(chapter) {
             wd <- setwd(paste0("chapters/", chapter))
