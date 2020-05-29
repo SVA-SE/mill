@@ -104,10 +104,8 @@ to_pdf_chapter <- function(build = TRUE, type = c("print", "web")) {
         ## 'fig_identifier.ext'.
         pattern <- paste0("^fig_", identifier, "[.](eps|pdf|png)")
         files <- list.files(pattern = pattern)
-        if (!length(files)) {
-            cat(sprintf("WARNING missing ref file: %s\n", marker))
-            return(NULL)
-        }
+        if (!length(files))
+            stop(sprintf("Missing ref file: %s\n", marker))
 
         ## Copy the files to the build directory after injecting the
         ## chapter name into the filename.
