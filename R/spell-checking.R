@@ -4,9 +4,15 @@
 ##' @export
 spell_checking <- function() {
     if (in_chapter()) {
+        ## Make sure to add a WORDLIST file in each chapter.
+        if (!file.exists("WORDLIST")) {
+            file.create("WORDLIST")
+            git2r::add(repository(), "WORDLIST")
+        }
+
         ignore <- character(0)
-        if (file.exists("../../assets/WORDLIST")) ## Project-level
-            ignore <- c(ignore, readLines("../../assets/WORDLIST"))
+        if (file.exists("../../WORDLIST")) ## Project-level
+            ignore <- c(ignore, readLines("../../WORDLIST"))
         if (file.exists("WORDLIST")) ## Chapter-level
             ignore <- c(ignore, readLines("WORDLIST"))
         ignore <- sort(unique(ignore))
@@ -20,6 +26,12 @@ spell_checking <- function() {
         cat(sort(unique(bad_words)), sep = "\n")
         cat("\n")
     } else if (in_report()) {
+        ## Make sure to add a WORDLIST file to the project.
+        if (!file.exists("WORDLIST")) {
+            file.create("WORDLIST")
+            git2r::add(repository(), "WORDLIST")
+        }
+
         bad_words <- lapply(list.files("chapters"), function(chapter) {
             wd <- setwd(paste0("chapters/", chapter))
             result <- spell_checking()
