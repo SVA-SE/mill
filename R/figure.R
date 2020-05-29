@@ -39,6 +39,13 @@ build_figures <- function(png = FALSE) {
                 source(figure, local = TRUE, chdir = TRUE),
                 error = function(e) {
                     cat("   *** ERROR ***\n")
+
+                    ## Also turn the error into a warning to be able
+                    ## to display the problem after completing all
+                    ## figures.
+                    msg <- sprintf("Unable to run script: %s/%s",
+                                   chapter, figure)
+                    warning(msg, call. = FALSE)
                 }
             )
         })
