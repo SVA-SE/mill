@@ -476,8 +476,14 @@ check_pattern <- function(id,
             files <- list.files(pattern = file_pattern)
         }
     } else {
-        files <- list.files("chapters", pattern = file_pattern,
-                            recursive = TRUE, full.names = TRUE)
+        files <- unlist(lapply(list.files("chapters"), function(chapter) {
+            if (id %in% as.numeric(ignore[[chapter]]))
+                return(character(0))
+            list.files(paste0("chapters/", chapter),
+                       pattern = file_pattern,
+                       recursive = TRUE,
+                       full.names = TRUE)
+        }))
     }
 
     l <- vapply(files, function(filename) {
