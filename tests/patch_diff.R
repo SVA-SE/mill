@@ -1,4 +1,11 @@
-setwd("chapters/test1")
+wd <- tempdir()
+file.create(file.path(wd, "README.org"))
+file.copy("chapters",
+          wd,
+          recursive = TRUE)
+wd <- file.path(wd, "chapters", "test1")
+setwd(wd)
+
 mill::apply_patch()
 
 ## Ensure that the two new files were created
