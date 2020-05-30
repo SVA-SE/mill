@@ -62,25 +62,28 @@ check <- function() {
     if (check_expect_clean_repository())
         return(invisible(TRUE))
 
-    result <- check_open_track_changes(1)
-    result <- c(result, check_apply_typeset_patch(2))
-    result <- c(result, check_reference_format(3))
-    result <- c(result, check_figure_reference_files(4))
-    result <- c(result, check_table_reference_files(5))
+    cat("** To skip a test, add the check id to the chapter CHECKLIST **\n")
+    ignore <- checklist()
+    id <- 0
+    result <- check_open_track_changes(id <- id + 1)
+    result <- c(result, check_apply_typeset_patch(id <- id + 1))
+    result <- c(result, check_reference_format(id <- id + 1))
+    result <- c(result, check_figure_reference_files(id <- id + 1))
+    result <- c(result, check_table_reference_files(id <- id + 1))
 
     ## Checking that the range character is '--' and not
     ## '-'. Identify, for example, '2016-2017' but exclude
     ## '3-19-11-N-311' or '{1-1}'.
     result <- c(result,
                 check_pattern(
-                    6,
+                    id <- id + 1, ignore,
                     "(?<!(-|\\d|{|}))\\d+-\\d+(?!(-|\\d|}|/|[.]\\d))",
                     "checking range character",
                     perl = TRUE))
 
     result <- c(result,
                 check_pattern(
-                    7,
+                    id <- id + 1, ignore,
                     "(?<=\\s)\\d+,\\d+(?!:)",
                     "checking for comma as decimal separator",
                     perl = TRUE,
@@ -88,117 +91,117 @@ check <- function() {
 
     result <- c(result,
                 check_pattern(
-                    8,
+                    id <- id + 1, ignore,
                     "[0-9]\\s+[0-9]",
                     "checking thousand separator"))
 
     result <- c(result,
                 check_pattern(
-                    9,
+                    id <- id + 1, ignore,
                     "[.]\\s*[.]",
                     "checking multiple dots"))
 
     result <- c(result,
                 check_pattern(
-                    10,
+                    id <- id + 1, ignore,
                     "[,]\\s*[,]",
                     "checking multiple commas"))
 
     result <- c(result,
                 check_pattern(
-                    11,
+                    id <- id + 1, ignore,
                     "\u00b4",
                     "checking for incorrect apostrophe character"))
 
     result <- c(result,
                 check_pattern(
-                    12,
+                    id <- id + 1, ignore,
                     "[/]\\s*[\\]numprint[{]100000[}]",
                     "checking for incorrect 'per 100000 inhabitants'"))
 
     result <- c(result,
                 check_pattern(
-                    13,
+                    id <- id + 1, ignore,
                     "[0-9]\\s+[\\][%]",
                     "checking for space between digit and '%'"))
 
     result <- c(result,
                 check_pattern(
-                    14,
+                    id <- id + 1, ignore,
                     "http[:]//",
                     "checking for 'http://'"))
 
     result <- c(result,
                 check_pattern(
-                    15,
+                    id <- id + 1, ignore,
                     "2018",
                     "checking for '2018'"))
 
     result <- c(result,
                 check_pattern(
-                    16,
+                    id <- id + 1, ignore,
                     "(?<![a-z\\{])figure(?![a-z])",
                     "checking for lowercase 'figure'",
                     perl = TRUE))
 
     result <- c(result,
                 check_pattern(
-                    17,
+                    id <- id + 1, ignore,
                     "(?<![a-z\\{])table(?![a-z])",
                     "checking for lowercase 'table'",
                     perl = TRUE))
 
     result <- c(result,
                 check_pattern(
-                    18,
+                    id <- id + 1, ignore,
                     "[fF]ig(?![u:_])",
                     "checking for shortform of figure",
                     perl = TRUE))
 
     result <- c(result,
                 check_pattern(
-                    19,
+                    id <- id + 1, ignore,
                     "(?<![a-z\\{])[tT]ab(?![l:_])",
                     "checking for shortform of table",
                     perl = TRUE))
 
     result <- c(result,
                 check_pattern(
-                    20,
+                    id <- id + 1, ignore,
                     "[\\][^{]*[{]\\s",
                     paste0("checking for whitespace at ",
                            "beginning of '\\command{ text}'")))
 
     result <- c(result,
                 check_pattern(
-                    21,
+                    id <- id + 1, ignore,
                     "[\\][^{]*[{][^}]*(?<=\\s)[}]",
                     "checking for whitespace at end of '\\commad{text }'",
                     perl = TRUE))
 
     result <- c(result,
                 check_pattern(
-                    22,
+                    id <- id + 1, ignore,
                     "[\\][^{]*[{].[}][.]",
                     paste0("checking for one character command ",
                            "followed by '.' e.g. '\\textit{S}.'")))
 
     result <- c(result,
                 check_pattern(
-                    23,
+                    id <- id + 1, ignore,
                     "[\\]hl[{]",
                     "checking for highlights"))
 
     result <- c(result,
                 check_pattern(
-                    24,
+                    id <- id + 1, ignore,
                     "\\scounty\\s[^o]",
                     "checking usage of county e.g. 'Uppsala county' (use 'county of')"))
 
     invisible(any(result))
 }
 
-check_chapters <- function() {
+check_chapters <- function(id = NULL, ignore = NULL, patches = NULL) {
     if (in_chapter())
         return(".")
     list.files("chapters", full.names = TRUE)
@@ -450,6 +453,7 @@ check_table_reference_files <- function(id) {
 ##'
 ##' @noRd
 check_pattern <- function(id,
+                          ignore,
                           pattern,
                           description,
                           perl = FALSE,
