@@ -2,7 +2,6 @@
 ##'
 ##' Write a new CHECKLIST file to each chapter.
 ##' @export
-##' @noRd
 clear_checks <- function() {
     if (!in_report())
         stop("Must be in the report root folder to clear checks.")
