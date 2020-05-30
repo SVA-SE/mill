@@ -18,6 +18,28 @@ clear_checks <- function() {
     invisible(NULL)
 }
 
+##' Get a list with chapter checks to skip
+##' @noRd
+checklist <- function() {
+    ## Load CHECKLIST to find checks to ignore
+    ## Make sure to add a CHECKLIST file in each chapter.
+    CHECKLIST <- list.files(pattern = "^CHECKLIST$", recursive = TRUE)
+    ignore <- lapply(CHECKLIST, function(filename) {
+        x <- sort(as.numeric(readLines(filename)))
+        if (length(x))
+            return(x)
+        NULL
+    })
+
+    if (in_chapter()) {
+        names(ignore) <- basename(getwd())
+    } else {
+        names(ignore) <- basename(dirname(CHECKLIST))
+    }
+
+    ignore[!vapply(ignore, is.null, logical(1))]
+}
+
 ##' Check report
 ##'
 ##' @return invisible \code{FALSE} if OK, else invisible \code{TRUE}.
