@@ -38,7 +38,9 @@ ex <- c("fig_test1_timeseries.tex",
         "text.tex",
         "typeset.patch",
         "typeset.tex")
-cat(paste(ob, "\n"))
-cat(readLines("fig_test1_timeseries.tex"))
-cat(readLines("typeset"))
+cat(paste(ob, "\n"), "\n")
+cat(readLines("fig_test1_timeseries.tex"), "\n")
+cat(readLines("fig_timeseries.tex"), "\n")
+cat(readLines("typeset.tex"), "\n")
+cat(readLines("text.tex"))
 stopifnot(identical(ob, ex))
