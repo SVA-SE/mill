@@ -196,7 +196,8 @@ check <- function() {
                 check_pattern(
                     id <- id + 1, ignore,
                     "\\scounty\\s[^o]",
-                    "checking usage of county e.g. 'Uppsala county' (use 'county of')"))
+                    paste0("checking usage of county e.g. ",
+                           "'Uppsala county' (use 'county of')")))
 
     invisible(any(result))
 }
