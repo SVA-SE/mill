@@ -31,4 +31,5 @@ ex <- c("fig_test1_timeseries.tex",
         "text.tex",
         "typeset.patch",
         "typeset.tex")
+cat(paste(ob, "\n"))
 stopifnot(identical(ob, ex))
