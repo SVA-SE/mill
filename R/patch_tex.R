@@ -125,8 +125,13 @@ create_patch <- function() {
         chapter <- basename(getwd())
         create_patch_files(chapter, "tab")
 
+        ## Figure diff
+        chapter <- basename(getwd())
+        create_patch_files(chapter, "fig")
+
         ## Fix to handle named infocus files
         create_patch_files(chapter, "infocus")
+
     } else if (in_report()) {
         lapply(list.files("chapters"), function(chapter) {
             wd <- setwd(paste0("chapters/", chapter))
