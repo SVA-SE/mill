@@ -175,9 +175,8 @@ split_infocus <- function(tex) {
     stopifnot(length(i) == 1)
     tex <- tex[-seq_len(i)]
 
-    ## Bump subsection.
-    tex <- gsub("subsection*{", "section*{", tex, fixed = TRUE)
-    infocus <- grep("\\\\section", tex)
+    ## Find position of subsections.
+    infocus <- grep("\\\\subsection", tex)
     if (length(infocus) == 0)
         return(list())
 
@@ -198,7 +197,7 @@ split_infocus <- function(tex) {
             to <- to - 1
         }
 
-        tex[seq(from = from, to = to)]
+        style_infocus(tex[seq(from = from, to = to)])
     }, infocus, diff(c(infocus, length(tex) + 1)), SIMPLIFY = FALSE)
 }
 
@@ -223,6 +222,27 @@ extract_infocus <- function(tex, chapter) {
 
     length(infocus)
 }
+
+style_infocus <- function(tex) {
+    before_infocus <- c("\\hspace*{-5mm}%",
+                        "\\begin{tikzpicture}",
+                        "\\node[anchor = west,",
+                        "fill = highlightgray,",
+                        "minimum width = \\textwidth,",
+                        "minimum height = 75mm,",
+                        "rounded corners=3mm,",
+                        "draw=svared,",
+                        "line width=0.1mm](text) at (0,0){",
+                        "\\begin{minipage}{0.93\\textwidth}",
+                        "\\sf")
+    after_infocus <- c("\\end{minipage}",
+                       "};",
+                       "\\end{tikzpicture}")
+    c(before_infocus,
+      tex,
+      after_infocus)
+}
+
 
 style_fun <- function(tex, chapter) {
     tmp <- style_drop_section(tex, "Figures")
