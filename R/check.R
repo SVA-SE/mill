@@ -468,16 +468,21 @@ check_pattern <- function(id,
     }
 
     if (in_chapter()) {
-        files <- list.files(pattern = file_pattern)
+        ignore <- as.numeric(ignore[[basename(getwd())]])
+        if (id %in% ignore) {
+            files <- character(0)
+        } else {
+            files <- list.files(pattern = file_pattern)
+        }
     } else {
         files <- list.files("chapters", pattern = file_pattern,
                             recursive = TRUE, full.names = TRUE)
     }
 
-    l <- sapply(files, function(filename) {
+    l <- vapply(files, function(filename) {
         lines <- grep(pattern, readLines(filename), perl = perl)
         length(lines) > 0
-    })
+    }, logical(1), USE.NAMES = FALSE)
 
     l <- files[l]
     if (length(l)) {
