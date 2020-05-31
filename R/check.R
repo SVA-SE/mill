@@ -1,10 +1,22 @@
 ##' Clear checks
 ##'
-##' Write a new CHECKLIST file to each chapter.
+##' Write a new CHECKLIST file in the report root and in each
+##' chapter. To ignore a check, add the check id of the check to the
+##' CHECKLIST file. Checks can either be ignored on a global level by
+##' adding the id to the root CHECKLIST or on a chapter level by
+##' adding the id to a specific CHECKLIST chapter file. Comments are
+##' allowed in a CHECKLIST file, any text from a \code{#} character to
+##' the end of the line is taken to be a comment.
 ##' @export
 clear_checks <- function() {
     if (!in_report())
         stop("Must be in the report root folder to clear checks.")
+
+    ## Add a CHECKLIST file in the root folder.
+    filename <- "CHECKLIST"
+    unlink(filename)
+    file.create(filename)
+    git2r::add(repository(), filename)
 
     ## Make sure to add a CHECKLIST file in each chapter.
     lapply(list.files("chapters", full.names = TRUE), function(filename) {
