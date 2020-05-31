@@ -4,7 +4,16 @@
 \alias{spell_checking}
 \title{Spell checking of chapters}
 \usage{
-spell_checking()
+spell_checking(harvest = FALSE)
+}
+\arguments{
+\item{harvest}{\code{TRUE} if you want to harvest the words and
+add them to the report-level [r] or chapter-level [c]
+WORDLIST. Harvesting can only be used in an interactive
+session.}
+}
+\value{
+a character vector with the bad words invisible.
 }
 \description{
 Spell checking of chapters
