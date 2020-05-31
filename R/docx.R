@@ -142,7 +142,7 @@ save_figure <- function(tex, chapter) {
     ## Create the tex-file for the figure.
     fig <- paste0("fig_", prefix, "_", label)
     lines <- c("\\begin{figure}[H]",
-               paste0("  \\includegraphics{", fig, "}"),
+               paste0("  \\includegraphics[width=\\textwidth]{", fig, "}"),
                paste0("  ", caption),
                "\\end{figure}")
     filename <- paste0("fig_", label, ".tex")
