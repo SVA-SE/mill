@@ -1,34 +1,79 @@
 ##' Clear checks
 ##'
-##' Write a new CHECKLIST file to each chapter.
+##' Write a new CHECKLIST file in the report root and in each
+##' chapter. To ignore a check, add the check id of the check to the
+##' CHECKLIST file. Checks can either be ignored on a global level by
+##' adding the id to the root CHECKLIST or on a chapter level by
+##' adding the id to a specific CHECKLIST chapter file. Comments are
+##' allowed in a CHECKLIST file, any text from a \code{#} character to
+##' the end of the line is taken to be a comment.
 ##' @export
 clear_checks <- function() {
-    if (!in_report())
-        stop("Must be in the report root folder to clear checks.")
-
-    ## Make sure to add a CHECKLIST file in each chapter.
-    lapply(list.files("chapters", full.names = TRUE), function(filename) {
-        filename <- paste0(filename, "/CHECKLIST")
+    if (in_chapter()) {
+        ## Add a CHECKLIST file in the chapter folder.
+        filename <- "CHECKLIST"
         unlink(filename)
         file.create(filename)
         git2r::add(repository(), filename)
-    })
 
-    invisible(NULL)
+        return(invisible(NULL))
+    }
+
+    if (in_report()) {
+        ## Add a CHECKLIST file in the root folder.
+        filename <- "CHECKLIST"
+        unlink(filename)
+        file.create(filename)
+        git2r::add(repository(), filename)
+
+        ## Make sure to add a CHECKLIST file in each chapter.
+        lapply(list.files("chapters", full.names = TRUE), function(filename) {
+            filename <- paste0(filename, "/CHECKLIST")
+            unlink(filename)
+            file.create(filename)
+            git2r::add(repository(), filename)
+        })
+
+        return(invisible(NULL))
+    }
+
+    stop("Must be in the report root folder or in a chapter to clear checks.")
+}
+
+##' Read and parse a CHECKLIST file
+##'
+##' @param filename name of the CHECKLIST file.
+##' @param ignore numeric vector with ids to append to the ones found
+##'     in the CHECKLIST file.
+##' @return a numeric vector or NULL.
+##' @noRd
+read_checklist <- function(filename, ignore = NULL) {
+    if (!file.exists(filename))
+        return(ignore)
+
+    x <- readLines(filename)
+    x <- sub("#.*", "", x)
+    x <- trimws(x)
+    x <- c(ignore, as.numeric(x))
+    x <- x[!is.na(x)]
+    if (length(x))
+        return(sort(x))
+
+    NULL
 }
 
 ##' Get a list with chapter checks to skip
 ##' @noRd
 checklist <- function() {
-    ## Load CHECKLIST to find checks to ignore
-    ## Make sure to add a CHECKLIST file in each chapter.
+    ## Load report CHECKLIST to find checks to ignore on a report
+    ## level.
+    report_ignore <- NULL
+    if (in_report())
+        report_ignore <- read_checklist("CHECKLIST")
+
+    ## Load chapter CHECKLIST to find checks to ignore
     CHECKLIST <- list.files(pattern = "^CHECKLIST$", recursive = TRUE)
-    ignore <- lapply(CHECKLIST, function(filename) {
-        x <- sort(as.numeric(readLines(filename)))
-        if (length(x))
-            return(x)
-        NULL
-    })
+    ignore <- lapply(CHECKLIST, read_checklist, ignore = report_ignore)
 
     if (in_chapter()) {
         names(ignore) <- basename(getwd())
