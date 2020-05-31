@@ -7,5 +7,11 @@
 clear_checks()
 }
 \description{
-Write a new CHECKLIST file to each chapter.
+Write a new CHECKLIST file in the report root and in each
+chapter. To ignore a check, add the check id of the check to the
+CHECKLIST file. Checks can either be ignored on a global level by
+adding the id to the root CHECKLIST or on a chapter level by
+adding the id to a specific CHECKLIST chapter file. Comments are
+allowed in a CHECKLIST file, any text from a \code{#} character to
+the end of the line is taken to be a comment.
 }
