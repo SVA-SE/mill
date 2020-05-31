@@ -9,24 +9,35 @@
 ##' the end of the line is taken to be a comment.
 ##' @export
 clear_checks <- function() {
-    if (!in_report())
-        stop("Must be in the report root folder to clear checks.")
-
-    ## Add a CHECKLIST file in the root folder.
-    filename <- "CHECKLIST"
-    unlink(filename)
-    file.create(filename)
-    git2r::add(repository(), filename)
-
-    ## Make sure to add a CHECKLIST file in each chapter.
-    lapply(list.files("chapters", full.names = TRUE), function(filename) {
-        filename <- paste0(filename, "/CHECKLIST")
+    if (in_chapter()) {
+        ## Add a CHECKLIST file in the chapter folder.
+        filename <- "CHECKLIST"
         unlink(filename)
         file.create(filename)
         git2r::add(repository(), filename)
-    })
 
-    invisible(NULL)
+        return(invisible(NULL))
+    }
+
+    if (in_report()) {
+        ## Add a CHECKLIST file in the root folder.
+        filename <- "CHECKLIST"
+        unlink(filename)
+        file.create(filename)
+        git2r::add(repository(), filename)
+
+        ## Make sure to add a CHECKLIST file in each chapter.
+        lapply(list.files("chapters", full.names = TRUE), function(filename) {
+            filename <- paste0(filename, "/CHECKLIST")
+            unlink(filename)
+            file.create(filename)
+            git2r::add(repository(), filename)
+        })
+
+        return(invisible(NULL))
+    }
+
+    stop("Must be in the report root folder or in a chapter to clear checks.")
 }
 
 ##' Get a list with chapter checks to skip
