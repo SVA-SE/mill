@@ -28,14 +28,19 @@ spell_checking <- function(harvest = FALSE) {
             ignore <- c(ignore, readLines("WORDLIST"))
         ignore <- sort(unique(ignore))
 
+        cat(sprintf("Spell-check '%s' ... ", basename(getwd())))
         lines <- readLines("text.tex")
         bad_words <- hunspell(lines, format = "latex", dict = "en_GB",
                               ignore = ignore)
-        bad_words <- unlist(bad_words)
+        bad_words <- sort(unique(unlist(bad_words)))
 
-        cat("\n**********\n*\n*", basename(getwd()), "\n*\n**********\n\n")
-        cat(sort(unique(bad_words)), sep = "\n")
-        cat("\n")
+        if (length(bad_words)) {
+            cat("ERROR\n")
+            cat(bad_words, sep = "\n")
+            cat("\n")
+        } else{
+            cat("OK\n")
+        }
 
         if (interactive() && isTRUE(harvest)) {
             for (i in seq_len(length(bad_words))) {
