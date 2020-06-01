@@ -136,3 +136,12 @@
 \renewcommand{\baselinestretch}{1.06}
 \brokenpenalty = 10000
 \raggedcolumns
+
+\usepackage{adjustbox}
+
+\newcolumntype{R}[2]{%
+    >{\adjustbox{angle=#1,lap=\width-(#2)}\bgroup}%
+    l%
+    <{\egroup}%
+}
+\newcommand*\rot{\multicolumn{1}{R{75}{1em}}}
