@@ -64,7 +64,6 @@ to_pdf_report <- function(type = c("print", "web")) {
 to_pdf_chapter <- function(build = TRUE, type = c("print", "web")) {
     type <- match.arg(type)
     chapter <- basename(getwd())
-    on.exit(unlink("typeset.tex"), add = TRUE)
     if (build) {
         filename <- paste0(chapter, ".tex")
         on.exit(unlink(filename), add = TRUE)
