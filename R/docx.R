@@ -246,7 +246,6 @@ style_infocus <- function(tex) {
       after_infocus)
 }
 
-
 style_fun <- function(tex, chapter) {
     tmp <- style_drop_section(tex, "Figures")
     extract_figures(tmp$drop, chapter)
