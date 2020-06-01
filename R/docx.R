@@ -258,7 +258,7 @@ style_fun <- function(tex, chapter) {
     tex <- hypertargets_chapter_specific(tex, chapter)
     tex <- asterisk(tex, "add")
     tex <- style_toc(tex, output = "tex")
-    tex <- style_numprint(tex, output = "tex")
+    tex <- style_numprint(tex)
 
     tmp <- style_drop_section(tex, "In focus")
     extract_infocus(tmp$drop, chapter)
