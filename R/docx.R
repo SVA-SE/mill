@@ -381,17 +381,6 @@ convert_docx_ref_to_ref <- function(tex, title) {
     gsub("\\s+\\\\ref", "~\\\\ref", tex)
 }
 
-##' Convert the tex ref to docx ref
-##'
-##' @param tex The tex character vector
-##' @return tex character vector
-##' @noRd
-convert_ref_to_docx_ref <- function(tex) {
-    pattern <- "\\\\ref[{]([^:]*)[:][^:]*[:]([^}]*)[}]"
-    replacement <- "[\\1:\\2]"
-    gsub(pattern, replacement, tex)
-}
-
 ##' Make tex hypertargets chapter specific in the report
 ##'
 ##' @param tex The tex character vector
