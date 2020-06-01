@@ -279,25 +279,42 @@ extract_infocus <- function(tex, chapter) {
 }
 
 style_infocus <- function(tex) {
-    before_infocus <- c("\\hspace*{-5mm}%",
-                        "\\begin{tikzpicture}",
-                        "\\node[anchor = west,",
-                        "fill = highlightgray,",
-                        "minimum width = \\textwidth,",
-                        "minimum height = 75mm,",
-                        "rounded corners=3mm,",
-                        "draw=svared,",
-                        "line width=0.1mm](text) at (0,0){",
-                        "\\begin{minipage}{0.93\\textwidth}",
-                        "\\sf")
+    tex <- tex_2_one_line(tex)
 
-    after_infocus <- c("\\end{minipage}",
-                       "};",
-                       "\\end{tikzpicture}")
+    ## Determine the infocus title.
+    i <- regexpr("\\\\subsection[*][{]", tex)
+    if (i == -1)
+        stop("Unable to find 'subsection'")
+    i <- i + attr(i, "match.length") - 1
+    title <- tex_argument(substr(tex, i, nchar(tex)))
 
-    c(before_infocus,
-      style_numprint(tex),
-      after_infocus)
+    ## Split the tex to remove the title and then combine it again
+    ## with the infocus title.
+    tex_1 <- substr(tex, 1, i)
+    tex_2 <- substr(tex, i + nchar(title) + 1, nchar(tex))
+    infocus_title <- paste0("\\texorpdfstring{{\\color{svared}IN FOCUS:} ",
+                            title, "}{", title, "}")
+    tex <- paste0(tex_1, infocus_title, tex_2)
+
+    ## Apply numprint and convert the tex to multi-lines again.
+    tex <- tex_2_multi_line(style_numprint(tex))
+
+    ## Finally, add some tex before and after the infocus.
+    c("\\hspace*{-5mm}%",
+      "\\begin{tikzpicture}",
+      "\\node[anchor = west,",
+      "fill = highlightgray,",
+      "minimum width = \\textwidth,",
+      "minimum height = 75mm,",
+      "rounded corners=3mm,",
+      "draw=svared,",
+      "line width=0.1mm](text) at (0,0){",
+      "\\begin{minipage}{0.93\\textwidth}",
+      "\\sf",
+      tex,
+      "\\end{minipage}",
+      "};",
+      "\\end{tikzpicture}")
 }
 
 style_fun <- function(tex, chapter) {
