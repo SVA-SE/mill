@@ -469,15 +469,6 @@ add_line_between_references <- function(tex) {
     tex
 }
 
-##' Convert style of empty line from tex to docx
-##'
-##' @param tex The tex character vector
-##' @return tex character vector
-##' @noRd
-empty_line_from_tex_to_docx <- function(tex) {
-    gsub("\\\\\\\\", "", tex)
-}
-
 ##' Handle multicols when converting between tex and docx
 ##'
 ##' @param tex The tex character vector.
