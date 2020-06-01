@@ -65,7 +65,6 @@ inject_tab_fig_infocus <- function(tex, infocus, chapter) {
     }
 
     ## Append infocus
-
     if (length(infocus)[1] > 0) {
         infocus <- length(split_infocus(infocus))[1]
         chapter <- normalize_title(chapter)
