@@ -35,6 +35,21 @@ tex_argument <- function(tex) {
     substr(tex, 2, i)
 }
 
+##' Collapse tex-lines to one line that contains '\n' between lines.
+##' @noRd
+tex_2_one_line <- function(tex) {
+    paste0(tex, collapse = "\n")
+}
+
+##' Split tex that contains '\n' to multiple lines.
+##' @noRd
+tex_2_multi_line <- function(tex) {
+    f <- textConnection(tex)
+    tex <- readLines(f)
+    close(f)
+    tex
+}
+
 ##' Check if current working directory is in a chapter
 ##' @noRd
 in_chapter <- function() {

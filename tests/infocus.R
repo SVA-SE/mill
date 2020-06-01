@@ -40,8 +40,7 @@ paste0("\\ref{fig:cryptosporidiosis:timeseries-months}). ",
 "four kale producers in the southern parts of Sweden was identified as",
 "the probable source of infection.")
 
-tex <- paste0(tex, collapse = "\n")
-
+tex <- mill:::tex_2_one_line(tex)
 i <- regexpr("\\\\subsection[*][{]", tex)
 if (i == -1)
     stop("Unable to find 'subsection'")
