@@ -522,20 +522,12 @@ style_multicols <- function(tex, output = c("docx", "tex")) {
     c(tex, "\\end{multicols}")
 }
 
-##' Style of numprint when converting between various formats
+##' Inject numprint when converting to tex
 ##'
 ##' @param tex The tex character vector.
-##' @param output The output format of the conversion.
 ##' @return tex character vector.
 ##' @noRd
-style_numprint <- function(tex, output = c("docx", "tex")) {
-    remove <- switch(match.arg(output),
-                     docx = TRUE,
-                     tex  = FALSE)
-
-    if (isTRUE(remove))
-        return(gsub("[\\]numprint[{]([[:digit:]]+)[}]", "\\1", tex))
-
+style_numprint <- function(tex) {
     ## Find the line for the reference section to make sure not to add
     ## \numprint{} to numbers in references. Use the complete text if
     ## the chapter doesn't contain a reference section.
