@@ -334,7 +334,7 @@ style_fun <- function(tex, chapter) {
     extract_infocus(tmp$drop, chapter)
     tex <- tmp$tex
     tex <- add_line_between_references(tex)
-    tex <- style_multicols(tex, output = "tex")
+    tex <- style_multicols(tex)
     tex <- inject_tab_fig_infocus(tex, tmp$drop, chapter)
     tex
 }
@@ -527,35 +527,12 @@ add_line_between_references <- function(tex) {
     tex
 }
 
-##' Handle multicols when converting between tex and docx
+##' Handle multicols when converting to tex
 ##'
 ##' @param tex The tex character vector.
-##' @param output The output format of the conversion.
 ##' @return tex character vector.
 ##' @noRd
-style_multicols <- function(tex, output = c("docx", "tex")) {
-    remove <- switch(match.arg(output),
-                     docx = TRUE,
-                     tex  = FALSE)
-
-    if (isTRUE(remove)) {
-        ## Check for '\begin{multicols}{2}'.
-        i <- grep("^[\\]begin[{]multicols[}][{]2[}]$", tex)
-        if (length(i)) {
-            stopifnot(identical(length(i), 1L))
-            tex <- tex[-i]
-        }
-
-        ## Check for '\end{multicols}'.
-        i <- grep("^[\\][e][n][d][{]multicols[}]$", tex)
-        if (length(i)) {
-            stopifnot(identical(length(i), 1L))
-            tex <- tex[-i]
-        }
-
-        return(tex)
-    }
-
+style_multicols <- function(tex) {
     ## Find the addcontentsline.
     i <- grep("^[\\]addcontentsline[{]toc[}][{]chapter[}][{]", tex)
     stopifnot(identical(length(i), 1L))
