@@ -327,7 +327,7 @@ style_fun <- function(tex, chapter) {
     tex <- make_labels_chapter_specific(tex, chapter)
     tex <- hypertargets_chapter_specific(tex, chapter)
     tex <- asterisk(tex, "add")
-    tex <- style_toc(tex, output = "tex")
+    tex <- style_toc(tex)
     tex <- style_numprint(tex)
 
     tmp <- style_drop_section(tex, "In focus")
@@ -607,30 +607,12 @@ style_numprint <- function(tex) {
       tex[-i])
 }
 
-##' Style table of contents when converting between various formats
+##' Style table of contents when converting to tex
 ##'
 ##' @param tex The tex character vector.
-##' @param output The output format of the conversion.
 ##' @return tex character vector.
 ##' @noRd
-style_toc <- function(tex, output = c("docx", "tex")) {
-    remove <- switch(match.arg(output),
-                     docx = TRUE,
-                     tex  = FALSE)
-
-    if (isTRUE(remove)) {
-        i <- grep("^[\\]addcontentsline[{]toc[}][{]chapter[}][{]", tex)
-
-        if (length(i)) {
-            ## We expect one '\addcontentsline{toc}{chapter}'.
-            stopifnot(identical(length(i), 1L))
-
-            tex <- tex[-i]
-        }
-
-        return(tex)
-    }
-
+style_toc <- function(tex) {
     ## Determine the name of the chapter from
     ## '\chapter*{name-of-chapter}'. Then create a toc using the
     ## chapter name.
