@@ -35,6 +35,31 @@ tex_argument <- function(tex) {
     substr(tex, 2, i)
 }
 
+##' Extract arguments from a tex command
+##'
+##' Extract arguments from a tex command
+##' \command{argument1}{argument2}.
+##' @param tex the character vector of length one to extract the
+##'     argument from. The first character must be the opening '{'.
+##' @return a list with a character vector for each argument.
+##' @noRd
+tex_arguments <- function(tex) {
+    args <- list()
+
+    repeat {
+        x <- tex_argument(tex)
+        args[[length(args) + 1]] <- x
+
+        ## Move forward and check if there exists another
+        ## argument.
+        tex <- substr(tex, nchar(x) + 3, nchar(tex))
+        if (substr(tex, 1, 1) != "{")
+            break
+    }
+
+    args
+}
+
 ##' Collapse tex-lines to one line that contains '\n' between lines.
 ##' @noRd
 tex_2_one_line <- function(tex) {
