@@ -638,26 +638,49 @@ style_numprint <- function(tex) {
 ##' @return tex character vector.
 ##' @noRd
 style_toc <- function(tex) {
-    ## Determine the name of the chapter from
-    ## '\chapter*{name-of-chapter}'. Then create a toc using the
-    ## chapter name.
-    chapter <- paste(tex, collapse = " ")
-    chapter <- sub("^.+[\\]chapter[*][{]", "", chapter)
-    chapter <- unlist(strsplit(chapter, "}"))[1]
-    toc <- paste0("\\addcontentsline{toc}{chapter}{", chapter, "}")
+    tex <- tex_2_one_line(tex)
 
-    ## Find the line for the chapter section. Since chapter section
-    ## can run over multiple lines, look for the first label '\label{sec:'.
-    i <- min(grep("\\\\label[{]sec[:]", tex))
-    stopifnot(identical(length(i), 1L))
+    ## Extract the arguments for the first hypertarget. It contains
+    ## the chapter and label in the second argument.
+    i <- regexpr("\\\\hypertarget[{]", tex)
+    if (i == -1)
+        stop("Unable to find 'hypertarget'")
+    i <- i + attr(i, "match.length") - 1
+    hypertarget <- tex_arguments(substr(tex, i, nchar(tex)))
+    stopifnot(length(hypertarget) == 2)
 
-    ## Split the tex into two parts and inject the toc between them.
-    tex_a <- tex[seq_len(i)]
-    tex_b <- character(0)
-    if (i < length(tex))
-        tex_b <- tex[seq(from = i + 1, to = length(tex), by = 1)]
+    ## Extract the tex after the hypertarget. The '+4' is to include
+    ## the '{' and '}' for each argument.
+    i <- i + nchar(hypertarget[[1]]) + nchar(hypertarget[[2]]) + 4
+    tex <- substr(tex, i, nchar(tex))
 
-    c(tex_a, toc, tex_b)
+    ## Determine the title of the chapter from
+    ## '\chapter*{title-of-chapter}'
+    i <- regexpr("\\\\chapter[*][{]", hypertarget[[2]])
+    if (i == -1)
+        stop("Unable to find 'chapter'")
+    i <- i + attr(i, "match.length") - 1
+    title <- tex_argument(substr(hypertarget[[2]], i, nchar(hypertarget[[2]])))
+
+    ## Determine the label of the chapter from
+    ## '\label{label-of-chapter}'
+    i <- regexpr("\\\\label[{]", hypertarget[[2]])
+    if (i == -1)
+        stop("Unable to find 'label'")
+    i <- i + attr(i, "match.length") - 1
+    label <- tex_argument(substr(hypertarget[[2]], i, nchar(hypertarget[[2]])))
+
+    ## Determine 'texorpdfstring'.
+    texorpdfstring <- paste0("\\texorpdfstring{", title, "}{", title, "}")
+
+    ## Conbine all pieces.
+    tex <- paste0("\\hypertarget{", hypertarget[[1]], "}{%\n",
+                  "\\chapter*{", texorpdfstring, "}\\label{", label, "}}\n",
+                  "\\addcontentsline{toc}{chapter}{", texorpdfstring, "}",
+                  tex)
+
+    ## Convert the tex to multi-lines again.
+    tex_2_multi_line(tex)
 }
 
 ##' Cleanup temporary files
