@@ -145,6 +145,7 @@ save_figure <- function(tex, chapter) {
                paste0("  \\includegraphics[width=\\textwidth]{", fig, "}"),
                paste0("  ", caption),
                "\\end{figure}")
+    lines <- style_numprint(lines)
     filename <- paste0("fig_", label, ".tex")
     cat(sprintf("  - Write file: %s\n", filename))
     writeLines(lines, filename)
@@ -242,7 +243,7 @@ style_infocus <- function(tex) {
                        "};",
                        "\\end{tikzpicture}")
     c(before_infocus,
-      tex,
+      style_numprint(tex),
       after_infocus)
 }
 
