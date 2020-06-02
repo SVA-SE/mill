@@ -1,58 +1,45 @@
-##' Extract argument from a tex command
-##'
-##' Extract argument from a tex command \command{argument}.
-##' @param tex the character vector of length one to extract the
-##'     argument from. The first character must be the opening '{'.
-##' @return a character vector with the argument.
-##' @noRd
-tex_argument <- function(tex) {
-    stopifnot(is.character(tex),
-              length(tex) == 1,
-              substr(tex, 1, 1) == "{")
-
-    i <- 1
-    depth <- 0
-    len <- nchar(tex)
-
-    ## Iterate over all characters in {} to extract the argument.
-    repeat {
-        if (substr(tex, i, i) == "}") {
-            depth <- depth - 1
-        } else if (substr(tex, i, i) == "{") {
-            depth <- depth + 1
-        }
-
-        if (depth == 0) {
-            i <- i - 1
-            break
-        }
-
-        i <- i + 1
-        if (i > len)
-            stop("Unable to find a closing '}'")
-    }
-
-    substr(tex, 2, i)
-}
-
 ##' Extract arguments from a tex command
 ##'
 ##' Extract arguments from a tex command
 ##' \command{argument1}{argument2}.
 ##' @param tex the character vector of length one to extract the
 ##'     argument from. The first character must be the opening '{'.
-##' @return a list with a character vector for each argument.
+##' @return a character vector with the arguments.
 ##' @noRd
 tex_arguments <- function(tex) {
-    args <- list()
+    stopifnot(is.character(tex),
+              length(tex) == 1,
+              substr(tex, 1, 1) == "{")
+
+    args <- character(0)
 
     repeat {
-        x <- tex_argument(tex)
-        args[[length(args) + 1]] <- x
+        i <- 1
+        depth <- 0
+        len <- nchar(tex)
 
-        ## Move forward and check if there exists another
-        ## argument.
-        tex <- substr(tex, nchar(x) + 3, nchar(tex))
+        ## Iterate over all characters in {} to extract the argument.
+        repeat {
+            if (substr(tex, i, i) == "}") {
+                depth <- depth - 1
+            } else if (substr(tex, i, i) == "{") {
+                depth <- depth + 1
+            }
+
+            if (depth == 0) {
+                i <- i - 1
+                break
+            }
+
+            i <- i + 1
+            if (i > len)
+                stop("Unable to find a closing '}'")
+        }
+
+        args <- c(args, substr(tex, 2, i))
+
+        ## Move forward and check if there exists another argument.
+        tex <- substr(tex, i + 2, nchar(tex))
         if (substr(tex, 1, 1) != "{")
             break
     }
