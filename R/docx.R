@@ -298,7 +298,7 @@ style_infocus <- function(tex) {
     if (i == -1)
         stop("Unable to find 'subsection'")
     i <- i + attr(i, "match.length") - 1
-    title <- tex_argument(substr(tex, i, nchar(tex)))
+    title <- tex_arguments(substr(tex, i, nchar(tex)))
 
     ## Split the tex to remove the title and then combine it again
     ## with the infocus title.
@@ -545,20 +545,31 @@ add_line_between_references <- function(tex) {
 ##' @return tex character vector.
 ##' @noRd
 style_multicols <- function(tex) {
-    ## Find the addcontentsline.
-    i <- grep("^[\\]addcontentsline[{]toc[}][{]chapter[}][{]", tex)
-    stopifnot(identical(length(i), 1L))
+    tex <- tex_2_one_line(tex)
 
-    ## Split the tex into two parts and inject the begin multicols
-    ## between them.
-    tex_a <- tex[seq_len(i)]
-    tex_b <- character(0)
-    if (i < length(tex))
-        tex_b <- tex[seq(from = i + 1, to = length(tex), by = 1)]
-    tex <- c(tex_a, "\\begin{multicols}{2}", tex_b)
+    ## Extract the arguments for the addcontentsline.
+    i <- regexpr("\\\\addcontentsline[{]", tex)
+    if (i == -1)
+        stop("Unable to find 'addcontentsline'")
+    i <- i + attr(i, "match.length") - 1
+    args <- tex_arguments(substr(tex, i, nchar(tex)))
+    stopifnot(length(args) == 3)
+    args <- paste0("{", paste0(args, collapse = "}{"), "}")
 
-    ## Add end multicols
-    c(tex, "\\end{multicols}")
+    ## Split the tex into two parts: before and after
+    ## 'addcontentsline'.
+    tex_1 <- substr(tex, 1, i - 1)
+    tex_2 <- substr(tex, i + nchar(args), nchar(tex))
+
+    ## Combine the pieces and add the begin/end multicols.
+    tex <- paste0(tex_1,
+                  args,
+                  "\n\\begin{multicols}{2}",
+                  tex_2,
+                  "\n\\end{multicols}")
+
+    ## Convert the tex to multi-lines again.
+    tex_2_multi_line(tex)
 }
 
 ##' Inject numprint when converting to tex
@@ -647,7 +658,8 @@ style_toc <- function(tex) {
     if (i == -1)
         stop("Unable to find 'chapter'")
     i <- i + attr(i, "match.length") - 1
-    title <- tex_argument(substr(hypertarget[[2]], i, nchar(hypertarget[[2]])))
+    title <- tex_arguments(substr(hypertarget[[2]], i, nchar(hypertarget[[2]])))
+    stopifnot(length(title) == 1)
 
     ## Determine the label of the chapter from
     ## '\label{label-of-chapter}'
@@ -655,7 +667,8 @@ style_toc <- function(tex) {
     if (i == -1)
         stop("Unable to find 'label'")
     i <- i + attr(i, "match.length") - 1
-    label <- tex_argument(substr(hypertarget[[2]], i, nchar(hypertarget[[2]])))
+    label <- tex_arguments(substr(hypertarget[[2]], i, nchar(hypertarget[[2]])))
+    stopifnot(length(label) == 1)
 
     ## Determine 'texorpdfstring'.
     texorpdfstring <- paste0("\\texorpdfstring{", title, "}{", title, "}")
