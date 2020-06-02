@@ -635,7 +635,7 @@ style_numprint <- function(tex) {
 ##' @param tex The tex character vector.
 ##' @return tex character vector.
 ##' @noRd
-style_chaper_title <- function(tex) {
+style_chapter_title <- function(tex) {
     tex <- tex_2_one_line(tex)
 
     ## Extract the arguments for the first hypertarget. It contains
