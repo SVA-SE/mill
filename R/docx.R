@@ -339,7 +339,7 @@ style_fun <- function(tex, chapter) {
     tex <- make_labels_chapter_specific(tex, chapter)
     tex <- hypertargets_chapter_specific(tex, chapter)
     tex <- asterisk(tex, "add")
-    tex <- style_toc(tex)
+    tex <- style_chapter_title(tex)
     tex <- style_numprint(tex)
 
     tmp <- style_drop_section(tex, "In focus")
@@ -630,12 +630,12 @@ style_numprint <- function(tex) {
       tex[-i])
 }
 
-##' Style table of contents when converting to tex
+##' Style chapter title and table of contents when converting to tex
 ##'
 ##' @param tex The tex character vector.
 ##' @return tex character vector.
 ##' @noRd
-style_toc <- function(tex) {
+style_chaper_title <- function(tex) {
     tex <- tex_2_one_line(tex)
 
     ## Extract the arguments for the first hypertarget. It contains
