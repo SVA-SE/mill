@@ -187,7 +187,7 @@ save_figure <- function(tex, chapter) {
     pattern <- paste0("^(Figure)?[[:space:]]*[{][[][}]",
                       "fig:[^{]+[{][]][}][:]?[[:space:]]*")
     label <- trimws(regmatches(tex[1], regexpr(pattern, tex[1])))
-    is_figure <- startsWith("Figure", label)
+    is_figure <- startsWith(label, "Figure")
     label <- sub("^(Figure)?[[:space:]]*[{][[][}]fig:", "", label)
     label <- sub("[{][]][}][:]?$", "", label)
 
