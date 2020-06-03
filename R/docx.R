@@ -184,16 +184,25 @@ save_figure <- function(tex, chapter) {
     stopifnot(length(tex) > 0)
 
     ## Determine the label.
-    pattern <- "^Figure[[:space:]]*[{][[][}]fig:[^{]+[{][]][}]:[[:space:]]*"
+    pattern <- paste0("^(Figure)?[[:space:]]*[{][[][}]",
+                      "fig:[^{]+[{][]][}][:]?[[:space:]]*")
     label <- trimws(regmatches(tex[1], regexpr(pattern, tex[1])))
-    label <- sub("^Figure[[:space:]]*[{][[][}]fig:", "", label)
-    label <- sub("[{][]][}]:$", "", label)
+    is_figure <- startsWith("Figure", label)
+    label <- sub("^(Figure)?[[:space:]]*[{][[][}]fig:", "", label)
+    label <- sub("[{][]][}][:]?$", "", label)
 
     ## Determine the caption.
     caption <- tex
     caption[1] <- sub(pattern, "", caption[1])
-    caption[1] <- paste0("\\caption{", caption[1])
-    caption <- c(caption, paste0("\\label{fig:", prefix, ":", label, "}"))
+    if (is_figure) {
+        caption[1] <- paste0("\\caption{", caption[1])
+        caption <- c(caption, paste0("\\label{fig:", prefix, ":", label, "}"))
+    } else {
+        caption[1] <- paste0("\\caption*{\\scriptsize{", caption[1])
+        caption[length(caption)] <- paste0(caption[length(caption)], "}")
+        caption <- c(caption, paste0("\\label{fig:", prefix, ":", label, "}"))
+    }
+
     i <- seq_len(length(caption))[-1]
     caption[i] <- paste0("  ", caption[i])
     caption <- c(caption, "}")
