@@ -619,7 +619,10 @@ style_numprint <- function(tex) {
         remove2 <- substr(rev_x[y - 1], 1, 1) == "-" &
                    substr(rev_x[y - 1], 1, 2) != "--"
 
-        remove <- remove | remove2
+        ## Check that a single '_'.
+        remove3 <- substr(rev_x[y - 1], 1, 1) == "_"
+
+        remove <- remove | remove2 | remove3
         y <- y[!remove]
 
         ## replace those we want to replace with numprint
