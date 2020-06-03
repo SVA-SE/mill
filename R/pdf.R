@@ -101,7 +101,7 @@ to_pdf_chapter <- function(build = TRUE, type = c("print", "web")) {
 
         ## Search for files that fits the pattern
         ## 'fig_identifier.ext'.
-        pattern <- paste0("^fig_", identifier, "[.](eps|pdf|png)")
+        pattern <- paste0("^fig_", identifier, "[.](eps|jpeg|jpg|pdf|png)")
         files <- list.files(pattern = pattern)
         if (!length(files))
             stop(sprintf("Missing ref file: %s\n", marker))
