@@ -91,6 +91,7 @@ create_Makefile <- function() {
                    "\t   -dPrinted=false \\",
                    "\t   -sOutputFile=web_report.pdf \\",
                    "\t   build/report.pdf",
+                   "",
                    ".PHONY: printer",
                    "printer:",
                    "\tcd assets/new-cover/;make",
