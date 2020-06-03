@@ -165,6 +165,8 @@ split_figures <- function(tex) {
     }, figures, diff(c(figures, length(tex) + 1)), SIMPLIFY = FALSE)
 }
 
+##' @importFrom tools file_ext
+##' @noRd
 save_figure <- function(tex, chapter) {
     prefix <- normalize_title(chapter)
 
@@ -197,7 +199,7 @@ save_figure <- function(tex, chapter) {
     caption <- c(caption, "}")
 
     ## Move and rename the figure file.
-    to <- paste0("docx_fig_", label, ".png")
+    to <- paste0("docx_fig_", label, ".", file_ext(filename))
     cat(sprintf("  - Write file: %s (Only for info, not added to repo.)\n",
                 to))
     file.copy(filename, to)
