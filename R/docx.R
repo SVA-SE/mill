@@ -622,17 +622,18 @@ style_numprint <- function(tex) {
                   substr(x[y + 1], 1, 2) != "--"
 
         ## Check that a single hyphen does not preceed the numbers
-        rev_x <- lapply(strsplit(x, NULL), function(x) {
+        rev_x <- unlist(lapply(strsplit(x, NULL), function(x) {
             paste(rev(x), collapse = "")
-        })
+        }))
         remove2 <- substr(rev_x[y - 1], 1, 1) == "-" &
                    substr(rev_x[y - 1], 1, 2) != "--"
 
         ## Check that a single '_'.
         remove3 <- substr(rev_x[y - 1], 1, 1) == "_"
 
-        ## Check for a single '('.
-        remove4 <- substr(rev_x[y - 1], 1, 1) == "("
+        ## Remove the matches if they are inside '(' and ')'.
+        remove4 <- endsWith(x[y - 1], "(") &
+                   startsWith(x[y + 1], ")")
 
         remove <- remove | remove2 | remove3 | remove4
         y <- y[!remove]
