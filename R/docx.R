@@ -108,6 +108,8 @@ import <- function() {
 }
 
 inject_tab_fig_infocus <- function(tex, infocus, chapter) {
+    chapter <- normalize_title(chapter)
+
     ## Find the references
     tex_a <- c(tex, unlist(infocus))
     pattern <- "[\\]label[{][^}]*[}]|[\\]ref[{][^}]*[}]"
@@ -124,14 +126,20 @@ inject_tab_fig_infocus <- function(tex, infocus, chapter) {
 
     df <- df[df$reftype %in% c("fig", "tab"), ]
     if (nrow(df)) {
-        df$filename <- paste0("\\input{", gsub(":", "_", df$marker), ".tex}")
-        tex <- c(tex, unique(df$filename))
+        df$filename <- paste0(gsub(":", "_", df$marker), ".tex")
+
+        ## Are there any unreferenced figure files to append.
+        files <- list.files(pattern = "^fig_[^.]+[.]tex$")
+        if (length(files) > 0)
+            files <- sub("^fig_", paste0("fig_", chapter, "_"), files)
+        files <- unique(c(df$filename, files))
+        files <- paste0("\\input{", files, "}")
+        tex <- c(tex, files)
     }
 
     ## Append infocus
     if (length(infocus)[1] > 0) {
         infocus <- length(split_infocus(infocus))[1]
-        chapter <- normalize_title(chapter)
         infocus <- paste0("\\input{infocus_", chapter,
                           "_", seq_len(infocus), ".tex}")
         tex <- c(tex, infocus)
