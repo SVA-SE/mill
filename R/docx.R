@@ -56,9 +56,12 @@ tex_2_one_line <- function(tex) {
 ##' Split tex that contains '\n' to multiple lines.
 ##' @noRd
 tex_2_multi_line <- function(tex) {
-    f <- textConnection(tex)
-    tex <- readLines(f)
-    close(f)
+    if (!is.null(tex)) {
+        f <- textConnection(tex)
+        tex <- readLines(f)
+        close(f)
+    }
+
     tex
 }
 
@@ -443,26 +446,67 @@ normalize_title <- function(title) {
     gsub("[[:space:]]+", "-", tolower(title))
 }
 
+##' A section starts with something like:
+##' \hypertarget{figures}{%
+##' \section{Figures}\label{figures}}
+##' @noRd
 style_drop_section <- function(tex, section) {
+    tex <- tex_2_one_line(tex)
+
+    ## Find all 'hypertarget'.
+    i <- gregexpr("\\\\hypertarget[{]", tex)[[1]]
+    if (any(i == -1))
+        return(tex_2_multi_line(tex))
+
+    ## Now split all 'hypertarget' into smaller pieces to find the
+    ## hypertarget with the section that we want to drop.
+    h <- mapply(function(i, n) {
+        args = tex_arguments(substr(tex, i + n - 1, nchar(tex)))
+
+        ## First, determine if this is a section, and then if it's the
+        ## section to drop.
+        j <- regexpr("\\\\section[{]", args[[2]])
+        if (j == -1) {
+            drop <- FALSE
+        } else {
+            j <- j + attr(j, "match.length") - 1
+            title <- tex_arguments(substr(args[[2]], j, nchar(args[[2]])))
+            drop <- identical(title, section)
+        }
+
+        list(i = i, drop = drop)
+    }, i, attr(i, "match.length"), SIMPLIFY = FALSE)
+
+    ## Check if a section to drop was identified.
     drop <- NULL
-    i <- grep(paste0("^[\\]section[*]?[{]", section, "[}]"), tex)
-    if (length(i) && i > 2) {
-        section <- normalize_title(section)
-        if (startsWith(tex[i - 1], paste0("\\hypertarget{"))) {
-            i <- i - 2
-        }
+    if (any(vapply(h, function(x) x$drop, logical(1)))) {
+        ## Determine the index where to cut the tex.
+        i <- min(unlist(sapply(h, function(x) {
+            if (isTRUE(x$drop))
+                return(x$i)
+            integer(0)
+        })))
 
-        ## Remove empty lines.
-        while (i > 1 && ((nchar(tex[i]) == 0) || tex[i] == "\\\\\\\\")) {
-            i <- i - 1
-        }
+        ## Determine if there are any tex after the cut to keep.
+        j <- unlist(sapply(h, function(x) {
+            if (!isTRUE(x$drop))
+                return(x$i)
+            integer(0)
+        }))
+        j <- j[j > i]
 
-        j <- seq(from = i + 1, to = length(tex))
-        drop <- tex[j]
-        tex <- tex[seq_len(i)]
+        if (length(j) > 0) {
+            drop <- trimws(substr(tex, i, j - 1))
+            tex <- paste0(trimws(substr(tex, 1, i - 1)),
+                          trimws(substr(tex, j, nchar(tex))))
+        } else {
+            drop <- trimws(substr(tex, i, nchar(tex)))
+            tex <- trimws(substr(tex, 1, i - 1))
+        }
     }
 
-    list(tex = tex, drop = drop)
+    list(tex  = tex_2_multi_line(tex),
+         drop = tex_2_multi_line(drop))
 }
 
 ##' Convert the docx references to tex ref
