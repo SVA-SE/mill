@@ -241,7 +241,6 @@ save_figure <- function(tex, chapter) {
 
 extract_figures <- function(tex, chapter) {
     if (!is.null(tex)) {
-        tex <- style_drop_section(tex, "Tables")$tex
         figures <- split_figures(tex)
         lapply(figures, save_figure, chapter = chapter)
     }
@@ -465,17 +464,19 @@ style_drop_section <- function(tex, section) {
 
         ## First, determine if this is a section, and then if it's the
         ## section to drop.
-        j <- regexpr("\\\\section[{]", args[[2]])
-        if (j == -1) {
-            drop <- FALSE
-        } else {
-            j <- j + attr(j, "match.length") - 1
-            title <- tex_arguments(substr(args[[2]], j, nchar(args[[2]])))
-            drop <- identical(title, section)
-        }
+        j <- regexpr("\\\\section[*]?[{]", args[[2]])
+        if (j == -1)
+            return(NULL)
+
+        j <- j + attr(j, "match.length") - 1
+        title <- tex_arguments(substr(args[[2]], j, nchar(args[[2]])))
+        drop <- identical(trimws(title), trimws(section))
 
         list(i = i, drop = drop)
     }, i, attr(i, "match.length"), SIMPLIFY = FALSE)
+
+    ## Keep only hypertargets that are sections.
+    h <- h[!vapply(h, is.null, logical(1))]
 
     ## Check if a section to drop was identified.
     drop <- NULL
@@ -498,6 +499,7 @@ style_drop_section <- function(tex, section) {
         if (length(j) > 0) {
             drop <- trimws(substr(tex, i, j - 1))
             tex <- paste0(trimws(substr(tex, 1, i - 1)),
+                          "\n\n",
                           trimws(substr(tex, j, nchar(tex))))
         } else {
             drop <- trimws(substr(tex, i, nchar(tex)))
