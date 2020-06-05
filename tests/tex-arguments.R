@@ -15,7 +15,7 @@ tex <- c(
 
 tex <- mill:::tex_2_one_line(tex)
 
-stopifnot(identical(mill:::tex_arguments(substr(tex, 13, nchar(tex))),
+stopifnot(identical(mill:::tex_arguments(substr(tex, 13, nchar(tex)))$m,
                     c(paste0("sec:animal-databases:animal-registers-",
                              "and-data-sources-used-in-surveillance"),
                       paste0("%\n\\chapter*{Animal registers and data ",

@@ -1,17 +1,26 @@
 ##' Extract arguments from a tex command
 ##'
 ##' Extract arguments from a tex command
-##' \command{argument1}{argument2}.
+##' \command[optional argument1]{argument2}{argument3}.
 ##' @param tex the character vector of length one to extract the
 ##'     argument from. The first character must be the opening '{'.
 ##' @return a character vector with the arguments.
 ##' @noRd
 tex_arguments <- function(tex) {
-    stopifnot(is.character(tex),
-              length(tex) == 1,
-              substr(tex, 1, 1) == "{")
+    stopifnot(is.character(tex), length(tex) == 1)
 
-    args <- character(0)
+    ## Optional arguments
+    o <- regmatches(tex, regexpr("[^]]*[]]", tex))
+    if (isTRUE(nchar(o) > 0)) {
+        o <- substr(o, 2, nchar(o) - 1)
+
+        ## Move forward to mandatory arguments.
+        tex <- substr(tex, nchar(o) + 3, nchar(tex))
+    }
+
+    ## Mandatory arguments
+    stopifnot(substr(tex, 1, 1) == "{")
+    m <- character(0)
 
     repeat {
         i <- 1
@@ -36,7 +45,7 @@ tex_arguments <- function(tex) {
                 stop("Unable to find a closing '}'")
         }
 
-        args <- c(args, substr(tex, 2, i))
+        m <- c(m, substr(tex, 2, i))
 
         ## Move forward and check if there exists another argument.
         tex <- substr(tex, i + 2, nchar(tex))
@@ -44,7 +53,7 @@ tex_arguments <- function(tex) {
             break
     }
 
-    args
+    list(m = m, o = o)
 }
 
 ##' Collapse tex-lines to one line that contains '\n' between lines.
