@@ -243,6 +243,10 @@ check <- function() {
                     paste0("checking usage of county e.g. ",
                            "'Uppsala county' (use 'county of')")))
 
+    result <- c(result,
+                check_incomplete_line(
+                    id <- id + 1, ignore))
+
     invisible(any(result))
 }
 
@@ -503,7 +507,7 @@ check_pattern <- function(id,
                           description,
                           perl = FALSE,
                           patches = TRUE) {
-    cat(sprintf("[%02i] %s ...", id, description))
+    cat(sprintf("[%02i] %s ... ", id, description))
 
     ## List files.
     if (isTRUE(patches)) {
@@ -543,6 +547,55 @@ check_pattern <- function(id,
             lines <- grep(pattern, readLines(filename), perl = perl)
             lines <- paste(lines, collapse = ", ")
             cat(lines, "\n")
+        })
+        return(TRUE)
+    }
+
+    cat("OK\n")
+    FALSE
+}
+
+##' Check for incomplete final line in 'typeset.tex'
+##'
+##' @noRd
+check_incomplete_line <- function(id, ignore) {
+    cat(sprintf(
+        "[%02i] checking for incomplete final line in 'typeset.tex' ... ",
+        id))
+
+    if (in_chapter()) {
+        ignore <- as.numeric(ignore[[basename(getwd())]])
+        if (id %in% ignore) {
+            files <- character(0)
+        } else {
+            files <- list.files(pattern = "^typeset[.]tex$")
+        }
+    } else {
+        files <- unlist(lapply(list.files("chapters"), function(chapter) {
+            if (id %in% as.numeric(ignore[[chapter]]))
+                return(character(0))
+            list.files(paste0("chapters/", chapter),
+                       pattern = "^typeset[.]tex$",
+                       recursive = TRUE,
+                       full.names = TRUE)
+        }))
+    }
+
+    l <- vapply(files, function(filename) {
+        result <- FALSE
+        tryCatch(readLines(filename),
+                 warning = function(w) {
+                     if (startsWith(w$message, "incomplete final line"))
+                         result <<- TRUE
+        })
+        result
+    }, logical(1), USE.NAMES = FALSE)
+
+    l <- files[l]
+    if (length(l)) {
+        cat("ERROR\n")
+        lapply(l, function(filename) {
+            cat("     -", filename, "\n")
         })
         return(TRUE)
     }
