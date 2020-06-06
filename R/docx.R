@@ -257,16 +257,28 @@ split_figures <- function(tex) {
     pattern <- paste0("(Figure)?[[:space:]]*[{][[][}]",
                       "fig:[^{]+[{][]][}][:]?[[:space:]]*")
 
-    ## Determine split points for captions.
-    i <- gregexpr(pattern, tex)[[1]]
-    if (length(i) == 0)
-        stop("Unable to find any figure captions.")
-    i <- c(1, i[-1], nchar(tex) + 1)
+    ## Split tex into captions.
+    captions <- list()
+    repeat {
+        i <- gregexpr(pattern, tex)[[1]]
+        if (isTRUE(i == -1))
+            stop("Unable to find a figure caption.")
 
-    ## Split tex into each figure caption.
-    mapply(function(from, n) {
-        to <- from + n
-        caption <- substr(tex, from, to)
+        if (length(i) == 1) {
+            to <- nchar(tex)
+        } else {
+            ## Determine if there is an 'includegraphics' between the
+            ## first and second caption.
+            j <- gregexpr("\\\\includegraphics[[]", tex)[[1]]
+            j <- j[j > i[1] & j < i[2]]
+            if (length(j)) {
+                to <- j[1] - 1
+            } else {
+                to <- i[2] - 1
+            }
+        }
+
+        caption <- substr(tex, 1, to)
 
         ## Check for a 'includegraphics' with the image file from the
         ## docx-file.
@@ -275,6 +287,7 @@ split_figures <- function(tex) {
         if (!isTRUE(i == -1)) {
             cmd <- tex_cmd(substr(caption, i, nchar(tex)))
             stopifnot(length(cmd$m) == 1)
+            docx <- cmd$m[1]
             caption <- substr(caption, i + tex_cmd_nchar(cmd), nchar(caption))
         }
 
@@ -286,8 +299,13 @@ split_figures <- function(tex) {
         if (!isTRUE(i == -1))
             stop(sprintf("Invalid caption:\n%s", caption))
 
-        caption
-    }, i[-length(i)], diff(i), SIMPLIFY = FALSE)
+        captions[[length(captions) + 1]] <- caption
+        tex <- substr(tex, to + 1, nchar(tex))
+        if (nchar(tex) == 0)
+            break
+    }
+
+    captions
 }
 
 ##' @importFrom tools file_ext
