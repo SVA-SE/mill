@@ -22,3 +22,8 @@ stopifnot(identical(mill:::tex_arguments(substr(tex, 13, nchar(tex)))$m,
                              "sources used in\nsurveillance}\\label{",
                              "sec:animal-databases:animal-registers-and-",
                              "data-sources-used-in-surveillance}"))))
+
+tex <- "\\includegraphics[width=3.6181in,height=2.32592in]{./media/image1.png}"
+args <- mill:::tex_arguments(substr(tex, 17, nchar(tex)))
+stopifnot(identical(args$o, "width=3.6181in,height=2.32592in"))
+stopifnot(identical(args$m, "./media/image1.png"))

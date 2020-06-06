@@ -46,7 +46,7 @@ if (i == -1)
     stop("Unable to find 'subsection'")
 i <- i + attr(i, "match.length") - 1
 
-stopifnot(identical(mill:::tex_arguments(substr(tex, i, nchar(tex))),
+stopifnot(identical(mill:::tex_arguments(substr(tex, i, nchar(tex)))$m,
                     paste0("National \textit{increase} in the number ",
                            "of reported cases of\ncryptosporidiosis in ",
                            "humans Oct-Dec\n2019")))
