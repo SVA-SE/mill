@@ -20,6 +20,29 @@ ignore_words <- function() {
     sort(unique(ignore))
 }
 
+harvest_words <- function(bad_words, harvest) {
+    if (interactive() && isTRUE(harvest)) {
+        for (i in seq_len(length(bad_words))) {
+            m <- sprintf("Add '%s' [(r)report|(c)hapter|(s)kip|(q)uit]? ",
+                         bad_words[i])
+            x <- readline(m)
+            if (tolower(substr(x, 1, 1)) == "r") {
+                w <- sort(c(bad_words[i], readLines("../../WORDLIST")))
+                writeLines(w, "../../WORDLIST")
+            } else if (tolower(substr(x, 1, 1)) == "c") {
+                w <- sort(c(bad_words[i], readLines("WORDLIST")))
+                writeLines(w, "WORDLIST")
+            } else if (tolower(substr(x, 1, 1)) == "s") {
+                next
+            } else if (tolower(substr(x, 1, 1)) == "q") {
+                break
+            } else {
+                stop(sprintf("Unknown option: '%s'", x))
+            }
+        }
+    }
+}
+
 ##' Spell checking of chapters
 ##'
 ##' @param harvest \code{TRUE} if you want to harvest the words and
@@ -47,26 +70,7 @@ spell_checking <- function(harvest = FALSE) {
             cat("OK\n")
         }
 
-        if (interactive() && isTRUE(harvest)) {
-            for (i in seq_len(length(bad_words))) {
-                m <- sprintf("Add '%s' [(r)report|(c)hapter|(s)kip|(q)uit]? ",
-                             bad_words[i])
-                x <- readline(m)
-                if (tolower(substr(x, 1, 1)) == "r") {
-                    w <- sort(c(bad_words[i], readLines("../../WORDLIST")))
-                    writeLines(w, "../../WORDLIST")
-                } else if (tolower(substr(x, 1, 1)) == "c") {
-                    w <- sort(c(bad_words[i], readLines("WORDLIST")))
-                    writeLines(w, "WORDLIST")
-                } else if (tolower(substr(x, 1, 1)) == "s") {
-                    next
-                } else if (tolower(substr(x, 1, 1)) == "q") {
-                    break
-                } else {
-                    stop(sprintf("Unknown option: '%s'", x))
-                }
-            }
-        }
+        harvest_words(bad_words, harvest)
     } else if (in_report()) {
         ## Make sure to add a WORDLIST file to the project.
         if (!file.exists("WORDLIST")) {
