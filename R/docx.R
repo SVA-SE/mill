@@ -243,21 +243,51 @@ inject_tab_fig_infocus <- function(tex, infocus, chapter) {
 ##' @return a list with the tex for each figure.
 ##' @noRd
 split_figures <- function(tex) {
-    figures <- grep("\\\\includegraphics", tex)
-    if (length(figures) == 0)
-        return(list())
+    tex <- tex_2_one_line(tex)
 
+    ## Remove the first hypertarget.
+    i <- regexpr("\\\\hypertarget[{]", tex)
+    if (isTRUE(i == -1))
+        stop("Unable to find 'hypertarget'")
+    cmd <- tex_cmd(substr(tex, i, nchar(tex)))
+    stopifnot(length(cmd$m) == 2)
+    tex <- substr(tex, i + tex_cmd_nchar(cmd), nchar(tex))
+
+    ## Pattern that starts a figure caption.
+    pattern <- paste0("(Figure)?[[:space:]]*[{][[][}]",
+                      "fig:[^{]+[{][]][}][:]?[[:space:]]*")
+
+    ## Determine split points for captions.
+    i <- gregexpr(pattern, tex)[[1]]
+    if (length(i) == 0)
+        stop("Unable to find any figure captions.")
+    i <- c(1, i[-1], nchar(tex) + 1)
+
+    ## Split tex into each figure caption.
     mapply(function(from, n) {
-        to <- from + n - 1
+        to <- from + n
+        caption <- substr(tex, from, to)
 
-        ## Remove empty lines.
-        while (to > from &&
-               ((nchar(tex[to]) == 0) || tex[to] == "\\\\\\\\")) {
-            to <- to - 1
+        ## Check for a 'includegraphics' with the image file from the
+        ## docx-file.
+        docx <- NA_character_
+        i <- regexpr("\\\\includegraphics[[]", caption)
+        if (!isTRUE(i == -1)) {
+            cmd <- tex_cmd(substr(caption, i, nchar(tex)))
+            stopifnot(length(cmd$m) == 1)
+            caption <- substr(caption, i + tex_cmd_nchar(cmd), nchar(caption))
         }
 
-        tex[seq(from = from, to = to)]
-    }, figures, diff(c(figures, length(tex) + 1)), SIMPLIFY = FALSE)
+        caption <- trimws(caption)
+        attr(caption, "docx") <- docx
+
+        ## Check for empty lines.
+        i <- gregexpr("\n{2,}", caption)[[1]]
+        if (!isTRUE(i == -1))
+            stop(sprintf("Invalid caption:\n%s", caption))
+
+        caption
+    }, i[-length(i)], diff(i), SIMPLIFY = FALSE)
 }
 
 ##' @importFrom tools file_ext
