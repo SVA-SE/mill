@@ -313,48 +313,39 @@ split_figures <- function(tex) {
 save_figure <- function(tex, chapter) {
     prefix <- normalize_title(chapter)
 
-    ## Determine the filename.
-    pattern <- "^\\\\includegraphics[[][^]]+[]][{]"
-    filename <- sub(pattern, "", sub("[}]$", "", tex[1]))
-    stopifnot(file.exists(filename))
+    ## The file that has been extracted from the docx-file. NA if the
+    ## file was not found.
+    docx_figure <- attr(tex, "docx")
 
-    ## Remove empty lines.
-    tex <- tex[-1]
-    while (length(tex) &&
-           ((nchar(tex[1]) == 0) || tex[1] == "\\\\\\\\")) {
-               tex <- tex[-1]
-           }
-    stopifnot(length(tex) > 0)
-
-    ## Determine the label.
+    ## Determine the figure label.
     pattern <- paste0("^(Figure)?[[:space:]]*[{][[][}]",
                       "fig:[^{]+[{][]][}][:]?[[:space:]]*")
-    label <- trimws(regmatches(tex[1], regexpr(pattern, tex[1])))
+    label <- trimws(regmatches(tex, regexpr(pattern, tex)))
     is_figure <- startsWith(label, "Figure")
     label <- sub("^(Figure)?[[:space:]]*[{][[][}]fig:", "", label)
     label <- sub("[{][]][}][:]?$", "", label)
 
     ## Determine the caption.
-    caption <- tex
-    caption[1] <- sub(pattern, "", caption[1])
+    tex <- sub(pattern, "", tex)
     if (is_figure) {
-        caption[1] <- paste0("\\caption{", caption[1])
-        caption <- c(caption, paste0("\\label{fig:", prefix, ":", label, "}"))
+        tex <- paste0("\\caption{", tex)
     } else {
-        caption[1] <- paste0("\\caption*{\\scriptsize{", caption[1])
-        caption[length(caption)] <- paste0(caption[length(caption)], "}")
-        caption <- c(caption, paste0("\\label{fig:", prefix, ":", label, "}"))
+        tex <- paste0("\\caption*{\\scriptsize{", tex, "}")
     }
+    tex <- paste0(tex, paste0("\n\\label{fig:", prefix, ":", label, "}"))
 
+    caption <- tex_2_multi_line(tex)
     i <- seq_len(length(caption))[-1]
     caption[i] <- paste0("  ", caption[i])
     caption <- c(caption, "}")
 
-    ## Move and rename the figure file.
-    to <- paste0("docx_fig_", label, ".", file_ext(filename))
-    cat(sprintf("  - Write file: %s (Only for info, not added to repo.)\n",
-                to))
-    file.copy(filename, to)
+    ## Move and rename the docx_figure file.
+    if (!is.na(docx_figure)) {
+        to <- paste0("docx_fig_", label, ".", file_ext(docx_figure))
+        cat(sprintf("  - Write file: %s (Only for info, not added to repo.)\n",
+                    to))
+        file.copy(docx_figure, to)
+    }
 
     ## Create the tex-file for the figure.
     fig <- paste0("fig_", prefix, "_", label)
