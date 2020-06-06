@@ -1,3 +1,25 @@
+ignore_words <- function() {
+    ## Make sure to add a WORDLIST file in the report root and in each
+    ## chapter.
+    if (!file.exists("../../WORDLIST")) {
+        file.create("../../WORDLIST")
+        git2r::add(repository(), "WORDLIST")
+    }
+
+    if (!file.exists("WORDLIST")) {
+        file.create("WORDLIST")
+        git2r::add(repository(), "WORDLIST")
+    }
+
+    ignore <- character(0)
+    if (file.exists("../../WORDLIST")) ## Project-level
+        ignore <- c(ignore, readLines("../../WORDLIST"))
+    if (file.exists("WORDLIST")) ## Chapter-level
+        ignore <- c(ignore, readLines("WORDLIST"))
+
+    sort(unique(ignore))
+}
+
 ##' Spell checking of chapters
 ##'
 ##' @param harvest \code{TRUE} if you want to harvest the words and
@@ -9,24 +31,7 @@
 ##' @export
 spell_checking <- function(harvest = FALSE) {
     if (in_chapter()) {
-        ## Make sure to add a WORDLIST file in the report root and in
-        ## each chapter.
-        if (!file.exists("../../WORDLIST")) {
-            file.create("../../WORDLIST")
-            git2r::add(repository(), "WORDLIST")
-        }
-
-        if (!file.exists("WORDLIST")) {
-            file.create("WORDLIST")
-            git2r::add(repository(), "WORDLIST")
-        }
-
-        ignore <- character(0)
-        if (file.exists("../../WORDLIST")) ## Project-level
-            ignore <- c(ignore, readLines("../../WORDLIST"))
-        if (file.exists("WORDLIST")) ## Chapter-level
-            ignore <- c(ignore, readLines("WORDLIST"))
-        ignore <- sort(unique(ignore))
+        ignore <- ignore_words()
 
         cat(sprintf("Spell-check '%s' ... ", basename(getwd())))
         lines <- readLines("text.tex")
