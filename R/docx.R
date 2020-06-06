@@ -330,7 +330,7 @@ style_infocus <- function(tex) {
     if (i == -1)
         stop("Unable to find 'subsection'")
     i <- i + attr(i, "match.length") - 1
-    title <- tex_arguments(substr(tex, i, nchar(tex)))
+    title <- tex_arguments(substr(tex, i, nchar(tex)))$m
 
     ## Split the tex to remove the title and then combine it again
     ## with the infocus title.
@@ -471,16 +471,16 @@ style_drop_section <- function(tex, section) {
     ## Now split all 'hypertarget' into smaller pieces to find the
     ## hypertarget with the section that we want to drop.
     h <- mapply(function(i, n) {
-        args = tex_arguments(substr(tex, i + n - 1, nchar(tex)))
+        args <- tex_arguments(substr(tex, i + n - 1, nchar(tex)))$m
 
         ## First, determine if this is a section, and then if it's the
         ## section to drop.
-        j <- regexpr("\\\\section[*]?[{]", args[[2]])
+        j <- regexpr("\\\\section[*]?[{]", args[2])
         if (j == -1)
             return(NULL)
 
         j <- j + attr(j, "match.length") - 1
-        title <- tex_arguments(substr(args[[2]], j, nchar(args[[2]])))
+        title <- tex_arguments(substr(args[2], j, nchar(args[2])))$m
         drop <- identical(trimws(title), trimws(section))
 
         list(i = i, drop = drop)
@@ -628,7 +628,7 @@ style_multicols <- function(tex) {
     if (i == -1)
         stop("Unable to find 'addcontentsline'")
     i <- i + attr(i, "match.length") - 1
-    args <- tex_arguments(substr(tex, i, nchar(tex)))
+    args <- tex_arguments(substr(tex, i, nchar(tex)))$m
     stopifnot(length(args) == 3)
     args <- paste0("{", paste0(args, collapse = "}{"), "}")
 
@@ -727,37 +727,37 @@ style_chapter_title <- function(tex) {
     if (i == -1)
         stop("Unable to find 'hypertarget'")
     i <- i + attr(i, "match.length") - 1
-    hypertarget <- tex_arguments(substr(tex, i, nchar(tex)))
+    hypertarget <- tex_arguments(substr(tex, i, nchar(tex)))$m
     stopifnot(length(hypertarget) == 2)
 
     ## Extract the tex after the hypertarget. The '+4' is to include
     ## the '{' and '}' for each argument.
-    i <- i + nchar(hypertarget[[1]]) + nchar(hypertarget[[2]]) + 4
+    i <- i + nchar(hypertarget[1]) + nchar(hypertarget[2]) + 4
     tex <- substr(tex, i, nchar(tex))
 
     ## Determine the title of the chapter from
     ## '\chapter*{title-of-chapter}'
-    i <- regexpr("\\\\chapter[*][{]", hypertarget[[2]])
+    i <- regexpr("\\\\chapter[*][{]", hypertarget[2])
     if (i == -1)
         stop("Unable to find 'chapter'")
     i <- i + attr(i, "match.length") - 1
-    title <- tex_arguments(substr(hypertarget[[2]], i, nchar(hypertarget[[2]])))
+    title <- tex_arguments(substr(hypertarget[2], i, nchar(hypertarget[2])))$m
     stopifnot(length(title) == 1)
 
     ## Determine the label of the chapter from
     ## '\label{label-of-chapter}'
-    i <- regexpr("\\\\label[{]", hypertarget[[2]])
+    i <- regexpr("\\\\label[{]", hypertarget[2])
     if (i == -1)
         stop("Unable to find 'label'")
     i <- i + attr(i, "match.length") - 1
-    label <- tex_arguments(substr(hypertarget[[2]], i, nchar(hypertarget[[2]])))
+    label <- tex_arguments(substr(hypertarget[2], i, nchar(hypertarget[2])))$m
     stopifnot(length(label) == 1)
 
     ## Determine 'texorpdfstring'.
     texorpdfstring <- paste0("\\texorpdfstring{", title, "}{", title, "}")
 
     ## Conbine all pieces.
-    tex <- paste0("\\hypertarget{", hypertarget[[1]], "}{%\n",
+    tex <- paste0("\\hypertarget{", hypertarget[1], "}{%\n",
                   "\\chapter*{", texorpdfstring, "}\\label{", label, "}}\n",
                   "\\addcontentsline{toc}{chapter}{", texorpdfstring, "}",
                   tex)
