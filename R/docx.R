@@ -1,3 +1,76 @@
+##' Extract tex command and arguments
+##'
+##' Extract command and arguments from tex \command[optional
+##' argument1]{argument2}{argument3}.
+##' @param tex the character vector of length one to extract the
+##'     command and arguments from. The first character must be the
+##'     opening '\'.
+##' @return list with one character vector 'cmd' for the command, one
+##'     character vector 'o' with the optional arguments and one
+##'     character vector 'm' with the mandatory arguments.
+##' @noRd
+tex_cmd <- function(tex) {
+    stopifnot(is.character(tex), length(tex) == 1)
+
+    ## Command
+    cmd <- regmatches(tex, regexpr("^[\\][a-zA-Z]*[*]?", tex))
+    if (!isTRUE(nchar(cmd) > 0))
+        stop("Invalid tex command")
+    tex <- substr(tex, nchar(cmd) + 1, nchar(tex))
+
+    ## Optional arguments
+    o <- regmatches(tex, regexpr("^[[][^]]*[]]", tex))
+    if (isTRUE(nchar(o) > 0)) {
+        o <- substr(o, 2, nchar(o) - 1)
+
+        ## Move forward to mandatory arguments.
+        tex <- substr(tex, nchar(o) + 3, nchar(tex))
+    }
+
+    ## Mandatory arguments
+    stopifnot(substr(tex, 1, 1) == "{")
+    m <- character(0)
+
+    repeat {
+        i <- 1
+        depth <- 0
+        len <- nchar(tex)
+
+        ## Iterate over all characters in {} to extract the argument.
+        repeat {
+            if (substr(tex, i, i) == "}") {
+                depth <- depth - 1
+            } else if (substr(tex, i, i) == "{") {
+                depth <- depth + 1
+            }
+
+            if (depth == 0) {
+                i <- i - 1
+                break
+            }
+
+            i <- i + 1
+            if (i > len)
+                stop("Unable to find a closing '}'")
+        }
+
+        m <- c(m, substr(tex, 2, i))
+
+        ## Move forward and check if there exists another argument.
+        tex <- substr(tex, i + 2, nchar(tex))
+        if (substr(tex, 1, 1) != "{")
+            break
+    }
+
+    list(cmd = cmd, m = m, o = o)
+}
+
+tex_cmd_nchar <- function(x) {
+    nchar(x$cmd) +
+        sum(vapply(x$o, function(o) nchar(o) + 2L, integer(1))) +
+        sum(vapply(x$m, function(m) nchar(m) + 2L, integer(1)))
+}
+
 ##' Extract arguments from a tex command
 ##'
 ##' Extract arguments from a tex command \command[optional

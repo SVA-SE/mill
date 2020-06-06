@@ -27,3 +27,17 @@ tex <- "\\includegraphics[width=3.6181in,height=2.32592in]{./media/image1.png}"
 args <- mill:::tex_arguments(substr(tex, 17, nchar(tex)))
 stopifnot(identical(args$o, "width=3.6181in,height=2.32592in"))
 stopifnot(identical(args$m, "./media/image1.png"))
+
+tex <- "\\includegraphics[width=3.6181in,height=2.32592in]{./media/image1.png}"
+cmd <- mill:::tex_cmd(tex)
+stopifnot(identical(cmd$cmd, "\\includegraphics"))
+stopifnot(identical(cmd$o, "width=3.6181in,height=2.32592in"))
+stopifnot(identical(cmd$m, "./media/image1.png"))
+stopifnot(identical(mill:::tex_cmd_nchar(cmd), nchar(tex)))
+
+tex <- "\\section*{some section}"
+cmd <- mill:::tex_cmd(tex)
+stopifnot(identical(cmd$cmd, "\\section*"))
+stopifnot(identical(cmd$o, character(0)))
+stopifnot(identical(cmd$m, "some section"))
+stopifnot(identical(mill:::tex_cmd_nchar(cmd), nchar(tex)))
