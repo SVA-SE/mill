@@ -560,7 +560,7 @@ check_pattern <- function(id,
 ##' @noRd
 check_incomplete_line <- function(id, ignore) {
     cat(sprintf(
-        "[%02i] checking for incomplete final line in 'typeset.tex' ... ",
+        "[%02i] checking for incomplete final line in tex-files ... ",
         id))
 
     if (in_chapter()) {
@@ -568,14 +568,14 @@ check_incomplete_line <- function(id, ignore) {
         if (id %in% ignore) {
             files <- character(0)
         } else {
-            files <- list.files(pattern = "^typeset[.]tex$")
+            files <- list.files(pattern = "[.]tex$")
         }
     } else {
         files <- unlist(lapply(list.files("chapters"), function(chapter) {
             if (id %in% as.numeric(ignore[[chapter]]))
                 return(character(0))
             list.files(paste0("chapters/", chapter),
-                       pattern = "^typeset[.]tex$",
+                       pattern = "[.]tex$",
                        recursive = TRUE,
                        full.names = TRUE)
         }))
