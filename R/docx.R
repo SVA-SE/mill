@@ -1,16 +1,18 @@
 ##' Extract arguments from a tex command
 ##'
-##' Extract arguments from a tex command
-##' \command[optional argument1]{argument2}{argument3}.
+##' Extract arguments from a tex command \command[optional
+##' argument1]{argument2}{argument3}.
 ##' @param tex the character vector of length one to extract the
 ##'     argument from. The first character must be the opening '{'.
-##' @return a character vector with the arguments.
+##' @return list with one character vector 'o' with the optional
+##'     arguments and one character vector 'm' with the mandatory
+##'     arguments.
 ##' @noRd
 tex_arguments <- function(tex) {
     stopifnot(is.character(tex), length(tex) == 1)
 
     ## Optional arguments
-    o <- regmatches(tex, regexpr("[^]]*[]]", tex))
+    o <- regmatches(tex, regexpr("^[[][^]]*[]]", tex))
     if (isTRUE(nchar(o) > 0)) {
         o <- substr(o, 2, nchar(o) - 1)
 
