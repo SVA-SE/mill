@@ -464,7 +464,7 @@ style_infocus <- function(tex) {
       "minimum height = 75mm,",
       "rounded corners=3mm,",
       "draw=svared,",
-      "line width=0.1mm](text) at (0,0){",
+      "line width=0.1mm](text) at (0,0) {",
       "\\begin{minipage}{0.93\\textwidth}",
       "\\sf",
       tex,
