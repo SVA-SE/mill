@@ -109,7 +109,7 @@ check <- function() {
     cat("** To skip a test, add the check id to the chapter CHECKLIST **\n")
     ignore <- checklist()
     id <- 0
-    result <- check_open_track_changes(id <- id + 1)
+    result <- check_open_track_changes(id <- id + 1, ignore)
     result <- c(result, check_apply_typeset_patch(id <- id + 1))
     result <- c(result, check_reference_format(id <- id + 1))
     result <- c(result, check_figure_reference_files(id <- id + 1))
@@ -321,15 +321,20 @@ check_patch_is_installed <- function() {
 ##' Check for open track changes in each chapter docx-file.
 ##'
 ##' @noRd
-check_open_track_changes <- function(id) {
+check_open_track_changes <- function(id, ignore) {
     cat(sprintf("[%02i] checking for open track changes ... ", id))
 
     l <- sapply(check_chapters(), function(chapter) {
         if (in_chapter()) {
+            ignore <- as.numeric(ignore[[basename(getwd())]])
+            if (id %in% ignore)
+                return(NULL)
             filename <- paste0("../../workspace/chapters/",
                                basename(getwd()), "/",
                                basename(getwd()), ".docx")
         } else {
+            if (id %in% as.numeric(ignore[[basename(chapter)]]))
+                return(NULL)
             filename <- paste0("workspace/chapters/",
                                basename(chapter), "/",
                                basename(chapter), ".docx")
