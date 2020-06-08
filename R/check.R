@@ -244,7 +244,7 @@ check <- function() {
                            "'Uppsala county' (use 'county of')")))
 
     result <- c(result,
-                check_incomplete_line(
+                check_warnings(
                     id <- id + 1, ignore))
 
     invisible(any(result))
@@ -560,12 +560,13 @@ check_pattern <- function(id,
     FALSE
 }
 
-##' Check for incomplete final line in 'typeset.tex'
+##' Check for warnings in grep and readLines, for example, incomplete
+##' final line.
 ##'
 ##' @noRd
-check_incomplete_line <- function(id, ignore) {
+check_warnings <- function(id, ignore) {
     cat(sprintf(
-        "[%02i] checking for incomplete final line in tex-files ... ",
+        "[%02i] checking for warnings from grep and readLines of tex-files ... ",
         id))
 
     if (in_chapter()) {
@@ -587,16 +588,15 @@ check_incomplete_line <- function(id, ignore) {
     }
 
     l <- vapply(files, function(filename) {
-        result <- FALSE
-        tryCatch(readLines(filename),
+        result <- ""
+        tryCatch(grep("test", readLines(filename)),
                  warning = function(w) {
-                     if (startsWith(w$message, "incomplete final line"))
-                         result <<- TRUE
-        })
+                     result <<- paste0(filename, ": ", w$message)
+                 })
         result
-    }, logical(1), USE.NAMES = FALSE)
+    }, character(1), USE.NAMES = FALSE)
 
-    l <- files[l]
+    l <- l[nchar(l) > 0]
     if (length(l)) {
         cat("ERROR\n")
         lapply(l, function(filename) {
