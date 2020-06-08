@@ -247,6 +247,10 @@ check <- function() {
                 check_warnings(
                     id <- id + 1, ignore))
 
+    result <- c(result,
+                check_spelling(
+                    id <- id + 1, ignore))
+
     invisible(any(result))
 }
 
@@ -602,6 +606,48 @@ check_warnings <- function(id, ignore) {
         cat("ERROR\n")
         lapply(l, function(filename) {
             cat("     -", filename, "\n")
+        })
+        return(TRUE)
+    }
+
+    cat("OK\n")
+    FALSE
+}
+
+##' Run spell-check on each chapter.
+##'
+##' @noRd
+check_spelling <- function(id, ignore) {
+    cat(sprintf("[%02i] checking for misspelled words ... ", id))
+
+    if (in_chapter()) {
+        ignore <- as.numeric(ignore[[basename(getwd())]])
+        if (id %in% ignore) {
+            words <- character(0)
+        } else {
+            words <- spell_checking(FALSE, FALSE)
+            if (length(words))
+                words <- paste0(basename(getwd()), ": ", words)
+        }
+    } else {
+        words <- unlist(lapply(list.files("chapters"), function(chapter) {
+            if (id %in% as.numeric(ignore[[chapter]]))
+                return(character(0))
+
+            wd <- setwd(paste0("chapters/", chapter))
+            w <- spell_checking(FALSE, FALSE)
+            setwd(wd)
+
+            if (length(w))
+                w <- paste0(chapter, ": ", w)
+            w
+        }))
+    }
+
+    if (length(words)) {
+        cat("ERROR\n")
+        lapply(words, function(w) {
+            cat("     -", w, "\n")
         })
         return(TRUE)
     }
