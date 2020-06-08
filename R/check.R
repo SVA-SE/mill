@@ -565,9 +565,10 @@ check_pattern <- function(id,
 ##'
 ##' @noRd
 check_warnings <- function(id, ignore) {
-    cat(sprintf(
-        "[%02i] checking for warnings from grep and readLines of tex-files ... ",
-        id))
+    fmt <- paste0("[%02i] checking for warnings from grep ",
+                  "and readLines of tex-files ... ")
+
+    cat(sprintf(fmt, id))
 
     if (in_chapter()) {
         ignore <- as.numeric(ignore[[basename(getwd())]])
