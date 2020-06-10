@@ -211,15 +211,18 @@ inject_tab_fig_infocus <- function(tex, infocus, chapter) {
                      reftype  = reftype,
                      stringsAsFactors = FALSE)
 
+    ## Are there any unreferenced figure files to append.
+    files <- list.files(pattern = "^fig_[^.]+[.]tex$")
+    if (length(files) > 0)
+        files <- sub("^fig_", paste0("fig_", chapter, "_"), files)
+
     df <- df[df$reftype %in% c("fig", "tab"), ]
     if (nrow(df)) {
         df$filename <- paste0(gsub(":", "_", df$marker), ".tex")
-
-        ## Are there any unreferenced figure files to append.
-        files <- list.files(pattern = "^fig_[^.]+[.]tex$")
-        if (length(files) > 0)
-            files <- sub("^fig_", paste0("fig_", chapter, "_"), files)
         files <- unique(c(df$filename, files))
+    }
+
+    if (length(files) > 0) {
         files <- paste0("\\input{", files, "}")
         tex <- c(tex, files)
     }
