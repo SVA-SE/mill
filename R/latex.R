@@ -6,7 +6,7 @@
 ##' @noRd
 luatex_cmd <- function(options = c("--interaction=nonstopmode", "-V 7")) {
     if (.Platform$OS.type == "windows")
-        return("texify --pdf --engine=luatex --max-iterations=50")
+        return("texify --pdf --engine=luatex --max-iterations=50 --batch")
     paste("lualatex", options)
 }
 

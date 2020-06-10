@@ -52,21 +52,23 @@ harvest_words <- function(bad_words, harvest) {
 ##' @return a character vector with the bad words invisible.
 ##' @importFrom hunspell hunspell
 ##' @export
-spell_checking <- function(harvest = FALSE) {
+spell_checking <- function(harvest = FALSE, verbose = TRUE) {
     if (in_chapter()) {
         ignore <- ignore_words()
 
-        cat(sprintf("Spell-check '%s' ... ", basename(getwd())))
+        if (isTRUE(verbose))
+            cat(sprintf("Spell-check '%s' ... ", basename(getwd())))
+
         lines <- readLines("text.tex")
         bad_words <- hunspell(lines, format = "latex", dict = "en_GB",
                               ignore = ignore)
         bad_words <- sort(unique(unlist(bad_words)))
 
-        if (length(bad_words)) {
+        if (all(isTRUE(verbose), length(bad_words))) {
             cat("ERROR\n")
             cat(bad_words, sep = "\n")
             cat("\n")
-        } else{
+        } else if (isTRUE(verbose)) {
             cat("OK\n")
         }
 

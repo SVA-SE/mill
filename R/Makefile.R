@@ -88,7 +88,7 @@ create_Makefile <- function() {
                    "",
                    ".PHONY: web_windows",
                    "web_windows: standard",
-                   "\twings64c -sDEVICE=pdfwrite \\",
+                   "\tgswin64c -sDEVICE=pdfwrite \\",
                    "\t   -dCompatibilityLevel=1.7 \\",
                    "\t   -dPDFSETTINGS=//ebook \\",
                    "\t   -dNOPAUSE \\",
