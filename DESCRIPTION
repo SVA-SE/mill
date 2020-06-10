@@ -1,7 +1,7 @@
 Package: mill
 Type: Package
 Title: Authoring Reports
-Version: 20.6.6
+Version: 20.6.10
 Authors@R: c(person("Stefan", "Widgren", role = c("aut", "cre"),
              email = "stefan.widgren@gmail.com"),
              person("Thomas", "Rosendal", role = c("aut")))
