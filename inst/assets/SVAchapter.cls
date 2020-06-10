@@ -42,7 +42,7 @@
 \titleformat*{\subsection}{\fontspec{Lato Bold}}
 \titlespacing*{\subsection}{0pt}{12pt}{0pt}
 
-\titleformat*{\subsubsection}{\fontspec{Lato}\emph}
+\titleformat*{\subsubsection}{\fontspec{Lato}\itshape}
 \titlespacing*{\subsubsection}{0pt}{12pt}{0pt}
 
 \titleformat{\paragraph}[hang]
