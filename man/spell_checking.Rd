@@ -4,7 +4,7 @@
 \alias{spell_checking}
 \title{Spell checking of chapters}
 \usage{
-spell_checking(harvest = FALSE)
+spell_checking(harvest = FALSE, verbose = TRUE)
 }
 \arguments{
 \item{harvest}{\code{TRUE} if you want to harvest the words and

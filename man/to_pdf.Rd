@@ -4,7 +4,7 @@
 \alias{to_pdf}
 \title{Build report}
 \usage{
-to_pdf(type = c("print", "web"))
+to_pdf(web = FALSE)
 }
 \arguments{
 \item{type}{The report type to create}
