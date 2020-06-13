@@ -27,10 +27,12 @@ harvest_words <- function(bad_words, harvest) {
                          bad_words[i])
             x <- readline(m)
             if (tolower(substr(x, 1, 1)) == "r") {
-                w <- sort(c(bad_words[i], readLines("../../WORDLIST", encoding = "UTF-8")))
+                w <- sort(c(bad_words[i],
+                            readLines("../../WORDLIST",encoding = "UTF-8")))
                 writeLines(w, "../../WORDLIST")
             } else if (tolower(substr(x, 1, 1)) == "c") {
-                w <- sort(c(bad_words[i], readLines("WORDLIST", encoding = "UTF-8")))
+                w <- sort(c(bad_words[i],
+                            readLines("WORDLIST", encoding = "UTF-8")))
                 writeLines(w, "WORDLIST")
             } else if (tolower(substr(x, 1, 1)) == "s") {
                 next

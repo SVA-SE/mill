@@ -544,7 +544,9 @@ check_pattern <- function(id,
     }
 
     l <- vapply(files, function(filename) {
-        lines <- grep(pattern, readLines(filename, encoding = "UTF-8"), perl = perl)
+        lines <- grep(pattern,
+                      readLines(filename, encoding = "UTF-8"),
+                      perl = perl)
         length(lines) > 0
     }, logical(1), USE.NAMES = FALSE)
 
@@ -553,7 +555,9 @@ check_pattern <- function(id,
         cat("ERROR\n")
         lapply(l, function(filename) {
             cat("     -", filename, "  line(s): ")
-            lines <- grep(pattern, readLines(filename, encoding = "UTF-8"), perl = perl)
+            lines <- grep(pattern,
+                          readLines(filename, encoding = "UTF-8"),
+                          perl = perl)
             lines <- paste(lines, collapse = ", ")
             cat(lines, "\n")
         })
