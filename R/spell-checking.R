@@ -13,9 +13,9 @@ ignore_words <- function() {
 
     ignore <- character(0)
     if (file.exists("../../WORDLIST")) ## Project-level
-        ignore <- c(ignore, readLines("../../WORDLIST"))
+        ignore <- c(ignore, readLines("../../WORDLIST", encoding = "UTF-8"))
     if (file.exists("WORDLIST")) ## Chapter-level
-        ignore <- c(ignore, readLines("WORDLIST"))
+        ignore <- c(ignore, readLines("WORDLIST", encoding = "UTF-8"))
 
     sort(unique(ignore))
 }
@@ -27,10 +27,10 @@ harvest_words <- function(bad_words, harvest) {
                          bad_words[i])
             x <- readline(m)
             if (tolower(substr(x, 1, 1)) == "r") {
-                w <- sort(c(bad_words[i], readLines("../../WORDLIST")))
+                w <- sort(c(bad_words[i], readLines("../../WORDLIST", encoding = "UTF-8")))
                 writeLines(w, "../../WORDLIST")
             } else if (tolower(substr(x, 1, 1)) == "c") {
-                w <- sort(c(bad_words[i], readLines("WORDLIST")))
+                w <- sort(c(bad_words[i], readLines("WORDLIST", encoding = "UTF-8")))
                 writeLines(w, "WORDLIST")
             } else if (tolower(substr(x, 1, 1)) == "s") {
                 next
@@ -59,7 +59,7 @@ spell_checking <- function(harvest = FALSE, verbose = TRUE) {
         if (isTRUE(verbose))
             cat(sprintf("Spell-check '%s' ... ", basename(getwd())))
 
-        lines <- readLines("text.tex")
+        lines <- readLines("text.tex", encoding = "UTF-8")
         bad_words <- hunspell(lines, format = "latex", dict = "en_GB",
                               ignore = ignore)
         bad_words <- sort(unique(unlist(bad_words)))

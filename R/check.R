@@ -51,7 +51,7 @@ read_checklist <- function(filename, ignore = NULL) {
     if (!file.exists(filename))
         return(ignore)
 
-    x <- readLines(filename)
+    x <- readLines(filename, encoding = "UTF-8")
     x <- sub("#.*", "", x)
     x <- trimws(x)
     x <- c(ignore, as.numeric(x))
@@ -544,7 +544,7 @@ check_pattern <- function(id,
     }
 
     l <- vapply(files, function(filename) {
-        lines <- grep(pattern, readLines(filename), perl = perl)
+        lines <- grep(pattern, readLines(filename, encoding = "UTF-8"), perl = perl)
         length(lines) > 0
     }, logical(1), USE.NAMES = FALSE)
 
@@ -553,7 +553,7 @@ check_pattern <- function(id,
         cat("ERROR\n")
         lapply(l, function(filename) {
             cat("     -", filename, "  line(s): ")
-            lines <- grep(pattern, readLines(filename), perl = perl)
+            lines <- grep(pattern, readLines(filename, encoding = "UTF-8"), perl = perl)
             lines <- paste(lines, collapse = ", ")
             cat(lines, "\n")
         })
@@ -594,7 +594,7 @@ check_warnings <- function(id, ignore) {
 
     l <- vapply(files, function(filename) {
         result <- ""
-        tryCatch(grep("test", readLines(filename)),
+        tryCatch(grep("test", readLines(filename, encoding = "UTF-8")),
                  warning = function(w) {
                      result <<- paste0(filename, ": ", w$message)
                  })
