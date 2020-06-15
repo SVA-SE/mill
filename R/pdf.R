@@ -3,26 +3,25 @@
 ##' @param type The report type to create
 ##' @return invisible NULL
 ##' @export
-to_pdf <- function(type = c("print", "web")) {
+to_pdf <- function(web = FALSE) {
     if (in_chapter()) {
-        to_pdf_chapter(build = TRUE, type = type)
+        to_pdf_chapter(build = TRUE, web = web)
     } else if (in_report()) {
-        to_pdf_report(type = type)
+        to_pdf_report(web = web)
     }
 
     invisible(NULL)
 }
 
 ##' @noRd
-to_pdf_report <- function(type = c("print", "web")) {
-    type <- match.arg(type)
+to_pdf_report <- function(web = FALSE) {
     cat("Nuke previous build\n")
     unlink("build", recursive = TRUE)
     dir.create("build")
 
     lapply(list.files("chapters"), function(chapter) {
         wd <- setwd(paste0("chapters/", chapter))
-        to_pdf_chapter(build = FALSE, type = type)
+        to_pdf_chapter(build = FALSE, web = web)
         setwd(wd)
     })
 
@@ -35,7 +34,7 @@ to_pdf_report <- function(type = c("print", "web")) {
         lapply(files, function(to) {
             from <- file.path("../assets", dir, to)
             cat(sprintf("Add to build dir: %s\n", to))
-            if (startsWith(to, "img") && type == "web") {
+            if (startsWith(to, "img") && isTRUE(web)) {
                 reduce_image(from, to)
             } else {
                 file.copy(from, to)
@@ -57,12 +56,22 @@ to_pdf_report <- function(type = c("print", "web")) {
     ## Build the preview pdf file.
     luatex("report.tex")
 
+    if (isTRUE(web)) {
+        cat("Compress with Ghostscript\n")
+        to <- paste0(wd, "/web_report.pdf")
+        to_pdf_compact(
+            from = "report.pdf",
+            to = to,
+            quality = "ebook"
+        )
+        cat(paste0("\nDone. Output written to ", to, "\n"))
+    }
+
     invisible(NULL)
 }
 
 ##' @noRd
-to_pdf_chapter <- function(build = TRUE, type = c("print", "web")) {
-    type <- match.arg(type)
+to_pdf_chapter <- function(build = TRUE, web = FALSE) {
     chapter <- basename(getwd())
     if (build) {
         filename <- paste0(chapter, ".tex")
@@ -172,7 +181,7 @@ to_pdf_chapter <- function(build = TRUE, type = c("print", "web")) {
         lapply(files, function(from) {
             to <- paste0(build_dir, from)
             cat(sprintf("Add to build dir: %s\n", to))
-            if (type == "web") {
+            if (isTRUE(web)) {
                 reduce_image(from, to)
             } else {
                 file.copy(from, to)
@@ -190,4 +199,52 @@ to_pdf_chapter <- function(build = TRUE, type = c("print", "web")) {
     }
 
     invisible(NULL)
+}
+
+##' @noRd
+##' @importFrom tools find_gs_cmd compactPDF
+##' @importFrom utils compareVersion
+to_pdf_compact <- function(from, to, quality = c("ebook", "screen", "printer")) {
+    quality = match.arg(quality)
+
+    gs_path <- find_gs_cmd()
+    if (!nzchar(gs_path))
+        stop("Ghostcript was not found")
+
+    gs_version <- compareVersion(system2(gs_path,
+                                  args = "--version",
+                                  stdout = TRUE),
+                              "9.52")
+
+    if (gs_version == -1)
+        warning(
+            paste0(
+                "Ghostscript version may be outdated, ",
+                "update version or double-check output PDF"
+            )
+        )
+
+    if (file.exists(to))
+        unlink(to)
+
+    compactPDF(
+        paths = from,
+        qpdf = "",
+        gs_cmd = gs_path,
+        gs_quality = quality,
+        gs_extras = c(
+            paste0("-sOutputFile=", to),
+            "-sDEVICE=pdfwrite",
+            "-dNOPAUSE",
+            "-dCompatibilityLevel=1.7",
+            "-dPDFSETTINGS=/ebook",
+            "-dNOPAUSE",
+            "-dQUIET",
+            "-dBATCH",
+            "-dDetectDuplicateImages",
+            "-dCompressFonts=true",
+            "-r150",
+            "-dPrinted=false"
+        )
+    )
 }
