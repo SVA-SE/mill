@@ -205,8 +205,12 @@ to_pdf_chapter <- function(build = TRUE, web = FALSE) {
 ##' @noRd
 ##' @importFrom tools find_gs_cmd compactPDF
 ##' @importFrom utils compareVersion
-to_pdf_compact <- function(from, to, quality = c("ebook", "screen", "printer")) {
-    quality = match.arg(quality)
+to_pdf_compact <-
+    function(from,
+             to,
+             quality = c("ebook", "screen", "printer")) {
+
+    quality <- match.arg(quality)
 
     gs_path <- find_gs_cmd()
     if (!nzchar(gs_path))
