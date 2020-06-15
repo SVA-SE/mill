@@ -56,6 +56,7 @@ to_pdf_report <- function(web = FALSE) {
     ## Build the preview pdf file.
     luatex("report.tex")
 
+    ## Use Ghostscript to compress to web format
     if (isTRUE(web)) {
         cat("Compress with Ghostscript\n")
         to <- paste0(wd, "/web_report.pdf")
