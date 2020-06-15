@@ -211,11 +211,12 @@ to_pdf_compact <- function(from, to, quality = c("ebook", "screen", "printer")) 
     if (!nzchar(gs_path))
         stop("Ghostcript was not found")
 
+    ## Older versions of Ghostscript may cause color problems,
+    ## warn if version is outdated
     gs_version <- compareVersion(system2(gs_path,
                                   args = "--version",
                                   stdout = TRUE),
                               "9.52")
-
     if (gs_version == -1)
         warning(
             paste0(
@@ -224,9 +225,11 @@ to_pdf_compact <- function(from, to, quality = c("ebook", "screen", "printer")) 
             )
         )
 
+    ## Kill existing dest. file to make gs work properly
     if (file.exists(to))
         unlink(to)
 
+    ## Run the compression
     compactPDF(
         paths = from,
         qpdf = "",
