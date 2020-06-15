@@ -55,12 +55,18 @@ to_pdf_report <- function(web = FALSE) {
 
     ## Build the preview pdf file.
     luatex("report.tex")
-    
+
     if (isTRUE(web)) {
-      cat("Compress with Ghostscript\n")
-      system(gs_cmd(from = "report.pdf", to = paste0(wd, "/web_report.pdf")))
+        cat("Compress with Ghostscript\n")
+        to <- paste0(wd, "/web_report.pdf")
+        to_pdf_compact(
+            from = "report.pdf",
+            to = to,
+            quality = "ebook"
+        )
+        cat(paste0("\nDone. Output written to ", to, "\n"))
     }
-    
+
     invisible(NULL)
 }
 
@@ -196,32 +202,49 @@ to_pdf_chapter <- function(build = TRUE, web = FALSE) {
 }
 
 ##' @noRd
-##' @importFrom tools find_gs_cmd
-gs_cmd <- function(from, to) {
-  gs_path <- find_gs_cmd()
-  if (!nzchar(gs_path))
-    stop("Ghostcript was not found")
-  
-  version <- as.numeric(system2(gs_path,
-                                args = "--version",
-                                stdout = TRUE))
-  
-  if (version < 9.52)
-    warning("Ghostscript version may be outdated. Double-check output PDF")
-  
-  paste(
-    gs_path,
-    "-sDEVICE=pdfwrite",
-    "-dCompatibilityLevel=1.7",
-    "-dPDFSETTINGS=/ebook",
-    "-dNOPAUSE",
-    "-dQUIET",
-    "-dBATCH",
-    "-dDetectDuplicateImages",
-    "-dCompressFonts=true -r150",
-    "-dPrinted=false",
-    paste0("-sOutputFile=", to),
-    from,
-    sep = " "
-  )
+##' @importFrom tools find_gs_cmd compactPDF
+##' @importFrom utils compareVersion
+to_pdf_compact <- function(from, to, quality = c("ebook", "screen", "printer")) {
+    quality = match.arg(quality)
+
+    gs_path <- find_gs_cmd()
+    if (!nzchar(gs_path))
+        stop("Ghostcript was not found")
+
+    gs_version <- compareVersion(system2(gs_path,
+                                  args = "--version",
+                                  stdout = TRUE),
+                              "9.52")
+
+    if (gs_version == -1)
+        warning(
+            paste0(
+                "Ghostscript version may be outdated, ",
+                "update version or double-check output PDF"
+            )
+        )
+
+    if (file.exists(to))
+        unlink(to)
+
+    compactPDF(
+        paths = from,
+        qpdf = "",
+        gs_cmd = gs_path,
+        gs_quality = quality,
+        gs_extras = c(
+            paste0("-sOutputFile=", to),
+            "-sDEVICE=pdfwrite",
+            "-dNOPAUSE",
+            "-dCompatibilityLevel=1.7",
+            "-dPDFSETTINGS=/ebook",
+            "-dNOPAUSE",
+            "-dQUIET",
+            "-dBATCH",
+            "-dDetectDuplicateImages",
+            "-dCompressFonts=true",
+            "-r150",
+            "-dPrinted=false"
+        )
+    )
 }
